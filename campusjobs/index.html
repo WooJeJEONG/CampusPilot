@@ -553,6 +553,7 @@
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'campusjobs');
+  if(SESSION && SESSION.role === 'admin'){ window.location.href = 'admin.html'; }
 
 </script>
 </body>
