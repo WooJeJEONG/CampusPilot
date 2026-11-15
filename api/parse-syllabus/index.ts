@@ -492,20 +492,23 @@ function isRetryableGroqError(error: unknown): boolean {
 }
 
 function groqUserError(error: unknown): Error {
+  // TEMP DEBUG (remove after diagnosing the Vercel GROQ_API_KEY issue):
+  // surface the raw Groq error so we can see exactly why auth is failing.
+  const status = error instanceof APIError ? error.status : undefined;
+  const rawMessage = error instanceof Error ? error.message : String(error);
   if (error instanceof SyntaxError) {
-    return new Error("The AI service returned an invalid response.");
+    return new Error("The AI service returned an invalid response. [DEBUG status=" + status + " msg=" + rawMessage + "]");
   }
   if (isRetryableGroqError(error)) {
-    return new Error(BUSY_ERROR);
+    return new Error(BUSY_ERROR + " [DEBUG status=" + status + " msg=" + rawMessage + "]");
   }
-  const status = error instanceof APIError ? error.status : undefined;
   if (status === 401 || status === 403) {
-    return new Error("The AI service rejected the request.");
+    return new Error("The AI service rejected the request. [DEBUG status=" + status + " msg=" + rawMessage + "]");
   }
   if (status === 400) {
-    return new Error("The AI service could not process this syllabus.");
+    return new Error("The AI service could not process this syllabus. [DEBUG status=" + status + " msg=" + rawMessage + "]");
   }
-  return new Error("Failed to parse this syllabus. Please try again.");
+  return new Error("Failed to parse this syllabus. Please try again. [DEBUG status=" + status + " msg=" + rawMessage + "]");
 }
 
 function estimateTokens(text: string): number {
