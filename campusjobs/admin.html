@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campuspilot — Campus Jobs — Admin</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+    --accent:#7E1A14; --accent-dark:#5E120E; --tint:#FBEDEC; --tint-border:#F1D3D0;
+    --bg:#F5F5F5; --card:#FFFFFF; --border:#E4E4E4; --border-strong:#D6D6D6;
+    --text:#1F1F1F; --text-2:#3A3A3A; --muted:#5A5A5A; --chip:#F1F1F1;
+    --blue:#1D4E89; --blue-tint:#E8F0FA; --amber:#8A5300; --amber-tint:#FFF3DC;
+  }#cjRoot *{box-sizing:border-box}#cjRoot a{color:var(--accent);text-decoration:none}#cjRoot a:hover{color:var(--accent-dark);text-decoration:underline}#cjRoot button, #cjRoot input, #cjRoot select, #cjRoot textarea{font-family:inherit}#cjRoot button{cursor:pointer}#cjRoot .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}#cjRoot .page{padding:32px 32px 56px}#cjRoot .wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:24px}#cjRoot .head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}#cjRoot .eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}#cjRoot h1{margin:6px 0;font-family:'Source Serif 4',Georgia,serif;font-size:34px;font-weight:600}#cjRoot h2{margin:0;font-size:18px;font-weight:700}#cjRoot h3{margin:0;font-size:17px;font-weight:700}#cjRoot .sub{margin:0;font-size:16px;color:var(--muted)}#cjRoot .muted{font-size:14px;color:var(--muted)}#cjRoot .small{font-size:13px}#cjRoot .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}#cjRoot .row{display:flex;align-items:center;gap:10px}#cjRoot .row-between{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}#cjRoot .btn{min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--border-strong);background:#fff;color:var(--text);font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}#cjRoot .btn:hover{background:#FAFAFA;text-decoration:none;color:var(--text)}#cjRoot .btn-primary{border-color:var(--accent);background:var(--accent);color:#fff}#cjRoot .btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff}#cjRoot .btn-sm{min-height:36px;font-size:14px;padding:0 12px}#cjRoot .btn-ghost{border-color:transparent;background:transparent;color:var(--muted)}#cjRoot .btn-ghost:hover{background:#F1F1F1;color:var(--text)}#cjRoot .btn-danger{color:var(--accent);border-color:var(--tint-border)}#cjRoot .btn svg{flex:none}#cjRoot .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}#cjRoot .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}#cjRoot .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}#cjRoot .stat .k{font-size:14px;color:var(--muted)}#cjRoot .stat .v{font-size:30px;font-weight:700}#cjRoot .stat .n{font-size:13px;color:var(--muted)}#cjRoot .stat.hl{background:var(--tint);border-color:var(--tint-border)}#cjRoot .stat.hl .k, #cjRoot .stat.hl .v{color:var(--accent)}#cjRoot .stat.hl .k{font-weight:600}#cjRoot .search{display:flex;align-items:center;gap:10px;height:46px;padding:0 14px;border:1px solid var(--border-strong);border-radius:8px;background:#FAFAFA}#cjRoot .search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--tint)}#cjRoot .search input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:15px;color:var(--text)}#cjRoot input::placeholder, #cjRoot textarea::placeholder{color:#767676}#cjRoot .chips{display:flex;flex-wrap:wrap;gap:8px}#cjRoot .chip{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--border-strong);background:#fff;color:var(--text-2);font-size:14px;font-weight:500}#cjRoot .chip:hover{border-color:var(--accent)}#cjRoot .chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:600}#cjRoot .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);overflow-x:auto}#cjRoot .tab{min-height:44px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);font-size:15px;font-weight:600;white-space:nowrap;margin-bottom:-1px}#cjRoot .tab:hover{color:var(--text)}#cjRoot .tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}#cjRoot .count{display:inline-block;min-width:22px;padding:1px 7px;border-radius:999px;background:var(--chip);color:var(--text-2);font-size:12px;font-weight:700;margin-left:4px}#cjRoot .tab[aria-selected="true"] .count{background:var(--tint);color:var(--accent)}#cjRoot .badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--text-2);white-space:nowrap}#cjRoot .badge.red{background:var(--tint);color:var(--accent)}#cjRoot .badge.blue{background:var(--blue-tint);color:var(--blue)}#cjRoot .badge.amber{background:var(--amber-tint);color:var(--amber)}#cjRoot .badge.dark{background:var(--text);color:#fff}#cjRoot .tag{font-size:13px;padding:4px 10px;border-radius:6px;background:var(--chip);color:var(--text-2);display:inline-flex;align-items:center;gap:6px}#cjRoot .tags{display:flex;flex-wrap:wrap;gap:8px}#cjRoot .avatar-sm{width:40px;height:40px;flex:none;border-radius:50%;background:var(--tint);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}#cjRoot .avatar-sm.gray{background:#ECECEC;color:var(--muted)}#cjRoot .stars{color:var(--accent);letter-spacing:1px;font-size:14px}#cjRoot .stars .off{color:#CFCFCF}#cjRoot .empty{border:1px dashed var(--border-strong);border-radius:12px;padding:32px 20px;text-align:center;background:#fff}#cjRoot label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--text-2)}#cjRoot .input, #cjRoot .select, #cjRoot .textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--border-strong);border-radius:8px;background:#fff;font-size:15px;color:var(--text)}#cjRoot .textarea{min-height:96px;resize:vertical;line-height:1.5}#cjRoot .input:focus, #cjRoot .select:focus, #cjRoot .textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--tint)}#cjRoot .check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text-2);min-height:36px}#cjRoot .check input{width:18px;height:18px;accent-color:var(--accent)}#cjRoot .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}#cjRoot .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:60;
+    background:var(--text);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;font-weight:500;
+    display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);transition:opacity .2s, transform .2s;max-width:calc(100% - 32px)}#cjRoot .toast.show{opacity:1;transform:translate(-50%,0)}#cjRoot .toast svg{flex:none;color:#F3B6B0}#cjRoot .modal-back{position:fixed;inset:0;background:rgba(20,20,20,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:55}#cjRoot .modal{background:#fff;border-radius:14px;width:100%;max-width:520px;max-height:calc(100vh - 32px);overflow:auto;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,.25)}#cjRoot .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}#cjRoot .icon-btn{width:40px;height:40px;flex:none;border-radius:8px;border:0;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center}#cjRoot .icon-btn:hover{background:#F1F1F1;color:var(--text)}@media (max-width:600px){#cjRoot .page{padding:20px 16px 40px}#cjRoot h1{font-size:28px}#cjRoot .card{padding:16px}}#cjRoot .admin-banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--text);color:#fff;border-radius:10px;padding:10px 16px;font-size:14px}#cjRoot .admin-banner b{letter-spacing:.06em}#cjRoot .panel{padding:0;overflow:hidden}#cjRoot .panel .tabs{padding:0 16px}#cjRoot .panel-body{padding:20px 24px 24px;display:flex;flex-direction:column;gap:16px}#cjRoot .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}#cjRoot table{width:100%;border-collapse:collapse;font-size:14px;min-width:720px}#cjRoot th{text-align:left;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:#FAFAFA;padding:10px 14px;border-bottom:1px solid var(--border)}#cjRoot td{padding:12px 14px;border-bottom:1px solid #EFEFEF;vertical-align:middle;color:var(--text-2)}#cjRoot tr:last-child td{border-bottom:0}#cjRoot td b{color:var(--text)}#cjRoot tr.hidden-row td{opacity:.55}#cjRoot .switch{position:relative;width:46px;height:26px;border-radius:999px;border:0;background:#CFCFCF;padding:0;flex:none}#cjRoot .switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}#cjRoot .switch[aria-checked="true"]{background:var(--accent)}#cjRoot .switch[aria-checked="true"]::after{left:23px}#cjRoot .sw-wrap{display:inline-flex;align-items:center;gap:8px;min-height:44px}#cjRoot .item{border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff}#cjRoot .item.flagged{border-color:var(--tint-border);box-shadow:inset 3px 0 0 var(--accent)}#cjRoot .post-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;color:var(--muted)}#cjRoot .post-meta .who{font-weight:700;color:var(--text);font-size:14px}#cjRoot .post-text{margin:0;font-size:15px;line-height:1.55;color:var(--text-2);white-space:pre-line}#cjRoot .reasons{display:flex;flex-wrap:wrap;gap:6px}#cjRoot .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}#cjRoot .toolbar .select{width:auto;min-width:220px}#cjRoot .last-comment{font-size:14px;color:var(--text-2);background:#FAFAFA;border-radius:8px;padding:8px 12px}
+</style>
+</head>
+<body>
+
+<div class="page" id="page-campusjobs">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polygon points="21,3.5 3,12.5 10.8,13.2" fill="#D42A2A"/><polygon points="21,3.5 10.8,13.2 13.5,21" fill="#7A0000"/></svg></div>
+      <div class="topbar-name">Campuspilot</div>
+      <div class="topbar-sub"><span>THE UNIVERSITY OF UTAH</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-avatar">G</div><span class="topbar-username">Garam (u1621896)</span>
+      <a class="topbar-logout" href="../login/index.html" onclick="logout();return false;">Logout</a>
+    </div>
+  </div>
+  <div class="breadcrumb-bar">
+    <div class="breadcrumb-left">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>
+      <a href="../home/index.html" class="crumb-link">Admin Portal</a> &nbsp;&rsaquo;&nbsp; <b id="cjCrumb">Campus Jobs</b>
+    </div>
+    <div class="breadcrumb-right">Fall Semester 2026</div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="nav-rail" id="navrail"></aside>
+
+    <main class="main-col">
+<div id="cjRoot">
+<div class="page">
+  <div class="wrap">
+
+    <div class="admin-banner"><b>ADMIN VIEW</b><span>Only CIDC staff can see this page. Changes appear on the student Campus Jobs page right away.</span></div>
+
+    <header class="head">
+      <div>
+        <div class="eyebrow">Admin · CIDC Office</div>
+        <h1>Campus Jobs Management</h1>
+        <p class="sub">Manage job info, current-staff contacts and the student Q&amp;A board.</p>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn" data-action="reset">Reset demo data</button>
+        <a class="btn btn-primary" href="index.html" target="_blank" rel="noopener"><span id="eyeIcon"></span>Open student view</a>
+      </div>
+    </header>
+
+    <section class="stats" aria-label="Summary" id="stats"></section>
+
+    <section class="card panel">
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="panel-body" role="tabpanel" id="panel"></div>
+    </section>
+
+  </div>
+</div>
+</div>
+    </main>
+  </div>
+</div>
+
+<div id="toast-host"></div>
+<div id="modalRoot"></div>
+<script src="../shared/session.js"></script>
+<script src="../shared/store.js"></script>
+<script src="../shared/toast.js"></script>
+<script src="../shared/nav.js"></script>
+<script>
+
+(function () {
+  /* ===== Shared demo data (same in student + admin pages) =====
+     Both pages read/write the same browser storage key, so changes made on the
+     admin page show up on the student page (same browser, same site). */
+  var STORE_KEY = 'campuspilot.campusJobs.v1';
+  var NOW = Date.now(), H = 3600000, D = 24 * H;
+  var CATS = [
+    { id: 'all', label: 'All jobs' },
+    { id: 'office', label: 'Office & Admin' },
+    { id: 'ta', label: 'Teaching Assistant' },
+    { id: 'library', label: 'Library' },
+    { id: 'ambassador', label: 'Student Ambassador' },
+    { id: 'tech', label: 'Tech Support' },
+    { id: 'tutor', label: 'Tutoring' }
+  ];
+  function seed() {
+    return {
+      jobs: [
+        { id: 'biz', title: 'Biz Coordinator', dept: 'School of Business Office', cat: 'office', hours: 'About 7 hrs/week', officeHours: 'None', pay: '₩10,320/hr', hiring: 'Every semester, around week 10', visible: true,
+          desc: 'Supports the business school office with student events, program emails and day-to-day admin.',
+          todo: ['Prepare and staff business school events', 'Draft program emails and announcements', 'Help with office admin and student questions'] },
+        { id: 'ta', title: 'Teaching Assistant – Accounting & Finance', dept: 'School of Business', cat: 'ta', hours: '8–10 hrs/week', officeHours: '2 hrs/week', pay: '₩12,000/hr', hiring: 'Before each semester (professor recommendation)', visible: true,
+          desc: 'Assists ACCTG and FIN professors with grading, office hours and exam review sessions.',
+          todo: ['Hold weekly office hours', 'Grade homework and quizzes', 'Run review sessions before exams'] },
+        { id: 'lib', title: 'Library Assistant', dept: 'UAC Library', cat: 'library', hours: '10–12 hrs/week', officeHours: 'None (desk shifts)', pay: '₩10,320/hr', hiring: 'Rolling, when a spot opens', visible: true,
+          desc: 'Runs the library front desk: check-outs, study-room bookings and helping students find resources.',
+          todo: ['Staff the circulation desk', 'Manage study-room reservations', 'Shelve returned materials'] },
+        { id: 'amb', title: 'Student Ambassador', dept: 'Office of Admissions', cat: 'ambassador', hours: '4–8 hrs/week (event-based)', officeHours: 'None', pay: '₩10,320/hr', hiring: 'Once a year, in spring', visible: true,
+          desc: 'Represents UAC at campus tours, open houses and high-school visits.',
+          todo: ['Lead campus tours', 'Answer questions at open-house events', 'Share student life on admissions channels'] },
+        { id: 'it', title: 'IT Help Desk Assistant', dept: 'IT Services', cat: 'tech', hours: '10 hrs/week', officeHours: 'None (desk shifts)', pay: '₩10,800/hr', hiring: 'Rolling', visible: true,
+          desc: 'First-line support for Wi-Fi, Canvas, printers and classroom AV.',
+          todo: ['Resolve Wi-Fi, Canvas and printer issues', 'Log support tickets', 'Set up classroom AV'] },
+        { id: 'wc', title: 'Writing Center Peer Tutor', dept: 'Writing Center', cat: 'tutor', hours: '6–8 hrs/week', officeHours: 'Tutoring slots, 6 hrs/week', pay: '₩11,000/hr', hiring: 'Fall semester, faculty referral', visible: true,
+          desc: 'One-on-one feedback sessions on essays, reports and résumés.',
+          todo: ['Hold 30-minute tutoring sessions', 'Give feedback on structure and grammar', 'Attend monthly tutor training'] }
+      ],
+      staff: [
+        { id: 's1', jobId: 'biz', name: 'Minji Park', major: 'Business Administration', year: '3rd year', since: 'Fall 2025', email: 'minji.park@example.edu', intro: 'Ask me about workload and event weeks!', contactable: true },
+        { id: 's2', jobId: 'biz', name: 'Daniel Lee', major: 'Business Administration', year: '4th year', since: 'Spring 2025', email: 'daniel.lee@example.edu', intro: 'Happy to talk about the interview process.', contactable: true },
+        { id: 's3', jobId: 'ta', name: 'Seoyeon Kim', major: 'Business Administration', year: '4th year', since: 'Fall 2025', email: 'seoyeon.kim@example.edu', intro: 'TA for ACCTG 2600. Questions about grading load welcome.', contactable: true },
+        { id: 's4', jobId: 'ta', name: 'Jun Choi', major: 'Economics', year: '3rd year', since: 'Spring 2026', email: 'jun.choi@example.edu', intro: 'TA for FIN 3040.', contactable: false },
+        { id: 's5', jobId: 'lib', name: 'Hana Yoon', major: 'Psychology', year: '2nd year', since: 'Spring 2026', email: 'hana.yoon@example.edu', intro: 'Quiet shifts = study time :)', contactable: true },
+        { id: 's6', jobId: 'amb', name: 'Ethan Jung', major: 'Communication', year: '3rd year', since: 'Spring 2026', email: 'ethan.jung@example.edu', intro: 'Ask me about tours and open houses.', contactable: true },
+        { id: 's7', jobId: 'it', name: 'Chris Han', major: 'Computer Science', year: '2nd year', since: 'Fall 2026', email: 'chris.han@example.edu', intro: 'No coding needed for this job!', contactable: true },
+        { id: 's8', jobId: 'wc', name: 'Yerin Song', major: 'English Language', year: '4th year', since: 'Fall 2025', email: 'yerin.song@example.edu', intro: 'Peer tutor for essays and résumés.', contactable: true }
+      ],
+      posts: [
+        { id: 'p1', jobId: 'biz', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 2 * D, likes: 6, liked: false, reports: [],
+          text: 'Is Biz Coordinator a lot of work? Do you have office hours?',
+          comments: [
+            { id: 'c1', author: 'Minji Park', role: 'staff', time: NOW - 2 * D + 3 * H, text: 'No office hours for Biz Coordi! It’s about 7 hours a week, mostly event prep and emails.', reports: [] },
+            { id: 'c2', author: 'Anonymous', role: 'student', time: NOW - D, text: 'It gets busier around midterms and the career fair week.', reports: [] }
+          ] },
+        { id: 'p2', jobId: 'biz', type: 'r', rating: 4, author: 'Anonymous', role: 'student', time: NOW - 6 * D, likes: 9, liked: false, reports: [],
+          text: 'Flexible schedule and you get to know the business school staff well. Event weeks are busy but the rest is chill.', comments: [] },
+        { id: 'p3', jobId: 'biz', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 9 * D, likes: 3, liked: false, reports: [],
+          text: 'When do they usually hire for spring semester?',
+          comments: [
+            { id: 'c3', author: 'CIDC Office', role: 'admin', time: NOW - 8 * D, text: 'Spring hiring opens around week 10 of the fall semester. We will post it on CampusPilot.', reports: [] }
+          ] },
+        { id: 'p4', jobId: 'ta', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 3 * D, likes: 4, liked: false, reports: [],
+          text: 'How many office hours do TAs have per week? And how long does grading take?',
+          comments: [
+            { id: 'c4', author: 'Seoyeon Kim', role: 'staff', time: NOW - 3 * D + 5 * H, text: '2 hours of office hours, then about 5 hours of grading. Exam weeks are heavier.', reports: [] }
+          ] },
+        { id: 'p5', jobId: 'ta', type: 'r', rating: 5, author: 'Anonymous', role: 'student', time: NOW - 12 * D, likes: 11, liked: false, reports: [],
+          text: 'Best campus job if you liked the course. Explaining things to others really helped my own grades.', comments: [] },
+        { id: 'p6', jobId: 'lib', type: 'r', rating: 4, author: 'Anonymous', role: 'student', time: NOW - 5 * D, likes: 5, liked: false, reports: [],
+          text: 'Weekday evening shifts are quiet, so you can study at the desk. Finals week is the only busy time.', comments: [] },
+        { id: 'p7', jobId: 'amb', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 4 * D, likes: 2, liked: false, reports: [],
+          text: 'Do you need to speak Korean fluently to be an ambassador?',
+          comments: [
+            { id: 'c5', author: 'Ethan Jung', role: 'staff', time: NOW - 4 * D + 2 * H, text: 'English is the main language for tours, but Korean helps a lot with parents at open houses.', reports: [] }
+          ] },
+        { id: 'p8', jobId: 'amb', type: 'r', rating: 1, author: 'Anonymous', role: 'student', time: NOW - D, likes: 0, liked: false,
+          reports: [{ reason: 'Personal attack or harassment', time: NOW - 20 * H }, { reason: 'Personal attack or harassment', time: NOW - 10 * H }],
+          text: 'Total waste of time. The supervisor is the worst person on campus, do not apply.', comments: [] }
+      ],
+      messages: []
+    };
+  }
+  var mem = null;
+  function load() {
+    try { var raw = localStorage.getItem(STORE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+    if (mem) return mem;
+    var fresh = seed(); save(fresh); return fresh;
+  }
+  function save(data) {
+    mem = data;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+  function resetData() {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    mem = null;
+    return seed();
+  }
+  function uid(p) { return p + Math.random().toString(36).slice(2, 9); }
+
+  /* ===== Small helpers ===== */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function ago(t) {
+    var s = Math.max(0, Date.now() - t) / 1000;
+    if (s < 60) return 'Just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    if (s < 86400 * 30) return Math.floor(s / 86400) + 'd ago';
+    return new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+  function initials(n) {
+    return String(n).split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+  }
+  function stars(n) {
+    var out = '';
+    for (var i = 1; i <= 5; i++) out += i <= n ? '★' : '<span class="off">★</span>';
+    return '<span class="stars" role="img" aria-label="' + n + ' out of 5">' + out + '</span>';
+  }
+  function catLabel(id) {
+    for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) return CATS[i].label;
+    return '';
+  }
+  function findJob(data, id) { for (var i = 0; i < data.jobs.length; i++) if (data.jobs[i].id === id) return data.jobs[i]; return null; }
+  function findPost(data, id) { for (var i = 0; i < data.posts.length; i++) if (data.posts[i].id === id) return data.posts[i]; return null; }
+  function roleBadge(role) {
+    if (role === 'staff') return '<span class="badge blue">Current staff</span>';
+    if (role === 'admin') return '<span class="badge dark">Official</span>';
+    return '';
+  }
+  function avgRating(data, jobId) {
+    var r = data.posts.filter(function (p) { return p.jobId === jobId && p.type === 'r' && p.rating; });
+    if (!r.length) return null;
+    var sum = r.reduce(function (a, p) { return a + p.rating; }, 0);
+    return { avg: Math.round(sum / r.length * 10) / 10, n: r.length };
+  }
+
+  function toast(msg) { showToast(msg); }
+  var lastFocus = null;
+  function openModal(html) {
+    lastFocus = document.activeElement;
+    var root = document.getElementById('modalRoot');
+    root.innerHTML = '<div class="modal-back" data-action="close-modal-back"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">' + html + '</div></div>';
+    var f = root.querySelector('textarea, input, select, button:not(.icon-btn)');
+    if (f) f.focus();
+  }
+  function closeModal() {
+    document.getElementById('modalRoot').innerHTML = '';
+    if (lastFocus && lastFocus.focus) try { lastFocus.focus(); } catch (e) {}
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('modalRoot').innerHTML) closeModal();
+  });
+  function modalHead(title, sub) {
+    return '<div class="modal-head"><div><h2 id="modalTitle">' + title + '</h2>' + (sub ? '<div class="muted" style="margin-top:4px">' + sub + '</div>' : '') + '</div>' +
+      '<button type="button" class="icon-btn" data-action="close-modal" aria-label="Close">' + ICON.x + '</button></div>';
+  }
+
+  var ICON = {
+    x: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>',
+    users: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    chat: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    mail: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></svg>',
+    heart: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+    flag: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+    plus: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5A5A5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    pencil: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+    eye: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+  };
+
+  /* close buttons inside shell modals */
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('[data-action="close-modal"], [data-action="close-modal-back"]');
+    if (!c || !c.closest('#modalRoot')) return;
+    if (c.getAttribute('data-action') === 'close-modal-back' && e.target !== c) return;
+    closeModal();
+  });
+
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(true); } catch (err) { done(false); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    else fallback();
+  }
+
+  /* ===== Admin page ===== */
+  var ADMIN = 'CIDC Office';
+  var data = load();
+  var ui = { tab: 'reports', staffJob: 'all', boardJob: 'all' };
+
+  function reportedItems() {
+    var out = [];
+    data.posts.forEach(function (p) {
+      if (p.reports.length) out.push({ kind: 'post', post: p, item: p });
+      p.comments.forEach(function (c) { if (c.reports && c.reports.length) out.push({ kind: 'comment', post: p, item: c }); });
+    });
+    return out;
+  }
+  function jobOptions(sel, withAll) {
+    return (withAll ? '<option value="all"' + (sel === 'all' ? ' selected' : '') + '>All jobs</option>' : '') +
+      data.jobs.map(function (j) { return '<option value="' + j.id + '"' + (sel === j.id ? ' selected' : '') + '>' + esc(j.title) + '</option>'; }).join('');
+  }
+  function reasonsHtml(reports) {
+    var counts = {};
+    reports.forEach(function (r) { counts[r.reason] = (counts[r.reason] || 0) + 1; });
+    return Object.keys(counts).map(function (k) { return '<span class="badge red">' + esc(k) + (counts[k] > 1 ? ' ×' + counts[k] : '') + '</span>'; }).join('');
+  }
+
+  function renderStats() {
+    var vis = data.jobs.filter(function (j) { return j.visible; }).length;
+    var week = data.posts.filter(function (p) { return Date.now() - p.time < 7 * 86400000; }).length;
+    var rep = reportedItems().length;
+    document.getElementById('stats').innerHTML =
+      '<div class="stat"><div class="k">Jobs shown to students</div><div class="v">' + vis + '</div><div class="n">' + (data.jobs.length - vis) + ' hidden</div></div>' +
+      '<div class="stat"><div class="k">Current staff contacts</div><div class="v">' + data.staff.length + '</div><div class="n">' + data.staff.filter(function (s) { return s.contactable; }).length + ' taking questions</div></div>' +
+      '<div class="stat"><div class="k">Board posts</div><div class="v">' + data.posts.length + '</div><div class="n">' + week + ' in the last 7 days</div></div>' +
+      '<div class="stat' + (rep ? ' hl' : '') + '"><div class="k">Reports to review</div><div class="v">' + rep + '</div><div class="n">' + (rep ? 'needs attention' : 'all clear') + '</div></div>';
+  }
+
+  function renderTabs() {
+    var tabs = [['reports', 'Reports', reportedItems().length], ['jobs', 'Jobs', data.jobs.length], ['staff', 'Current staff', data.staff.length], ['board', 'Q&amp;A board', data.posts.length]];
+    document.getElementById('tabs').innerHTML = tabs.map(function (t) {
+      return '<button type="button" class="tab" role="tab" data-action="tab" data-id="' + t[0] + '" aria-selected="' + (ui.tab === t[0]) + '">' + t[1] + '<span class="count">' + t[2] + '</span></button>';
+    }).join('');
+  }
+
+  function renderPanel() {
+    var el = document.getElementById('panel');
+    if (ui.tab === 'reports') el.innerHTML = reportsPanel();
+    if (ui.tab === 'jobs') el.innerHTML = jobsPanel();
+    if (ui.tab === 'staff') el.innerHTML = staffPanel();
+    if (ui.tab === 'board') el.innerHTML = boardPanel();
+  }
+
+  function reportsPanel() {
+    var items = reportedItems();
+    var html = '<p class="muted" style="margin:0">Posts and comments students reported. Keep them (clears the reports) or remove them from the board.</p>';
+    if (!items.length) return html + '<div class="empty"><b>All clear</b><div class="muted" style="margin-top:4px">No reported posts right now.</div></div>';
+    return html + items.map(function (r) {
+      var job = findJob(data, r.post.jobId), it = r.item;
+      return '<div class="item flagged">' +
+        '<div class="post-meta"><span class="badge">' + (r.kind === 'post' ? (it.type === 'q' ? 'Question' : 'Review') : 'Comment') + '</span>' +
+          '<span class="who">' + esc(it.author) + '</span><span>on ' + esc(job ? job.title : '') + ' · ' + ago(it.time) + '</span></div>' +
+        '<p class="post-text">' + esc(it.text) + '</p>' +
+        '<div class="reasons"><span class="muted small" style="align-self:center">' + it.reports.length + (it.reports.length === 1 ? ' report:' : ' reports:') + '</span>' + reasonsHtml(it.reports) + '</div>' +
+        '<div class="actions"><button type="button" class="btn btn-sm" data-action="keep" data-kind="' + r.kind + '" data-post="' + r.post.id + '" data-id="' + it.id + '">Keep (dismiss reports)</button>' +
+        '<button type="button" class="btn btn-sm btn-danger" data-action="remove" data-kind="' + r.kind + '" data-post="' + r.post.id + '" data-id="' + it.id + '">' + ICON.trash + 'Remove ' + r.kind + '</button></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function jobsPanel() {
+    return '<div class="toolbar"><p class="muted" style="margin:0">Hidden jobs disappear from the student page but keep their posts and staff.</p>' +
+      '<button type="button" class="btn btn-primary" data-action="job-form">' + ICON.plus + 'Add job</button></div>' +
+      '<div class="table-wrap"><table><thead><tr><th scope="col">Job</th><th scope="col">Category</th><th scope="col">Hours</th><th scope="col">Staff</th><th scope="col">Posts</th><th scope="col">Shown</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>' +
+      data.jobs.map(function (j) {
+        return '<tr class="' + (j.visible ? '' : 'hidden-row') + '"><td><b>' + esc(j.title) + '</b><div class="muted small">' + esc(j.dept) + '</div></td>' +
+          '<td>' + esc(catLabel(j.cat)) + '</td><td>' + esc(j.hours) + '</td>' +
+          '<td>' + data.staff.filter(function (s) { return s.jobId === j.id; }).length + '</td>' +
+          '<td>' + data.posts.filter(function (p) { return p.jobId === j.id; }).length + '</td>' +
+          '<td><span class="sw-wrap"><button type="button" class="switch" role="switch" aria-checked="' + j.visible + '" aria-label="Show ' + esc(j.title) + ' to students" data-action="toggle-job" data-id="' + j.id + '"></button></span></td>' +
+          '<td><button type="button" class="btn btn-sm" data-action="job-form" data-id="' + j.id + '">' + ICON.pencil + 'Edit</button></td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+
+  function staffPanel() {
+    var list = data.staff.filter(function (s) { return ui.staffJob === 'all' || s.jobId === ui.staffJob; });
+    return '<div class="toolbar"><label class="row"><span class="muted">Job</span><select class="select" id="staffJob">' + jobOptions(ui.staffJob, true) + '</select></label>' +
+      '<button type="button" class="btn btn-primary" data-action="staff-form">' + ICON.plus + 'Add current staff</button></div>' +
+      '<p class="muted" style="margin:0">Only add students who currently work in the job and agreed to be contacted. Turn off “Taking questions” to hide their Message/Email buttons.</p>' +
+      (list.length ? '<div class="table-wrap"><table><thead><tr><th scope="col">Student</th><th scope="col">Job</th><th scope="col">Since</th><th scope="col">Email</th><th scope="col">Taking questions</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>' +
+      list.map(function (s) {
+        var j = findJob(data, s.jobId);
+        return '<tr><td><div class="row"><span class="avatar-sm">' + initials(s.name) + '</span><div><b>' + esc(s.name) + '</b><div class="muted small">' + esc(s.major) + ' · ' + esc(s.year) + '</div></div></div></td>' +
+          '<td>' + esc(j ? j.title : '') + '</td><td>' + esc(s.since) + '</td><td>' + esc(s.email) + '</td>' +
+          '<td><span class="sw-wrap"><button type="button" class="switch" role="switch" aria-checked="' + s.contactable + '" aria-label="' + esc(s.name) + ' taking questions" data-action="toggle-staff" data-id="' + s.id + '"></button></span></td>' +
+          '<td><button type="button" class="btn btn-sm btn-danger" data-action="remove-staff" data-id="' + s.id + '">' + ICON.trash + 'Remove</button></td></tr>';
+      }).join('') + '</tbody></table></div>'
+      : '<div class="empty">No current staff for this job yet.</div>');
+  }
+
+  function boardPanel() {
+    var list = data.posts.filter(function (p) { return ui.boardJob === 'all' || p.jobId === ui.boardJob; }).sort(function (a, b) { return b.time - a.time; });
+    var html = '<div class="toolbar"><label class="row"><span class="muted">Job</span><select class="select" id="boardJob">' + jobOptions(ui.boardJob, true) + '</select></label>' +
+      '<span class="muted">Official replies show with a black “Official” badge on the student page.</span></div>';
+    if (!list.length) return html + '<div class="empty">No posts for this job yet.</div>';
+    return html + list.map(function (p) {
+      var j = findJob(data, p.jobId);
+      var unanswered = p.type === 'q' && !p.comments.length;
+      var hasOfficial = p.comments.some(function (c) { return c.role === 'admin'; });
+      var last = p.comments[p.comments.length - 1];
+      return '<div class="item' + (p.reports.length ? ' flagged' : '') + '">' +
+        '<div class="post-meta">' + (p.type === 'q' ? '<span class="badge amber">Question</span>' : '<span class="badge red">Review</span>' + stars(p.rating)) +
+          '<span class="who">' + esc(p.author) + '</span><span>on ' + esc(j ? j.title : '') + ' · ' + ago(p.time) + '</span>' +
+          (unanswered ? '<span class="badge amber">Unanswered</span>' : '') + (hasOfficial ? '<span class="badge dark">Answered officially</span>' : '') +
+          (p.reports.length ? '<span class="badge red">' + p.reports.length + ' report' + (p.reports.length > 1 ? 's' : '') + '</span>' : '') + '</div>' +
+        '<p class="post-text">' + esc(p.text) + '</p>' +
+        (last ? '<div class="last-comment"><b>' + esc(last.author) + '</b> ' + roleBadge(last.role) + ' ' + esc(last.text) + '</div>' : '') +
+        '<div class="actions"><span class="muted small">' + p.comments.length + ' comments · ' + p.likes + ' helpful</span>' +
+          '<button type="button" class="btn btn-sm" data-action="reply-form" data-id="' + p.id + '">' + ICON.chat + 'Reply as official</button>' +
+          '<button type="button" class="btn btn-sm btn-danger" data-action="remove" data-kind="post" data-post="' + p.id + '" data-id="' + p.id + '">' + ICON.trash + 'Delete</button></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderAll() { renderStats(); renderTabs(); renderPanel(); }
+  function commit(msg) { save(data); renderAll(); if (msg) toast(msg); }
+
+  function jobForm(id) {
+    var j = id ? findJob(data, id) : { title: '', dept: '', cat: 'office', hours: '', officeHours: '', pay: '', hiring: '', desc: '', todo: [] };
+    var f = function (key, label, ph) { return '<label class="f">' + label + '<input class="input" id="f-' + key + '" value="' + esc(j[key]) + '" placeholder="' + ph + '"></label>'; };
+    openModal(modalHead(id ? 'Edit job' : 'Add job', 'Students see this on the Overview tab.') +
+      f('title', 'Job title', 'e.g. Biz Coordinator') + f('dept', 'Department', 'e.g. School of Business Office') +
+      '<div class="grid2"><label class="f">Category<select class="select" id="f-cat">' + CATS.filter(function (c) { return c.id !== 'all'; }).map(function (c) {
+        return '<option value="' + c.id + '"' + (j.cat === c.id ? ' selected' : '') + '>' + esc(c.label) + '</option>'; }).join('') + '</select></label>' +
+        f('pay', 'Pay', 'e.g. ₩10,320/hr') + '</div>' +
+      '<div class="grid2">' + f('hours', 'Hours', 'e.g. About 7 hrs/week') + f('officeHours', 'Office hours', 'e.g. None') + '</div>' +
+      f('hiring', 'When they hire', 'e.g. Every semester, around week 10') +
+      '<label class="f">Short description<textarea class="textarea" id="f-desc">' + esc(j.desc) + '</textarea></label>' +
+      '<label class="f">What you do (one per line)<textarea class="textarea" id="f-todo">' + esc(j.todo.join('\n')) + '</textarea></label>' +
+      '<div class="actions" style="justify-content:flex-end"><button type="button" class="btn" data-action="close-modal">Cancel</button>' +
+      '<button type="button" class="btn btn-primary" data-action="save-job" data-id="' + (id || '') + '">' + (id ? 'Save changes' : 'Add job') + '</button></div>');
+  }
+
+  function staffForm() {
+    var f = function (key, label, ph) { return '<label class="f">' + label + '<input class="input" id="s-' + key + '" placeholder="' + ph + '"></label>'; };
+    openModal(modalHead('Add current staff', 'They will appear under “Ask current staff”.') +
+      '<label class="f">Job<select class="select" id="s-job">' + jobOptions(ui.staffJob === 'all' ? data.jobs[0].id : ui.staffJob, false) + '</select></label>' +
+      '<div class="grid2">' + f('name', 'Name', 'e.g. Minji Park') + f('email', 'School email', 'name@utah.edu') + '</div>' +
+      '<div class="grid2">' + f('major', 'Major', 'e.g. Business Administration') + f('year', 'Year', 'e.g. 3rd year') + '</div>' +
+      f('since', 'Working since', 'e.g. Fall 2025') + f('intro', 'One-line intro (optional)', 'e.g. Ask me about workload!') +
+      '<label class="check"><input type="checkbox" id="s-consent"> The student agreed to be listed and contacted</label>' +
+      '<div class="actions" style="justify-content:flex-end"><button type="button" class="btn" data-action="close-modal">Cancel</button>' +
+      '<button type="button" class="btn btn-primary" data-action="save-staff">Add staff</button></div>');
+  }
+
+  function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-action]');
+    if (!b) return;
+    var a = b.getAttribute('data-action'), id = b.getAttribute('data-id');
+    if (a === 'close-modal-back') { if (e.target === b) closeModal(); return; }
+    if (a === 'close-modal') { closeModal(); return; }
+    if (a === 'tab') { ui.tab = id; renderTabs(); renderPanel(); return; }
+    if (a === 'reset') { data = resetData(); save(data); renderAll(); toast('Demo data reset'); return; }
+
+    if (a === 'keep' || a === 'remove') {
+      var kind = b.getAttribute('data-kind'), post = findPost(data, b.getAttribute('data-post'));
+      if (kind === 'post') {
+        if (a === 'keep') { post.reports = []; commit('Reports dismissed – post kept'); }
+        else { data.posts = data.posts.filter(function (p) { return p.id !== post.id; }); commit('Post removed from the board'); }
+      } else {
+        var c = post.comments.filter(function (x) { return x.id === id; })[0];
+        if (a === 'keep') { c.reports = []; commit('Reports dismissed – comment kept'); }
+        else { post.comments = post.comments.filter(function (x) { return x.id !== id; }); commit('Comment removed'); }
+      }
+      return;
+    }
+    if (a === 'toggle-job') { var j = findJob(data, id); j.visible = !j.visible; commit(j.title + (j.visible ? ' is now shown to students' : ' is hidden from students')); return; }
+    if (a === 'job-form') { jobForm(id); return; }
+    if (a === 'save-job') {
+      var title = val('f-title');
+      if (!title) { document.getElementById('f-title').focus(); toast('Job title is required'); return; }
+      var fields = { title: title, dept: val('f-dept'), cat: val('f-cat'), pay: val('f-pay'), hours: val('f-hours'), officeHours: val('f-officeHours') || 'None',
+        hiring: val('f-hiring'), desc: val('f-desc'), todo: val('f-todo').split('\n').map(function (s) { return s.trim(); }).filter(Boolean) };
+      if (id) { var job = findJob(data, id); for (var k in fields) job[k] = fields[k]; closeModal(); commit('Job updated'); }
+      else { fields.id = uid('j'); fields.visible = true; data.jobs.push(fields); closeModal(); commit('Job added – students can see it now'); }
+      return;
+    }
+    if (a === 'toggle-staff') { var s = data.staff.filter(function (x) { return x.id === id; })[0]; s.contactable = !s.contactable; commit(s.name + (s.contactable ? ' is taking questions' : ' is no longer taking questions')); return; }
+    if (a === 'remove-staff') { var rm = data.staff.filter(function (x) { return x.id === id; })[0]; data.staff = data.staff.filter(function (x) { return x.id !== id; }); commit(rm.name + ' removed'); return; }
+    if (a === 'staff-form') { staffForm(); return; }
+    if (a === 'save-staff') {
+      var name = val('s-name'), email = val('s-email');
+      if (!name || !email) { toast('Name and email are required'); return; }
+      if (!document.getElementById('s-consent').checked) { toast('Confirm the student agreed to be contacted'); return; }
+      data.staff.push({ id: uid('s'), jobId: val('s-job'), name: name, email: email, major: val('s-major'), year: val('s-year'), since: val('s-since'), intro: val('s-intro'), contactable: true });
+      closeModal(); commit(name + ' added as current staff');
+      return;
+    }
+    if (a === 'reply-form') {
+      var p = findPost(data, id);
+      openModal(modalHead('Official reply', 'Shown to students as “' + ADMIN + '” with an Official badge.') +
+        '<div class="last-comment">' + esc(p.text) + '</div>' +
+        '<label class="f" for="replyText">Your reply<textarea id="replyText" class="textarea" placeholder="e.g. Spring hiring opens around week 10."></textarea></label>' +
+        '<div class="actions" style="justify-content:flex-end"><button type="button" class="btn" data-action="close-modal">Cancel</button>' +
+        '<button type="button" class="btn btn-primary" data-action="send-reply" data-id="' + id + '">Post reply</button></div>');
+      return;
+    }
+    if (a === 'send-reply') {
+      var t = val('replyText');
+      if (!t) { document.getElementById('replyText').focus(); return; }
+      findPost(data, id).comments.push({ id: uid('c'), author: ADMIN, role: 'admin', time: Date.now(), text: t, reports: [] });
+      closeModal(); commit('Official reply posted');
+      return;
+    }
+  });
+
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'staffJob') { ui.staffJob = e.target.value; renderPanel(); }
+    if (e.target.id === 'boardJob') { ui.boardJob = e.target.value; renderPanel(); }
+  });
+  window.addEventListener('storage', function (e) { if (e.key === STORE_KEY) { data = load(); renderAll(); } });
+
+  document.getElementById('eyeIcon').outerHTML = ICON.eye;
+  renderAll();
+
+})();
+
+</script>
+<script>
+  var SESSION = requireSession();
+  mountNavRail('navrail', 'campusjobs');
+  if(SESSION && SESSION.role !== 'admin'){ window.location.href = 'index.html'; }
+
+</script>
+</body>
+</html>

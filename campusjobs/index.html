@@ -5,7 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Campuspilot — Campus Jobs</title>
 <link rel="stylesheet" href="../shared/styles.css">
-<link rel="stylesheet" href="campusjobs.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+    --accent:#7E1A14; --accent-dark:#5E120E; --tint:#FBEDEC; --tint-border:#F1D3D0;
+    --bg:#F5F5F5; --card:#FFFFFF; --border:#E4E4E4; --border-strong:#D6D6D6;
+    --text:#1F1F1F; --text-2:#3A3A3A; --muted:#5A5A5A; --chip:#F1F1F1;
+    --blue:#1D4E89; --blue-tint:#E8F0FA; --amber:#8A5300; --amber-tint:#FFF3DC;
+  }#cjRoot *{box-sizing:border-box}#cjRoot a{color:var(--accent);text-decoration:none}#cjRoot a:hover{color:var(--accent-dark);text-decoration:underline}#cjRoot button, #cjRoot input, #cjRoot select, #cjRoot textarea{font-family:inherit}#cjRoot button{cursor:pointer}#cjRoot .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}#cjRoot .page{padding:32px 32px 56px}#cjRoot .wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:24px}#cjRoot .head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}#cjRoot .eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}#cjRoot h1{margin:6px 0;font-family:'Source Serif 4',Georgia,serif;font-size:34px;font-weight:600}#cjRoot h2{margin:0;font-size:18px;font-weight:700}#cjRoot h3{margin:0;font-size:17px;font-weight:700}#cjRoot .sub{margin:0;font-size:16px;color:var(--muted)}#cjRoot .muted{font-size:14px;color:var(--muted)}#cjRoot .small{font-size:13px}#cjRoot .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}#cjRoot .row{display:flex;align-items:center;gap:10px}#cjRoot .row-between{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}#cjRoot .btn{min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--border-strong);background:#fff;color:var(--text);font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}#cjRoot .btn:hover{background:#FAFAFA;text-decoration:none;color:var(--text)}#cjRoot .btn-primary{border-color:var(--accent);background:var(--accent);color:#fff}#cjRoot .btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff}#cjRoot .btn-sm{min-height:36px;font-size:14px;padding:0 12px}#cjRoot .btn-ghost{border-color:transparent;background:transparent;color:var(--muted)}#cjRoot .btn-ghost:hover{background:#F1F1F1;color:var(--text)}#cjRoot .btn-danger{color:var(--accent);border-color:var(--tint-border)}#cjRoot .btn svg{flex:none}#cjRoot .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}#cjRoot .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}#cjRoot .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}#cjRoot .stat .k{font-size:14px;color:var(--muted)}#cjRoot .stat .v{font-size:30px;font-weight:700}#cjRoot .stat .n{font-size:13px;color:var(--muted)}#cjRoot .stat.hl{background:var(--tint);border-color:var(--tint-border)}#cjRoot .stat.hl .k, #cjRoot .stat.hl .v{color:var(--accent)}#cjRoot .stat.hl .k{font-weight:600}#cjRoot .search{display:flex;align-items:center;gap:10px;height:46px;padding:0 14px;border:1px solid var(--border-strong);border-radius:8px;background:#FAFAFA}#cjRoot .search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--tint)}#cjRoot .search input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:15px;color:var(--text)}#cjRoot input::placeholder, #cjRoot textarea::placeholder{color:#767676}#cjRoot .chips{display:flex;flex-wrap:wrap;gap:8px}#cjRoot .chip{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--border-strong);background:#fff;color:var(--text-2);font-size:14px;font-weight:500}#cjRoot .chip:hover{border-color:var(--accent)}#cjRoot .chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:600}#cjRoot .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);overflow-x:auto}#cjRoot .tab{min-height:44px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);font-size:15px;font-weight:600;white-space:nowrap;margin-bottom:-1px}#cjRoot .tab:hover{color:var(--text)}#cjRoot .tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}#cjRoot .count{display:inline-block;min-width:22px;padding:1px 7px;border-radius:999px;background:var(--chip);color:var(--text-2);font-size:12px;font-weight:700;margin-left:4px}#cjRoot .tab[aria-selected="true"] .count{background:var(--tint);color:var(--accent)}#cjRoot .badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--text-2);white-space:nowrap}#cjRoot .badge.red{background:var(--tint);color:var(--accent)}#cjRoot .badge.blue{background:var(--blue-tint);color:var(--blue)}#cjRoot .badge.amber{background:var(--amber-tint);color:var(--amber)}#cjRoot .badge.dark{background:var(--text);color:#fff}#cjRoot .tag{font-size:13px;padding:4px 10px;border-radius:6px;background:var(--chip);color:var(--text-2);display:inline-flex;align-items:center;gap:6px}#cjRoot .tags{display:flex;flex-wrap:wrap;gap:8px}#cjRoot .avatar-sm{width:40px;height:40px;flex:none;border-radius:50%;background:var(--tint);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}#cjRoot .avatar-sm.gray{background:#ECECEC;color:var(--muted)}#cjRoot .stars{color:var(--accent);letter-spacing:1px;font-size:14px}#cjRoot .stars .off{color:#CFCFCF}#cjRoot .empty{border:1px dashed var(--border-strong);border-radius:12px;padding:32px 20px;text-align:center;background:#fff}#cjRoot label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--text-2)}#cjRoot .input, #cjRoot .select, #cjRoot .textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--border-strong);border-radius:8px;background:#fff;font-size:15px;color:var(--text)}#cjRoot .textarea{min-height:96px;resize:vertical;line-height:1.5}#cjRoot .input:focus, #cjRoot .select:focus, #cjRoot .textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--tint)}#cjRoot .check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text-2);min-height:36px}#cjRoot .check input{width:18px;height:18px;accent-color:var(--accent)}#cjRoot .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}#cjRoot .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:60;
+    background:var(--text);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;font-weight:500;
+    display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);transition:opacity .2s, transform .2s;max-width:calc(100% - 32px)}#cjRoot .toast.show{opacity:1;transform:translate(-50%,0)}#cjRoot .toast svg{flex:none;color:#F3B6B0}#cjRoot .modal-back{position:fixed;inset:0;background:rgba(20,20,20,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:55}#cjRoot .modal{background:#fff;border-radius:14px;width:100%;max-width:520px;max-height:calc(100vh - 32px);overflow:auto;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,.25)}#cjRoot .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}#cjRoot .icon-btn{width:40px;height:40px;flex:none;border-radius:8px;border:0;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center}#cjRoot .icon-btn:hover{background:#F1F1F1;color:var(--text)}@media (max-width:600px){#cjRoot .page{padding:20px 16px 40px}#cjRoot h1{font-size:28px}#cjRoot .card{padding:16px}}#cjRoot .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}#cjRoot .how-step{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}#cjRoot .how-num{width:32px;height:32px;flex:none;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}#cjRoot .how-step b{display:block;font-size:15px;margin-bottom:2px}#cjRoot .filters{padding:16px;display:flex;flex-direction:column;gap:14px}#cjRoot .layout{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}#cjRoot .jlist{flex:1 1 300px;max-width:100%;display:flex;flex-direction:column;gap:10px}#cjRoot .detail{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden}@media (min-width:1100px){#cjRoot .jlist{max-width:380px}}#cjRoot .jitem{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;color:var(--text)}#cjRoot .jitem:hover{border-color:var(--border-strong);background:#FCFCFC}#cjRoot .jitem[aria-current="true"]{border-color:var(--accent);background:var(--tint);box-shadow:inset 3px 0 0 var(--accent)}#cjRoot .jitem .t{font-size:16px;font-weight:700}#cjRoot .jitem .meta{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted)}#cjRoot .jitem .meta span{display:inline-flex;align-items:center;gap:5px}#cjRoot .d-head{padding:22px 24px 16px;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--border)}#cjRoot .d-title{font-family:'Source Serif 4',Georgia,serif;font-size:26px;font-weight:600;margin:0}#cjRoot .d-body{padding:20px 24px 24px;display:flex;flex-direction:column;gap:18px}#cjRoot .d-tabs{padding:0 16px}#cjRoot .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}#cjRoot .fact{background:#FAFAFA;border:1px solid #EFEFEF;border-radius:10px;padding:12px 14px}#cjRoot .fact .k{font-size:13px;color:var(--muted)}#cjRoot .fact .v{font-size:16px;font-weight:700;margin-top:2px}#cjRoot .d-body ul{margin:0;padding-left:20px;line-height:1.6;color:var(--text-2);font-size:15px}#cjRoot .cta{background:var(--tint);border:1px solid var(--tint-border);border-radius:12px;padding:16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}#cjRoot .people{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}#cjRoot .person{border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;background:#fff}#cjRoot .person .intro{font-size:14px;color:var(--text-2);line-height:1.5;margin:0;background:#FAFAFA;border-radius:8px;padding:10px 12px}#cjRoot .composer{border:1px solid var(--border-strong);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;background:#FCFCFC}#cjRoot .seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden}#cjRoot .seg button{min-height:38px;padding:0 14px;border:0;background:#fff;font-size:14px;font-weight:600;color:var(--text-2)}#cjRoot .seg button+button{border-left:1px solid var(--border-strong)}#cjRoot .seg button[aria-pressed="true"]{background:var(--accent);color:#fff}#cjRoot .rate{display:inline-flex;gap:2px}#cjRoot .rate button{width:36px;height:36px;border:0;background:transparent;font-size:22px;color:#CFCFCF;padding:0}#cjRoot .rate button.on{color:var(--accent)}#cjRoot .post{border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff}#cjRoot .post-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;color:var(--muted)}#cjRoot .post-meta .who{font-weight:700;color:var(--text);font-size:14px}#cjRoot .post-text{margin:0;font-size:15px;line-height:1.55;color:var(--text-2);white-space:pre-line}#cjRoot .post-actions{display:flex;flex-wrap:wrap;gap:4px;margin-left:-8px}#cjRoot .post-actions .btn-ghost[aria-pressed="true"]{color:var(--accent)}#cjRoot .post-actions .btn-ghost[aria-pressed="true"] svg{fill:currentColor}#cjRoot .comments{border-top:1px solid #EFEFEF;padding-top:12px;display:flex;flex-direction:column;gap:12px}#cjRoot .comment{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:#FAFAFA;border-radius:8px}#cjRoot .comment.staff{background:var(--blue-tint)}#cjRoot .comment.admin{background:#F1F1F1;box-shadow:inset 3px 0 0 var(--text)}#cjRoot .comment p{margin:0;font-size:14px;line-height:1.5;color:var(--text-2)}#cjRoot .c-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}#cjRoot .c-form .input{flex:1 1 220px;min-height:40px}#cjRoot .board-filter{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+</style>
 </head>
 <body>
 
@@ -24,7 +35,7 @@
   <div class="breadcrumb-bar">
     <div class="breadcrumb-left">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>
-      Student Portal &nbsp;›&nbsp; <b id="cjCrumb">Campus Jobs</b>
+      Student Portal &nbsp;&rsaquo;&nbsp; <b id="cjCrumb">Campus Jobs</b>
     </div>
     <div class="breadcrumb-right">Fall Semester 2026</div>
   </div>
@@ -33,158 +44,516 @@
     <aside class="nav-rail" id="navrail"></aside>
 
     <main class="main-col">
+<div id="cjRoot">
+<div class="page">
+  <div class="wrap">
 
-      <!-- ===================== STUDENT VIEW ===================== -->
-      <div id="studentView">
-        <div class="cj-page">
-
-          <header class="cj-head">
-            <div>
-              <div class="cj-eyebrow">Student Employment</div>
-              <h1>Campus Jobs</h1>
-              <p class="cj-sub">On-campus positions at the Utah Asia Campus · Fall Semester 2026</p>
-            </div>
-            <div class="cj-actions">
-              <button type="button" class="cj-btn" onclick="document.getElementById('cjAppsCard').scrollIntoView({behavior:'smooth',block:'start'})">My Applications</button>
-              <button type="button" class="cj-btn" onclick="showToast('Résumé upload isn\'t available in this prototype yet.')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                Upload Résumé
-              </button>
-            </div>
-          </header>
-
-          <section class="cj-stats" aria-label="Summary">
-            <div class="cj-stat"><div class="cj-stat-k">Open positions</div><div class="cj-stat-v" id="openCount">0</div><div class="cj-stat-n" id="openNote">across 0 departments</div></div>
-            <div class="cj-stat"><div class="cj-stat-k">My applications</div><div class="cj-stat-v" id="appsCount">0</div><div class="cj-stat-n" id="appsNote">none yet</div></div>
-            <div class="cj-stat"><div class="cj-stat-k">Saved jobs</div><div class="cj-stat-v" id="savedCount">0</div><div class="cj-stat-n">tap the bookmark to save</div></div>
-            <div class="cj-stat hl"><div class="cj-stat-k">Next deadline</div><div class="cj-stat-v" id="nextDeadlineDate">—</div><div class="cj-stat-n" id="nextDeadlineNote">No upcoming deadlines</div></div>
-          </section>
-
-          <section class="cj-card cj-filters" aria-label="Search and filters">
-            <label for="job-search" class="cj-sr-only">Search jobs</label>
-            <div class="cj-search">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input id="job-search" type="search" placeholder="Search by job title or department" oninput="cjSetQuery(this.value)">
-            </div>
-            <div class="cj-chips" id="chips"></div>
-          </section>
-
-          <div class="cj-cols">
-            <section class="cj-list" aria-label="Job listings">
-              <div class="cj-list-head">
-                <h2 id="resultLabel">0 positions</h2>
-                <div class="muted">Newest first</div>
-              </div>
-              <div id="jobs" style="display:flex;flex-direction:column;gap:14px"></div>
-            </section>
-
-            <aside class="cj-side">
-              <div class="cj-card cj-side-card" id="cjAppsCard">
-                <div class="cj-row-between"><h2>Application status</h2></div>
-                <div id="apps" style="display:flex;flex-direction:column;gap:14px"></div>
-              </div>
-
-              <div class="cj-card cj-side-card">
-                <h2>Upcoming deadlines</h2>
-                <div id="deadlines" style="display:flex;flex-direction:column;gap:12px"></div>
-              </div>
-
-              <div class="cj-card cj-side-card cj-cidc">
-                <div class="cj-cidc-t">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                  <h2>Career &amp; Internship Center</h2>
-                </div>
-                <p>Get your résumé reviewed and practice interviews before you apply. Drop-in hours are on the CIDC calendar.</p>
-                <a href="#" onclick="event.preventDefault();showToast('Résumé review booking isn\'t available in this prototype yet.')">Book a résumé review
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </a>
-              </div>
-            </aside>
-          </div>
-
-        </div>
+    <header class="head">
+      <div>
+        <div class="eyebrow">Student Employment</div>
+        <h1>Campus Jobs</h1>
+        <p class="sub">See what campus jobs are really like – ask the students who do them now.</p>
       </div>
+    </header>
 
-      <!-- ===================== ADMIN VIEW ===================== -->
-      <div id="adminView" class="hidden">
-        <div class="admin-head-row">
-          <div>
-            <h1>Campus Jobs — Postings</h1>
-            <p>Publish new listings and manage which jobs stay open to students.</p>
-          </div>
-          <div class="cj-stats">
-            <div class="cj-stat"><div class="cj-stat-k">Total listings</div><div class="cj-stat-v" id="adminTotal">0</div></div>
-            <div class="cj-stat"><div class="cj-stat-k">Open</div><div class="cj-stat-v" id="adminOpen">0</div></div>
-            <div class="cj-stat"><div class="cj-stat-k">Closed</div><div class="cj-stat-v" id="adminClosed">0</div></div>
-          </div>
-        </div>
+    <section class="how" aria-label="How it works">
+      <div class="how-step"><span class="how-num">1</span><div><b>Browse campus jobs</b><span class="muted">Hours, pay, office hours and when they hire.</span></div></div>
+      <div class="how-step"><span class="how-num">2</span><div><b>Ask current staff</b><span class="muted">Message or email students who do the job now.</span></div></div>
+      <div class="how-step"><span class="how-num">3</span><div><b>Read &amp; share reviews</b><span class="muted">Anonymous Q&amp;A and reviews, like a student board.</span></div></div>
+    </section>
 
-        <div class="admin-two-col">
-          <div class="admin-left">
-            <div class="admin-panel">
-              <h2>Post New Job</h2>
-              <div class="cj-field"><label>Title</label><input type="text" id="cjFormTitle" placeholder="e.g. CS 3500 Teaching Assistant"></div>
-              <div class="cj-field"><label>Category</label>
-                <select id="cjFormCat">
-                  <option value="ta">Teaching Assistant</option>
-                  <option value="office">Office &amp; Admin</option>
-                  <option value="library">Library</option>
-                  <option value="ambassador">Student Ambassador</option>
-                  <option value="research">Research</option>
-                </select>
-              </div>
-              <div class="cj-field"><label>Department</label><input type="text" id="cjFormDept" placeholder="e.g. School of Computing"></div>
-              <div class="cj-field"><label>Location</label><input type="text" id="cjFormLocation" placeholder="e.g. Building B, Songdo"></div>
-              <div class="cj-field"><label>Pay</label><input type="text" id="cjFormPay" placeholder="e.g. ₩11,000/hour"></div>
-              <div class="cj-field"><label>Hours/week</label><input type="text" id="cjFormHours" placeholder="e.g. 10 hrs/week"></div>
-              <div class="cj-field"><label>Deadline (optional)</label><input type="date" id="cjFormDeadline"></div>
-              <div class="cj-field"><label>Description</label><textarea id="cjFormDesc" placeholder="What will this role do?"></textarea></div>
-              <div class="cj-field"><label>What you'll do (one per line)</label><textarea id="cjFormTodo" placeholder="e.g.&#10;Hold weekly office hours&#10;Grade homework sets"></textarea></div>
-              <div class="cj-field"><label>Requirements (one per line)</label><textarea id="cjFormReq" placeholder="e.g.&#10;Completed CS 3500 with a B+ or higher&#10;Available Tue/Thu afternoons"></textarea></div>
-              <button class="btn btn-red btn-block" onclick="cjSubmitPost()">Publish Listing</button>
-            </div>
-          </div>
-
-          <div class="admin-right">
-            <div class="admin-panel">
-              <div class="table-toolbar">
-                <select id="adminStatusFilter" onchange="cjSetAdminFilter(this.value)">
-                  <option value="all">All Statuses</option>
-                  <option value="open">Open</option>
-                  <option value="closed">Closed</option>
-                </select>
-                <input type="text" id="adminFilterInput" placeholder="Filter by title or department..." oninput="cjSetAdminQuery(this.value)">
-              </div>
-              <div class="table-wrapper">
-                <table class="admin-table">
-                  <colgroup>
-                    <col style="width:11%"><col style="width:26%"><col style="width:15%"><col style="width:17%"><col style="width:14%"><col style="width:9%"><col style="width:8%">
-                  </colgroup>
-                  <thead>
-                    <tr><th>Status</th><th>Title</th><th>Category</th><th>Department</th><th>Deadline</th><th>Applicants</th><th>Actions</th></tr>
-                  </thead>
-                  <tbody id="adminTableBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+    <section class="card filters" aria-label="Search and filters">
+      <label for="job-search" class="sr-only">Search jobs</label>
+      <div class="search">
+        <span id="searchIcon"></span>
+        <input id="job-search" type="search" placeholder="Search jobs or departments (e.g. Biz Coordinator)">
       </div>
+      <div class="chips" id="chips"></div>
+    </section>
 
+    <div class="layout">
+      <nav class="jlist" id="jobList" aria-label="Campus jobs"></nav>
+      <section class="card detail" id="detail" aria-live="polite"></section>
+    </div>
+
+  </div>
+</div>
+</div>
     </main>
   </div>
 </div>
 
 <div id="toast-host"></div>
+<div id="modalRoot"></div>
 <script src="../shared/session.js"></script>
 <script src="../shared/store.js"></script>
 <script src="../shared/toast.js"></script>
 <script src="../shared/nav.js"></script>
-<script src="campusjobs.js"></script>
+<script>
+
+(function () {
+  /* ===== Shared demo data (same in student + admin pages) =====
+     Both pages read/write the same browser storage key, so changes made on the
+     admin page show up on the student page (same browser, same site). */
+  var STORE_KEY = 'campuspilot.campusJobs.v1';
+  var NOW = Date.now(), H = 3600000, D = 24 * H;
+  var CATS = [
+    { id: 'all', label: 'All jobs' },
+    { id: 'office', label: 'Office & Admin' },
+    { id: 'ta', label: 'Teaching Assistant' },
+    { id: 'library', label: 'Library' },
+    { id: 'ambassador', label: 'Student Ambassador' },
+    { id: 'tech', label: 'Tech Support' },
+    { id: 'tutor', label: 'Tutoring' }
+  ];
+  function seed() {
+    return {
+      jobs: [
+        { id: 'biz', title: 'Biz Coordinator', dept: 'School of Business Office', cat: 'office', hours: 'About 7 hrs/week', officeHours: 'None', pay: '₩10,320/hr', hiring: 'Every semester, around week 10', visible: true,
+          desc: 'Supports the business school office with student events, program emails and day-to-day admin.',
+          todo: ['Prepare and staff business school events', 'Draft program emails and announcements', 'Help with office admin and student questions'] },
+        { id: 'ta', title: 'Teaching Assistant – Accounting & Finance', dept: 'School of Business', cat: 'ta', hours: '8–10 hrs/week', officeHours: '2 hrs/week', pay: '₩12,000/hr', hiring: 'Before each semester (professor recommendation)', visible: true,
+          desc: 'Assists ACCTG and FIN professors with grading, office hours and exam review sessions.',
+          todo: ['Hold weekly office hours', 'Grade homework and quizzes', 'Run review sessions before exams'] },
+        { id: 'lib', title: 'Library Assistant', dept: 'UAC Library', cat: 'library', hours: '10–12 hrs/week', officeHours: 'None (desk shifts)', pay: '₩10,320/hr', hiring: 'Rolling, when a spot opens', visible: true,
+          desc: 'Runs the library front desk: check-outs, study-room bookings and helping students find resources.',
+          todo: ['Staff the circulation desk', 'Manage study-room reservations', 'Shelve returned materials'] },
+        { id: 'amb', title: 'Student Ambassador', dept: 'Office of Admissions', cat: 'ambassador', hours: '4–8 hrs/week (event-based)', officeHours: 'None', pay: '₩10,320/hr', hiring: 'Once a year, in spring', visible: true,
+          desc: 'Represents UAC at campus tours, open houses and high-school visits.',
+          todo: ['Lead campus tours', 'Answer questions at open-house events', 'Share student life on admissions channels'] },
+        { id: 'it', title: 'IT Help Desk Assistant', dept: 'IT Services', cat: 'tech', hours: '10 hrs/week', officeHours: 'None (desk shifts)', pay: '₩10,800/hr', hiring: 'Rolling', visible: true,
+          desc: 'First-line support for Wi-Fi, Canvas, printers and classroom AV.',
+          todo: ['Resolve Wi-Fi, Canvas and printer issues', 'Log support tickets', 'Set up classroom AV'] },
+        { id: 'wc', title: 'Writing Center Peer Tutor', dept: 'Writing Center', cat: 'tutor', hours: '6–8 hrs/week', officeHours: 'Tutoring slots, 6 hrs/week', pay: '₩11,000/hr', hiring: 'Fall semester, faculty referral', visible: true,
+          desc: 'One-on-one feedback sessions on essays, reports and résumés.',
+          todo: ['Hold 30-minute tutoring sessions', 'Give feedback on structure and grammar', 'Attend monthly tutor training'] }
+      ],
+      staff: [
+        { id: 's1', jobId: 'biz', name: 'Minji Park', major: 'Business Administration', year: '3rd year', since: 'Fall 2025', email: 'minji.park@example.edu', intro: 'Ask me about workload and event weeks!', contactable: true },
+        { id: 's2', jobId: 'biz', name: 'Daniel Lee', major: 'Business Administration', year: '4th year', since: 'Spring 2025', email: 'daniel.lee@example.edu', intro: 'Happy to talk about the interview process.', contactable: true },
+        { id: 's3', jobId: 'ta', name: 'Seoyeon Kim', major: 'Business Administration', year: '4th year', since: 'Fall 2025', email: 'seoyeon.kim@example.edu', intro: 'TA for ACCTG 2600. Questions about grading load welcome.', contactable: true },
+        { id: 's4', jobId: 'ta', name: 'Jun Choi', major: 'Economics', year: '3rd year', since: 'Spring 2026', email: 'jun.choi@example.edu', intro: 'TA for FIN 3040.', contactable: false },
+        { id: 's5', jobId: 'lib', name: 'Hana Yoon', major: 'Psychology', year: '2nd year', since: 'Spring 2026', email: 'hana.yoon@example.edu', intro: 'Quiet shifts = study time :)', contactable: true },
+        { id: 's6', jobId: 'amb', name: 'Ethan Jung', major: 'Communication', year: '3rd year', since: 'Spring 2026', email: 'ethan.jung@example.edu', intro: 'Ask me about tours and open houses.', contactable: true },
+        { id: 's7', jobId: 'it', name: 'Chris Han', major: 'Computer Science', year: '2nd year', since: 'Fall 2026', email: 'chris.han@example.edu', intro: 'No coding needed for this job!', contactable: true },
+        { id: 's8', jobId: 'wc', name: 'Yerin Song', major: 'English Language', year: '4th year', since: 'Fall 2025', email: 'yerin.song@example.edu', intro: 'Peer tutor for essays and résumés.', contactable: true }
+      ],
+      posts: [
+        { id: 'p1', jobId: 'biz', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 2 * D, likes: 6, liked: false, reports: [],
+          text: 'Is Biz Coordinator a lot of work? Do you have office hours?',
+          comments: [
+            { id: 'c1', author: 'Minji Park', role: 'staff', time: NOW - 2 * D + 3 * H, text: 'No office hours for Biz Coordi! It’s about 7 hours a week, mostly event prep and emails.', reports: [] },
+            { id: 'c2', author: 'Anonymous', role: 'student', time: NOW - D, text: 'It gets busier around midterms and the career fair week.', reports: [] }
+          ] },
+        { id: 'p2', jobId: 'biz', type: 'r', rating: 4, author: 'Anonymous', role: 'student', time: NOW - 6 * D, likes: 9, liked: false, reports: [],
+          text: 'Flexible schedule and you get to know the business school staff well. Event weeks are busy but the rest is chill.', comments: [] },
+        { id: 'p3', jobId: 'biz', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 9 * D, likes: 3, liked: false, reports: [],
+          text: 'When do they usually hire for spring semester?',
+          comments: [
+            { id: 'c3', author: 'CIDC Office', role: 'admin', time: NOW - 8 * D, text: 'Spring hiring opens around week 10 of the fall semester. We will post it on CampusPilot.', reports: [] }
+          ] },
+        { id: 'p4', jobId: 'ta', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 3 * D, likes: 4, liked: false, reports: [],
+          text: 'How many office hours do TAs have per week? And how long does grading take?',
+          comments: [
+            { id: 'c4', author: 'Seoyeon Kim', role: 'staff', time: NOW - 3 * D + 5 * H, text: '2 hours of office hours, then about 5 hours of grading. Exam weeks are heavier.', reports: [] }
+          ] },
+        { id: 'p5', jobId: 'ta', type: 'r', rating: 5, author: 'Anonymous', role: 'student', time: NOW - 12 * D, likes: 11, liked: false, reports: [],
+          text: 'Best campus job if you liked the course. Explaining things to others really helped my own grades.', comments: [] },
+        { id: 'p6', jobId: 'lib', type: 'r', rating: 4, author: 'Anonymous', role: 'student', time: NOW - 5 * D, likes: 5, liked: false, reports: [],
+          text: 'Weekday evening shifts are quiet, so you can study at the desk. Finals week is the only busy time.', comments: [] },
+        { id: 'p7', jobId: 'amb', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 4 * D, likes: 2, liked: false, reports: [],
+          text: 'Do you need to speak Korean fluently to be an ambassador?',
+          comments: [
+            { id: 'c5', author: 'Ethan Jung', role: 'staff', time: NOW - 4 * D + 2 * H, text: 'English is the main language for tours, but Korean helps a lot with parents at open houses.', reports: [] }
+          ] },
+        { id: 'p8', jobId: 'amb', type: 'r', rating: 1, author: 'Anonymous', role: 'student', time: NOW - D, likes: 0, liked: false,
+          reports: [{ reason: 'Personal attack or harassment', time: NOW - 20 * H }, { reason: 'Personal attack or harassment', time: NOW - 10 * H }],
+          text: 'Total waste of time. The supervisor is the worst person on campus, do not apply.', comments: [] }
+      ],
+      messages: []
+    };
+  }
+  var mem = null;
+  function load() {
+    try { var raw = localStorage.getItem(STORE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+    if (mem) return mem;
+    var fresh = seed(); save(fresh); return fresh;
+  }
+  function save(data) {
+    mem = data;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+  function resetData() {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    mem = null;
+    return seed();
+  }
+  function uid(p) { return p + Math.random().toString(36).slice(2, 9); }
+
+  /* ===== Small helpers ===== */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function ago(t) {
+    var s = Math.max(0, Date.now() - t) / 1000;
+    if (s < 60) return 'Just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    if (s < 86400 * 30) return Math.floor(s / 86400) + 'd ago';
+    return new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+  function initials(n) {
+    return String(n).split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+  }
+  function stars(n) {
+    var out = '';
+    for (var i = 1; i <= 5; i++) out += i <= n ? '★' : '<span class="off">★</span>';
+    return '<span class="stars" role="img" aria-label="' + n + ' out of 5">' + out + '</span>';
+  }
+  function catLabel(id) {
+    for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) return CATS[i].label;
+    return '';
+  }
+  function findJob(data, id) { for (var i = 0; i < data.jobs.length; i++) if (data.jobs[i].id === id) return data.jobs[i]; return null; }
+  function findPost(data, id) { for (var i = 0; i < data.posts.length; i++) if (data.posts[i].id === id) return data.posts[i]; return null; }
+  function roleBadge(role) {
+    if (role === 'staff') return '<span class="badge blue">Current staff</span>';
+    if (role === 'admin') return '<span class="badge dark">Official</span>';
+    return '';
+  }
+  function avgRating(data, jobId) {
+    var r = data.posts.filter(function (p) { return p.jobId === jobId && p.type === 'r' && p.rating; });
+    if (!r.length) return null;
+    var sum = r.reduce(function (a, p) { return a + p.rating; }, 0);
+    return { avg: Math.round(sum / r.length * 10) / 10, n: r.length };
+  }
+
+  function toast(msg) { showToast(msg); }
+  var lastFocus = null;
+  function openModal(html) {
+    lastFocus = document.activeElement;
+    var root = document.getElementById('modalRoot');
+    root.innerHTML = '<div class="modal-back" data-action="close-modal-back"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">' + html + '</div></div>';
+    var f = root.querySelector('textarea, input, select, button:not(.icon-btn)');
+    if (f) f.focus();
+  }
+  function closeModal() {
+    document.getElementById('modalRoot').innerHTML = '';
+    if (lastFocus && lastFocus.focus) try { lastFocus.focus(); } catch (e) {}
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('modalRoot').innerHTML) closeModal();
+  });
+  function modalHead(title, sub) {
+    return '<div class="modal-head"><div><h2 id="modalTitle">' + title + '</h2>' + (sub ? '<div class="muted" style="margin-top:4px">' + sub + '</div>' : '') + '</div>' +
+      '<button type="button" class="icon-btn" data-action="close-modal" aria-label="Close">' + ICON.x + '</button></div>';
+  }
+
+  var ICON = {
+    x: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>',
+    users: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    chat: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    mail: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></svg>',
+    heart: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+    flag: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+    plus: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5A5A5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    pencil: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+    eye: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+  };
+
+  /* close buttons inside shell modals */
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('[data-action="close-modal"], [data-action="close-modal-back"]');
+    if (!c || !c.closest('#modalRoot')) return;
+    if (c.getAttribute('data-action') === 'close-modal-back' && e.target !== c) return;
+    closeModal();
+  });
+
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(true); } catch (err) { done(false); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    else fallback();
+  }
+
+  /* ===== Student page ===== */
+  var ME = 'Garam';
+  var data = load();
+  var ui = { cat: 'all', q: '', jobId: null, tab: 'overview', board: 'all', open: {}, composing: false, dType: 'q', dRating: 0 };
+
+  function visibleJobs() { return data.jobs.filter(function (j) { return j.visible; }); }
+  function staffOf(id) { return data.staff.filter(function (s) { return s.jobId === id; }); }
+  function postsOf(id) {
+    return data.posts.filter(function (p) { return p.jobId === id; }).sort(function (a, b) { return b.time - a.time; });
+  }
+  function ensureJob() {
+    var vis = visibleJobs();
+    if (!vis.some(function (j) { return j.id === ui.jobId; })) ui.jobId = vis.length ? vis[0].id : null;
+  }
+
+  function renderChips() {
+    document.getElementById('chips').innerHTML = CATS.map(function (c) {
+      return '<button type="button" class="chip" data-action="cat" data-id="' + c.id + '" aria-pressed="' + (ui.cat === c.id) + '">' + esc(c.label) + '</button>';
+    }).join('');
+  }
+
+  function renderList() {
+    var q = ui.q.toLowerCase().trim();
+    var list = visibleJobs().filter(function (j) {
+      return (ui.cat === 'all' || j.cat === ui.cat) && (!q || (j.title + ' ' + j.dept).toLowerCase().indexOf(q) !== -1);
+    });
+    var el = document.getElementById('jobList');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty"><b>No jobs match</b><div class="muted" style="margin-top:4px">Try another keyword or “All jobs”.</div></div>';
+      return;
+    }
+    el.innerHTML = '<div class="muted" style="padding:0 2px">' + list.length + (list.length === 1 ? ' job' : ' jobs') + '</div>' + list.map(function (j) {
+      var r = avgRating(data, j.id);
+      return '<button type="button" class="jitem" data-action="select" data-id="' + j.id + '" aria-current="' + (ui.jobId === j.id) + '">' +
+        '<span class="t">' + esc(j.title) + '</span>' +
+        '<span class="muted">' + esc(j.dept) + '</span>' +
+        '<span class="meta"><span>' + ICON.clock + esc(j.hours) + '</span><span>' + ICON.users + staffOf(j.id).length + ' current staff</span>' +
+        '<span>' + ICON.chat + postsOf(j.id).length + ' posts</span>' + (r ? '<span>' + stars(Math.round(r.avg)) + ' ' + r.avg + '</span>' : '') + '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  function renderDetail() {
+    var el = document.getElementById('detail');
+    var j = findJob(data, ui.jobId);
+    if (!j || !j.visible) { el.innerHTML = '<div class="d-body"><div class="empty">Select a job to see details.</div></div>'; return; }
+    var staff = staffOf(j.id), posts = postsOf(j.id);
+    var tabs = [['overview', 'Overview', null], ['people', 'Ask current staff', staff.length], ['board', 'Q&amp;A &amp; Reviews', posts.length]];
+    var html = '<div class="d-head">' +
+      '<div class="tags"><span class="badge red">' + esc(catLabel(j.cat)) + '</span></div>' +
+      '<h2 class="d-title">' + esc(j.title) + '</h2>' +
+      '<div class="muted">' + esc(j.dept) + '</div>' +
+    '</div>' +
+    '<div class="tabs d-tabs" role="tablist">' + tabs.map(function (t) {
+      return '<button type="button" class="tab" role="tab" data-action="tab" data-id="' + t[0] + '" aria-selected="' + (ui.tab === t[0]) + '">' + t[1] + (t[2] != null ? '<span class="count">' + t[2] + '</span>' : '') + '</button>';
+    }).join('') + '</div>' +
+    '<div class="d-body" role="tabpanel">';
+    if (ui.tab === 'overview') html += overview(j, staff, posts);
+    if (ui.tab === 'people') html += people(j, staff);
+    if (ui.tab === 'board') html += board(j, posts);
+    el.innerHTML = html + '</div>';
+  }
+
+  function overview(j, staff, posts) {
+    var r = avgRating(data, j.id);
+    return '<p style="margin:0;font-size:16px;line-height:1.55;color:var(--text-2)">' + esc(j.desc) + '</p>' +
+      '<div class="facts">' +
+        '<div class="fact"><div class="k">Hours</div><div class="v">' + esc(j.hours) + '</div></div>' +
+        '<div class="fact"><div class="k">Office hours</div><div class="v">' + esc(j.officeHours) + '</div></div>' +
+        '<div class="fact"><div class="k">Pay</div><div class="v">' + esc(j.pay) + '</div></div>' +
+        '<div class="fact"><div class="k">Student rating</div><div class="v">' + (r ? stars(Math.round(r.avg)) + ' ' + r.avg + ' <span class="muted small">(' + r.n + ')</span>' : '<span class="muted">No reviews yet</span>') + '</div></div>' +
+      '</div>' +
+      '<div><h3 style="margin-bottom:8px">What you do</h3><ul>' + j.todo.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>' +
+      '<div><h3 style="margin-bottom:4px">When they hire</h3><div style="font-size:15px;color:var(--text-2)">' + esc(j.hiring) + '</div></div>' +
+      '<div class="cta"><div><b>Still curious?</b><div class="muted">' + staff.length + ' students do this job now · ' + posts.length + ' posts on the board</div></div>' +
+        '<div class="actions"><button type="button" class="btn" data-action="tab" data-id="board">Read Q&amp;A</button>' +
+        '<button type="button" class="btn btn-primary" data-action="tab" data-id="people">Ask current staff</button></div></div>';
+  }
+
+  function people(j, staff) {
+    if (!staff.length) return '<div class="empty">No current staff listed yet. Try the Q&amp;A board instead.</div>';
+    return '<p class="muted" style="margin:0">These students do this job right now and agreed to answer questions. Be polite and keep it about the job.</p>' +
+      '<div class="people">' + staff.map(function (s) {
+        var actions = s.contactable
+          ? '<button type="button" class="btn btn-primary btn-sm" data-action="message" data-id="' + s.id + '">' + ICON.chat + 'Message</button>' +
+            '<button type="button" class="btn btn-sm" data-action="email" data-id="' + s.id + '">' + ICON.mail + 'Email</button>'
+          : '<span class="badge">Not taking questions right now</span>';
+        return '<div class="person">' +
+          '<div class="row"><span class="avatar-sm">' + initials(s.name) + '</span><div><b>' + esc(s.name) + '</b><div class="muted small">' + esc(s.major) + ' · ' + esc(s.year) + '</div></div></div>' +
+          '<div class="tags"><span class="badge blue">Current staff</span><span class="tag">Since ' + esc(s.since) + '</span></div>' +
+          (s.intro ? '<p class="intro">“' + esc(s.intro) + '”</p>' : '') +
+          '<div class="actions">' + actions + '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+  }
+
+  function board(j, posts) {
+    var shown = posts.filter(function (p) { return ui.board === 'all' || p.type === ui.board; });
+    var html = '<div class="board-filter"><div class="chips">' +
+      [['all', 'All'], ['q', 'Questions'], ['r', 'Reviews']].map(function (f) {
+        return '<button type="button" class="chip" data-action="board" data-id="' + f[0] + '" aria-pressed="' + (ui.board === f[0]) + '">' + f[1] + '</button>';
+      }).join('') + '</div>' +
+      (ui.composing ? '' : '<button type="button" class="btn btn-primary" data-action="write">' + ICON.pencil + 'Write a post</button>') + '</div>';
+    if (ui.composing) html += composer();
+    if (!shown.length) html += '<div class="empty"><b>No posts yet</b><div class="muted" style="margin-top:4px">Be the first to ask a question about this job.</div></div>';
+    html += shown.map(postHtml).join('');
+    return html;
+  }
+
+  function composer() {
+    var rate = '';
+    if (ui.dType === 'r') {
+      rate = '<div class="row"><span class="muted">Your rating</span><div class="rate" role="group" aria-label="Rating">';
+      for (var i = 1; i <= 5; i++) rate += '<button type="button" class="' + (i <= ui.dRating ? 'on' : '') + '" data-action="rate" data-id="' + i + '" aria-label="' + i + ' star' + (i > 1 ? 's' : '') + '">★</button>';
+      rate += '</div></div>';
+    }
+    return '<div class="composer">' +
+      '<div class="row-between"><div class="seg" role="group" aria-label="Post type">' +
+        '<button type="button" data-action="dtype" data-id="q" aria-pressed="' + (ui.dType === 'q') + '">Question</button>' +
+        '<button type="button" data-action="dtype" data-id="r" aria-pressed="' + (ui.dType === 'r') + '">Review</button></div>' + rate + '</div>' +
+      '<label class="sr-only" for="draft">Post text</label>' +
+      '<textarea id="draft" class="textarea" placeholder="' + (ui.dType === 'q' ? 'e.g. Is this job a lot of work? How many office hours?' : 'What was the job really like? Workload, schedule, tips…') + '"></textarea>' +
+      '<div class="row-between"><label class="check"><input type="checkbox" id="draftAnon" checked> Post anonymously</label>' +
+      '<div class="actions"><button type="button" class="btn btn-sm" data-action="cancel-write">Cancel</button>' +
+      '<button type="button" class="btn btn-primary btn-sm" data-action="submit-post">Post</button></div></div>' +
+    '</div>';
+  }
+
+  function postHtml(p) {
+    var open = !!ui.open[p.id];
+    var reported = p.reports.some(function (r) { return r.mine; });
+    var html = '<article class="post">' +
+      '<div class="post-meta">' + (p.type === 'q' ? '<span class="badge amber">Question</span>' : '<span class="badge red">Review</span>' + stars(p.rating)) +
+        '<span class="who">' + esc(p.author) + '</span>' + roleBadge(p.role) + '<span>· ' + ago(p.time) + '</span></div>' +
+      '<p class="post-text">' + esc(p.text) + '</p>' +
+      '<div class="post-actions">' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-action="like" data-id="' + p.id + '" aria-pressed="' + !!p.liked + '" aria-label="Helpful, ' + p.likes + '">' + ICON.heart + p.likes + '</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-action="comments" data-id="' + p.id + '" aria-expanded="' + open + '">' + ICON.chat + p.comments.length + (p.comments.length === 1 ? ' comment' : ' comments') + '</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-action="report" data-id="' + p.id + '"' + (reported ? ' disabled' : '') + '>' + ICON.flag + (reported ? 'Reported' : 'Report') + '</button>' +
+      '</div>';
+    if (open) {
+      html += '<div class="comments">' + p.comments.map(function (c) {
+        return '<div class="comment ' + (c.role === 'staff' ? 'staff' : c.role === 'admin' ? 'admin' : '') + '">' +
+          '<div class="post-meta"><span class="who">' + esc(c.author) + '</span>' + roleBadge(c.role) + '<span>· ' + ago(c.time) + '</span></div>' +
+          '<p>' + esc(c.text) + '</p></div>';
+      }).join('') +
+      '<div class="c-form"><label class="sr-only" for="c-' + p.id + '">Write a comment</label>' +
+        '<input class="input" id="c-' + p.id + '" placeholder="Write a comment…" data-enter="' + p.id + '">' +
+        '<label class="check"><input type="checkbox" id="ca-' + p.id + '" checked> Anonymous</label>' +
+        '<button type="button" class="btn btn-primary btn-sm" data-action="comment" data-id="' + p.id + '">Reply</button></div>' +
+      '</div>';
+    }
+    return html + '</article>';
+  }
+
+  function renderAll() { ensureJob(); renderChips(); renderList(); renderDetail(); }
+
+  function addComment(id) {
+    var input = document.getElementById('c-' + id);
+    var text = input.value.trim();
+    if (!text) { input.focus(); toast('Write a comment first'); return; }
+    var anon = document.getElementById('ca-' + id).checked;
+    findPost(data, id).comments.push({ id: uid('c'), author: anon ? 'Anonymous' : ME, role: 'student', time: Date.now(), text: text, reports: [] });
+    save(data); renderList(); renderDetail();
+    var again = document.getElementById('c-' + id); if (again) again.focus();
+  }
+
+  var REASONS = ['Personal attack or harassment', 'False or misleading information', 'Shares private information', 'Spam or off-topic'];
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-action]');
+    if (!b) return;
+    var a = b.getAttribute('data-action'), id = b.getAttribute('data-id');
+    if (a === 'close-modal-back') { if (e.target === b) closeModal(); return; }
+    if (a === 'close-modal') { closeModal(); return; }
+    if (a === 'cat') { ui.cat = id; renderChips(); renderList(); return; }
+    if (a === 'select') { ui.jobId = id; ui.tab = 'overview'; ui.composing = false; ui.board = 'all'; renderList(); renderDetail(); return; }
+    if (a === 'tab') { ui.tab = id; renderDetail(); return; }
+    if (a === 'board') { ui.board = id; renderDetail(); return; }
+    if (a === 'write') { ui.composing = true; ui.dType = 'q'; ui.dRating = 0; renderDetail(); document.getElementById('draft').focus(); return; }
+    if (a === 'cancel-write') { ui.composing = false; renderDetail(); return; }
+    if (a === 'dtype' || a === 'rate') {
+      var keep = document.getElementById('draft').value, anon = document.getElementById('draftAnon').checked;
+      if (a === 'dtype') ui.dType = id; else ui.dRating = +id;
+      renderDetail();
+      document.getElementById('draft').value = keep; document.getElementById('draftAnon').checked = anon;
+      return;
+    }
+    if (a === 'submit-post') {
+      var t = document.getElementById('draft'), text = t.value.trim();
+      if (!text) { t.focus(); toast('Write something first'); return; }
+      if (ui.dType === 'r' && !ui.dRating) { toast('Pick a rating for your review'); return; }
+      var an = document.getElementById('draftAnon').checked;
+      data.posts.push({ id: uid('p'), jobId: ui.jobId, type: ui.dType, rating: ui.dType === 'r' ? ui.dRating : 0, author: an ? 'Anonymous' : ME, role: 'student',
+        time: Date.now(), likes: 0, liked: false, reports: [], text: text, comments: [] });
+      ui.composing = false; ui.board = 'all';
+      save(data); renderList(); renderDetail(); toast('Posted to the board');
+      return;
+    }
+    if (a === 'like') { var p = findPost(data, id); p.liked = !p.liked; p.likes += p.liked ? 1 : -1; save(data); renderDetail(); return; }
+    if (a === 'comments') { ui.open[id] = !ui.open[id]; renderDetail(); if (ui.open[id]) document.getElementById('c-' + id).focus(); return; }
+    if (a === 'comment') { addComment(id); return; }
+    if (a === 'report') {
+      openModal(modalHead('Report this post', 'An admin will review it. The writer won’t see who reported.') +
+        '<fieldset style="border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:4px"><legend class="sr-only">Reason</legend>' +
+        REASONS.map(function (r, i) { return '<label class="check"><input type="radio" name="reason" value="' + esc(r) + '"' + (i === 0 ? ' checked' : '') + '> ' + esc(r) + '</label>'; }).join('') +
+        '</fieldset><div class="actions" style="justify-content:flex-end"><button type="button" class="btn" data-action="close-modal">Cancel</button>' +
+        '<button type="button" class="btn btn-primary" data-action="submit-report" data-id="' + id + '">Send report</button></div>');
+      return;
+    }
+    if (a === 'submit-report') {
+      var reason = document.querySelector('input[name="reason"]:checked').value;
+      findPost(data, id).reports.push({ reason: reason, time: Date.now(), mine: true });
+      save(data); closeModal(); renderDetail(); toast('Thanks – an admin will review this post');
+      return;
+    }
+    if (a === 'message') {
+      var s = data.staff.filter(function (x) { return x.id === id; })[0];
+      var job = findJob(data, s.jobId);
+      openModal(modalHead('Message ' + esc(s.name), esc(job.title) + ' · Current staff') +
+        '<label class="f" for="msgText">Your question<textarea id="msgText" class="textarea" placeholder="Hi! I’m thinking about applying. How busy is the job during midterms?"></textarea></label>' +
+        '<div class="muted small">Your name (' + esc(ME) + ') is shown to ' + esc(s.name.split(' ')[0]) + ' so they can reply to your school email.</div>' +
+        '<div class="actions" style="justify-content:flex-end"><button type="button" class="btn" data-action="close-modal">Cancel</button>' +
+        '<button type="button" class="btn btn-primary" data-action="send-message" data-id="' + id + '">Send message</button></div>');
+      return;
+    }
+    if (a === 'email') {
+      var se = data.staff.filter(function (x) { return x.id === id; })[0];
+      var je = findJob(data, se.jobId);
+      var mailto = 'mailto:' + se.email + '?subject=' + encodeURIComponent('[CampusPilot] Question about ' + je.title);
+      openModal(modalHead('Email ' + esc(se.name), esc(je.title) + ' · Current staff') +
+        '<label class="f" for="emailAddr">School email<input id="emailAddr" class="input" value="' + esc(se.email) + '" readonly></label>' +
+        '<div class="muted small">Open your mail app with the subject filled in, or copy the address to use in Outlook or Gmail.</div>' +
+        '<div class="actions" style="justify-content:flex-end"><button type="button" class="btn" data-action="copy-email" data-id="' + id + '">Copy address</button>' +
+        '<a class="btn btn-primary" href="' + esc(mailto) + '" data-action="open-mail">' + ICON.mail + 'Open mail app</a></div>');
+      return;
+    }
+    if (a === 'copy-email') {
+      var sc = data.staff.filter(function (x) { return x.id === id; })[0];
+      copyText(sc.email, function (ok) { toast(ok ? 'Copied ' + sc.email : 'Copy failed – select the address and copy it'); });
+      return;
+    }
+    if (a === 'open-mail') { setTimeout(function () { closeModal(); toast('Opening your mail app…'); }, 50); return; }
+    if (a === 'send-message') {
+      var m = document.getElementById('msgText'), txt = m.value.trim();
+      if (!txt) { m.focus(); return; }
+      var st = data.staff.filter(function (x) { return x.id === id; })[0];
+      data.messages.push({ id: uid('m'), to: id, from: ME, text: txt, time: Date.now() });
+      save(data); closeModal(); toast('Message sent to ' + st.name);
+      return;
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.getAttribute && e.target.getAttribute('data-enter')) { e.preventDefault(); addComment(e.target.getAttribute('data-enter')); }
+  });
+  document.getElementById('job-search').addEventListener('input', function (e) { ui.q = e.target.value; renderList(); });
+  window.addEventListener('storage', function (e) { if (e.key === STORE_KEY) { data = load(); renderAll(); } });
+
+  document.getElementById('searchIcon').outerHTML = ICON.search;
+  renderAll();
+
+})();
+
+</script>
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'campusjobs');
-  if(SESSION){ isAdmin = (SESSION.role === 'admin'); cjApplyAdmin(); }
+
 </script>
 </body>
 </html>
