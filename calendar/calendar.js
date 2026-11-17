@@ -1,29 +1,508 @@
-/* Campuspilot — CALENDAR page logic (filters + add-schedule modal). */
+/* Campuspilot — CALENDAR page logic (month/year navigation, campus +
+   personal events, filters, add-schedule modal, event-detail modal). */
+
+var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function monthName(m){ return MONTH_NAMES[m-1]; }
+function pad2(n){ return n < 10 ? '0'+n : ''+n; }
+function daysInMonth(y,m){ return new Date(y, m, 0).getDate(); }
+function firstWeekday(y,m){ return new Date(y, m-1, 1).getDay(); }
+
+/* Demo campus events live only in September 2026 — the demo's "today".
+   Any other month/year is fully navigable, just shows an empty grid. */
+var TODAY = {year:2026, month:9, date:2};
+
+/* Official/RSVP/Free-Food events are admin-managed data, registered
+   through the same "+ Add Schedule" modal on this page (see
+   openAddModal/addSchedule below -- it behaves differently for an
+   admin session), persisted under CAL_STORE_KEY so they show up to
+   every student immediately. CAMPUS_EVENTS_SEED is only the one-time
+   starting content the store is initialized with on first load. */
+var CAL_STORE_KEY = 'campuspilot.calendar.events.v1';
+var CAMPUS_EVENTS_SEED = [
+  {id:'seed-1',  year:2026, month:9, date:1,  cat:'official', title:'Fall Convocation', time:'10am', location:'Grand Hall, UAC Main Building', org:'Office of the Dean', contact:'dean-office@utah.edu'},
+  {id:'seed-2',  year:2026, month:9, date:2,  cat:'official', title:'UAC Fall Club Fair', time:'11am–2pm', location:'Central Plaza', org:'University Activities Council', contact:'uac@utah.edu', perks:'Free club swag & giveaways'},
+  {id:'seed-3',  year:2026, month:9, date:4,  cat:'official', title:'Global Leader Forum', time:'4pm', location:'Auditorium A', org:'Office of International Affairs', contact:'oia@utah.edu'},
+  {id:'seed-4',  year:2026, month:9, date:5,  cat:'official', title:'IS Welcome Social', time:'6pm', location:'IS Lounge, 3F', org:'Information Systems Dept.', contact:'is-dept@utah.edu', perks:'Light refreshments provided'},
+  {id:'seed-5',  year:2026, month:9, date:10, cat:'official', career:1, title:'Resume Clinic', time:'1–4pm', location:'Career Center, Rm 210', org:'Career Services', contact:'career-uac@utah.edu'},
+  {id:'seed-6',  year:2026, month:9, date:11, cat:'rsvp', career:1, title:'Career Fair Pre-Reg', time:'2pm', location:'Student Center Gym', locAbbr:'Gym', org:'Career Services', contact:'career-uac@utah.edu', perks:'Free resume review & coffee bar'},
+  {id:'seed-7',  year:2026, month:9, date:11, cat:'official', career:1, title:'Alumni Career Talk', time:'2pm', location:'Rm 310', org:'Alumni Association', contact:'alumni@utah.edu'},
+  {id:'seed-8',  year:2026, month:9, date:17, cat:'food', title:'Midterm Pizza Social', time:'12:30pm', location:'1F Student Lounge', perks:'Free pizza & drinks — while supplies last'},
+  {id:'seed-9',  year:2026, month:9, date:18, cat:'rsvp', career:1, title:'Tech Career Night', time:'5–7:30pm', location:'U821 Grand Auditorium (UAC Building 8F)', locAbbr:'U821', org:'UAC IS Student Council & Career Center', contact:'career-uac@utah.edu', perks:'Pizza catering & official UAC tech sticker pack'},
+  {id:'seed-10', year:2026, month:9, date:18, cat:'official', career:1, title:'Alumni Networking', time:'7:30–8:30pm', location:'Grand Hall Lobby', org:'Alumni Association', contact:'alumni@utah.edu'},
+  {id:'seed-11', year:2026, month:9, date:23, cat:'official', career:1, title:'Startup Pitch Day', time:'1–4pm', location:'Innovation Hub', org:'Entrepreneurship Center', contact:'entrepreneurship@utah.edu', perks:'Pitch prizes & networking reception'},
+  {id:'seed-12', year:2026, month:9, date:25, cat:'official', title:'SLC Exchange Briefing', time:'3pm', location:'Rm 118', org:'Office of International Affairs', contact:'oia@utah.edu'},
+  {id:'seed-13', year:2026, month:9, date:26, cat:'food', title:'Coffee & Krispy Kreme', time:'10am', location:'5F Career Center'}
+];
+function calLoadEvents(){
+  try {
+    var raw = localStorage.getItem(CAL_STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  try { localStorage.setItem(CAL_STORE_KEY, JSON.stringify(CAMPUS_EVENTS_SEED)); } catch(e){}
+  return CAMPUS_EVENTS_SEED.slice();
+}
+var CAMPUS_EVENTS = calLoadEvents();
+/* Pick up a change made from another tab/page immediately. */
+window.addEventListener('storage', function(e){
+  if(e.key === CAL_STORE_KEY){ CAMPUS_EVENTS = calLoadEvents(); renderCalendar(); }
+});
+var personalEvents = [
+  {year:2026, month:9, date:3,  title:'CS 3500 Study Group', time:''},
+  {year:2026, month:9, date:15, title:'Library Study Session', time:''}
+]; /* seeded with the demo's own personal examples; new ones append via "+ Add Schedule": {year,month,date,title,time} */
+
+var viewYear = TODAY.year, viewMonth = TODAY.month;
+
+/* ---------------- event-detail modal wiring (shared/modal.js) ---------------- */
+var chipCounter = 0;
+function registerEventDetail(e, cat){
+  var key = 'cal-evt-' + (chipCounter++);
+  var rows = [];
+  var mainColor = cat==='food' ? 'gold' : (cat==='rsvp' ? 'red' : (cat==='personal' ? 'green' : 'granite'));
+  var when = monthName(e.month) + ' ' + e.date + ', ' + e.year + (e.time ? ' · ' + e.time : '');
+  /* Every event shows the same five rows, in the same order, so the
+     card's height (and the A4-ratio poster panel beside it) stays
+     consistent from event to event -- a field the source data doesn't
+     have just shows as "—" instead of being left out. */
+  rows.push({color: mainColor, icon:'calendar', label:'Date/Time', value: when});
+  rows.push({color:'granite', icon:'pin', label:'Location', value: e.location || '—'});
+  rows.push({color:'granite', icon:'people', label:'Host', value: e.org || '—'});
+  rows.push({color:'granite', icon:'mail', label:'Contact', value: e.contact || '—'});
+  rows.push({color:'gold', icon:'food', label:'Perks', value: e.perks || '—'});
+  var badge = e.org || (cat==='food' ? 'Free Food Event' : (cat==='rsvp' ? 'My RSVP' : (cat==='personal' ? 'Personal Schedule' : 'Campus Event')));
+  var badgeClass = cat==='food' ? 'gold' : (cat==='rsvp' ? 'red' : (cat==='personal' ? 'green' : 'granite'));
+  EVENTS_DETAIL[key] = {badge: badge, title: e.title, rows: rows, badgeClass: badgeClass, poster: e.poster || null};
+  return key;
+}
+/* Placeholder markup for events with no admin-uploaded poster photo
+   (the default state for every event until one is added). */
+var CAL_POSTER_PLACEHOLDER = '<svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#8B93A0" stroke-width="1.3"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/><path d="M8 14h2M8 17h2M14 14h2M14 17h2"/></svg>';
+function openCalModal(key, cat){
+  openModal(key);
+  var b = document.getElementById('modal-badge');
+  if(b) b.className = 'badge ' + (EVENTS_DETAIL[key].badgeClass || 'red');
+  var rsvpSection = document.getElementById('modal-rsvp-section');
+  if(rsvpSection) rsvpSection.style.display = (cat === 'official' || cat === 'rsvp') ? '' : 'none';
+  var posterEl = document.getElementById('modal-poster');
+  if(posterEl){
+    var poster = EVENTS_DETAIL[key].poster;
+    posterEl.innerHTML = poster ? '<img src="' + poster + '" alt="Event poster">' : CAL_POSTER_PLACEHOLDER;
+  }
+}
+
+function makeChip(e){
+  var span = document.createElement('span');
+  span.className = 'ev-chip ev-chip--' + e.cat + ' clickable';
+  span.setAttribute('data-cat', e.cat);
+  if(e.career) span.setAttribute('data-career', '1');
+  var prefix = e.cat === 'rsvp' ? "[RSVP'd] " : '';
+  var bits = [prefix + e.title];
+  if(e.location) bits.push('— ' + e.location);
+  if(e.time) bits.push('· ' + e.time);
+  span.textContent = bits.join(' ');
+  var key = registerEventDetail(e, e.cat);
+  span.addEventListener('click', function(){ openCalModal(key, e.cat); });
+  return span;
+}
+
+function makePersonalChip(e){
+  var span = document.createElement('span');
+  span.className = 'ev-chip ev-chip--personal clickable';
+  span.setAttribute('data-cat', 'personal');
+  span.textContent = '[Personal] ' + e.title + (e.time ? ' · ' + e.time : '');
+  var key = registerEventDetail(e, 'personal');
+  span.addEventListener('click', function(){ openCalModal(key, 'personal'); });
+  return span;
+}
+
+/* ---------------- calendar grid rendering ---------------- */
+function makeCell(num, dim, realDate, isToday){
+  var cell = document.createElement('div');
+  cell.className = 'cal-cell' + (isToday ? ' today' : '');
+  if(!dim) cell.setAttribute('data-date', String(realDate));
+  if(dim){
+    cell.innerHTML = '<div class="cal-date dim">' + num + '</div>';
+    return cell;
+  }
+  if(isToday){
+    cell.innerHTML = '<div class="date-row"><span class="cal-date" style="color:#BE0000;">' + num + '</span><span class="today-chip">TODAY</span></div>';
+  } else {
+    cell.innerHTML = '<div class="cal-date">' + num + '</div>';
+  }
+  CAMPUS_EVENTS.filter(function(e){ return e.year === viewYear && e.month === viewMonth && e.date === num; })
+    .forEach(function(e){ cell.appendChild(makeChip(e)); });
+  personalEvents.filter(function(e){ return e.year === viewYear && e.month === viewMonth && e.date === num; })
+    .forEach(function(e){ cell.appendChild(makePersonalChip(e)); });
+  return cell;
+}
+
+function renderCalendar(){
+  var body = document.getElementById('cal-body');
+  body.innerHTML = '';
+  var numDays = daysInMonth(viewYear, viewMonth);
+  var startDow = firstWeekday(viewYear, viewMonth);
+  var prevY = viewMonth === 1 ? viewYear - 1 : viewYear;
+  var prevM = viewMonth === 1 ? 12 : viewMonth - 1;
+  var prevDays = daysInMonth(prevY, prevM);
+
+  for(var i = 0; i < startDow; i++){
+    body.appendChild(makeCell(prevDays - startDow + 1 + i, true, null, false));
+  }
+  for(var d = 1; d <= numDays; d++){
+    var isToday = (viewYear === TODAY.year && viewMonth === TODAY.month && d === TODAY.date);
+    body.appendChild(makeCell(d, false, d, isToday));
+  }
+  var totalCells = startDow + numDays;
+  var trailing = (7 - (totalCells % 7)) % 7;
+  for(var j = 1; j <= trailing; j++){
+    body.appendChild(makeCell(j, true, null, false));
+  }
+
+  renderRightPanel();
+  updateFilterCounts();
+  applyFilters();
+}
+
+var DOW_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function daysUntil(e){
+  var target = new Date(e.year, e.month-1, e.date);
+  var today = new Date(TODAY.year, TODAY.month-1, TODAY.date);
+  return Math.round((target - today) / 86400000);
+}
+function renderRightPanel(){
+  var panel = document.querySelector('.right-panel');
+  var monthEvents = CAMPUS_EVENTS.filter(function(e){ return e.year === viewYear && e.month === viewMonth; });
+  var foodEvents = monthEvents.filter(function(e){ return e.cat === 'food'; });
+  var rsvpEvents = monthEvents.filter(function(e){ return e.cat === 'rsvp'; });
+  var html = '';
+  if(foodEvents.length){
+    html += '<div class="rp-head"><div class="rp-head-title">🍴 FREE FOOD EVENTS</div></div>';
+    foodEvents.forEach(function(e){
+      var dateAbbr = monthName(e.month).slice(0,3).toUpperCase() + ' ' + e.date;
+      html += '<div class="rp-food-box">'
+        + '<div class="rp-food-top"><span class="rp-food-date">' + dateAbbr + '</span>' + (e.time ? '<span class="rp-food-time">' + e.time + '</span>' : '') + '</div>'
+        + '<div class="rp-food-title">' + e.title + '</div>'
+        + (e.location ? '<div class="rp-food-loc">' + e.location + '</div>' : '')
+        + '</div>';
+    });
+  }
+  if(foodEvents.length && rsvpEvents.length) html += '<div class="rp-divider"></div>';
+  if(rsvpEvents.length){
+    html += '<div class="rp-head"><div class="rp-head-title">🔖 MY RSVPS (' + rsvpEvents.length + ')</div></div>';
+    rsvpEvents.forEach(function(e){
+      var dday = daysUntil(e);
+      var ddayText = dday > 0 ? ('D-' + dday) : (dday === 0 ? 'D-DAY' : ('D+' + Math.abs(dday)));
+      var dow = DOW_NAMES[new Date(e.year, e.month-1, e.date).getDay()];
+      var locAbbr = e.locAbbr || e.location || '';
+      html += '<div class="rp-rsvp-box">'
+        + '<div class="rp-rsvp-top"><span class="rp-rsvp-confirmed">CONFIRMED</span><span class="rp-rsvp-dday">' + ddayText + '</span></div>'
+        + '<div class="rp-rsvp-title">' + e.title + '</div>'
+        + '<div class="rp-rsvp-sub">' + dow + ', ' + monthName(e.month).slice(0,3) + ' ' + e.date + (e.time ? ' · ' + e.time : '') + (locAbbr ? ' (' + locAbbr + ')' : '') + '</div>'
+        + '</div>';
+    });
+  }
+  if(!foodEvents.length && !rsvpEvents.length){
+    html = '<div class="rp-head"><div class="rp-head-title">📅 THIS MONTH</div></div><div class="rp-empty">No official campus events on the calendar for ' + monthName(viewMonth) + ' ' + viewYear + '.</div>';
+  }
+  panel.innerHTML = html;
+}
+
+function updateFilterCounts(){
+  var monthEvents = CAMPUS_EVENTS.filter(function(e){ return e.year === viewYear && e.month === viewMonth; });
+  var counts = {all: monthEvents.length, rsvp: 0, food: 0, career: 0};
+  monthEvents.forEach(function(e){
+    if(e.cat === 'rsvp') counts.rsvp++;
+    if(e.cat === 'food') counts.food++;
+    if(e.career) counts.career++;
+  });
+  var setCount = function(sel, n){
+    var el = document.querySelector(sel);
+    if(el) el.textContent = '(' + n + ')';
+  };
+  setCount('[data-filter="all"] .count', counts.all);
+  setCount('[data-filter="rsvp"] .count', counts.rsvp);
+  setCount('[data-filter="food"] .count', counts.food);
+  setCount('[data-filter="career"] .count', counts.career);
+}
+
+/* ---------------- year/month dropdown ---------------- */
+function updateSelectLabels(){
+  var yLabel = document.querySelector('#cal-select-year .cal-select-label');
+  var mLabel = document.querySelector('#cal-select-month .cal-select-label');
+  if(yLabel) yLabel.textContent = viewYear + ' Year';
+  if(mLabel) mLabel.textContent = monthName(viewMonth) + ' (' + pad2(viewMonth) + ')';
+  document.querySelectorAll('#cal-select-year-menu .cal-select-opt').forEach(function(o){
+    o.classList.toggle('active', parseInt(o.getAttribute('data-value'), 10) === viewYear);
+  });
+  document.querySelectorAll('#cal-select-month-menu .cal-select-opt').forEach(function(o){
+    o.classList.toggle('active', parseInt(o.getAttribute('data-value'), 10) === viewMonth);
+  });
+}
+function toggleCalSelect(which){
+  var menu = document.getElementById('cal-select-' + which + '-menu');
+  var isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.cal-select-menu').forEach(function(m){ m.classList.remove('open'); });
+  if(!isOpen) menu.classList.add('open');
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.cal-select')){
+    document.querySelectorAll('.cal-select-menu').forEach(function(m){ m.classList.remove('open'); });
+  }
+});
+function selectCalOption(e, which, value){
+  e.stopPropagation();
+  document.getElementById('cal-select-' + which + '-menu').classList.remove('open');
+  if(which === 'year') viewYear = parseInt(value, 10);
+  else viewMonth = parseInt(value, 10);
+  updateSelectLabels();
+  renderCalendar();
+}
+function goToToday(){
+  viewYear = TODAY.year;
+  viewMonth = TODAY.month;
+  updateSelectLabels();
+  renderCalendar();
+}
 
 /* ---------------- add schedule modal ---------------- */
-(function(){
-  var sel = document.getElementById('as-date');
-  for(var d=1; d<=30; d++){ var o=document.createElement('option'); o.value=d; o.textContent='September '+d+', 2026'; sel.appendChild(o); }
-})();
-function openAddModal(){ document.getElementById('add-modal').classList.remove('hidden'); }
-function closeAddModal(){ document.getElementById('add-modal').classList.add('hidden'); }
-function addSchedule(){
-  var title = document.getElementById('as-title').value.trim() || 'New Personal Event';
-  var date = document.getElementById('as-date').value;
-  var time = document.getElementById('as-time').value.trim();
-  var cell = document.querySelector('.cal-cell[data-date="'+date+'"]');
-  if(cell){
-    var chip = document.createElement('span');
-    chip.className = 'ev-chip ev-chip--personal';
-    chip.setAttribute('data-cat','personal');
-    chip.textContent = '[Personal] ' + title + (time ? ' · ' + time : '');
-    cell.appendChild(chip);
-  }
-  closeAddModal();
+/* Date is a free Year/Month/Day pick -- not limited to whatever month
+   the grid happens to be showing, same as registering a real calendar
+   event. Year/Month options are filled once; Day options refresh
+   whenever Year or Month changes (months have different lengths). */
+var CAL_YEAR_OPTIONS = [2024, 2025, 2026, 2027, 2028];
+function calFillYearMonthSelects(){
+  var ySel = document.getElementById('as-year');
+  var mSel = document.getElementById('as-month');
+  if(!ySel || !mSel) return;
+  ySel.innerHTML = CAL_YEAR_OPTIONS.map(function(y){ return '<option value="'+y+'">'+y+'</option>'; }).join('');
+  mSel.innerHTML = MONTH_NAMES.map(function(name, i){ return '<option value="'+(i+1)+'">'+name+'</option>'; }).join('');
+}
+function calRefreshDaySelect(keepDay){
+  var ySel = document.getElementById('as-year'), mSel = document.getElementById('as-month'), dSel = document.getElementById('as-day');
+  if(!ySel || !mSel || !dSel) return;
+  var y = parseInt(ySel.value, 10), m = parseInt(mSel.value, 10);
+  var n = daysInMonth(y, m);
+  var prev = keepDay ? parseInt(dSel.value, 10) : null;
+  var opts = '';
+  for(var d = 1; d <= n; d++){ opts += '<option value="'+d+'">'+d+'</option>'; }
+  dSel.innerHTML = opts;
+  if(prev && prev <= n) dSel.value = prev;
+}
+
+/* Admin uses this exact same modal/button to register an Official,
+   RSVP-required or Free-Food event instead of a personal one -- same
+   calendar page, same "+ Add Schedule" flow, just a different target
+   store depending on who's signed in. */
+function calIsAdmin(){ return typeof SESSION !== 'undefined' && SESSION && SESSION.role === 'admin'; }
+var calPendingPoster = null;
+function calResetAddForm(){
   document.getElementById('as-title').value = '';
-  document.getElementById('as-time').value = '';
-  applyFilters();
-  showToast('Personal schedule added to Sep ' + date);
+  calResetTimeField('start');
+  calResetTimeField('end');
+  var loc = document.getElementById('as-location'); if(loc) loc.value = '';
+  var org = document.getElementById('as-org'); if(org) org.value = '';
+  var contact = document.getElementById('as-contact'); if(contact) contact.value = '';
+  var perks = document.getElementById('as-perks'); if(perks) perks.value = '';
+  var locAbbr = document.getElementById('as-locAbbr'); if(locAbbr) locAbbr.value = '';
+  var career = document.getElementById('as-career'); if(career) career.checked = false;
+  var posterInput = document.getElementById('as-poster'); if(posterInput) posterInput.value = '';
+  var catSel = document.getElementById('as-cat'); if(catSel) catSel.value = 'official';
+  calPendingPoster = null;
+  var preview = document.getElementById('as-poster-preview-wrap');
+  if(preview) preview.classList.add('hidden');
+  var locAbbrField = document.getElementById('as-locAbbr-field');
+  if(locAbbrField) locAbbrField.classList.add('hidden');
+}
+function openAddModal(){
+  var admin = calIsAdmin();
+  document.getElementById('add-official-fields-top').classList.toggle('hidden', !admin);
+  document.getElementById('add-official-fields-bottom').classList.toggle('hidden', !admin);
+  document.getElementById('add-modal-title').textContent = admin ? 'Register Official Event' : 'Add Personal Schedule';
+  document.getElementById('add-modal-sub').textContent = admin
+    ? 'This publishes to the shared Calendar — every student will see it right away.'
+    : "This event is visible only to you and won't appear as an Official Campus event.";
+  document.getElementById('add-schedule-btn').textContent = admin ? 'Register Event' : 'Add Schedule';
+  /* default the date pick to whatever month the grid is currently on,
+     but it can be freely changed to any year/month/day from here */
+  document.getElementById('as-year').value = viewYear;
+  document.getElementById('as-month').value = viewMonth;
+  calRefreshDaySelect(false);
+  document.getElementById('add-modal').classList.remove('hidden');
+}
+function closeAddModal(){ document.getElementById('add-modal').classList.add('hidden'); }
+document.getElementById('as-year').addEventListener('change', function(){ calRefreshDaySelect(true); });
+document.getElementById('as-month').addEventListener('change', function(){ calRefreshDaySelect(true); });
+calFillYearMonthSelects();
+
+/* 24h "HH:MM" input -> demo-style 12h label ("5pm", "7:30pm") */
+function calFormatTime12(t){
+  if(!t) return '';
+  var bits = t.split(':');
+  var h = parseInt(bits[0], 10), m = bits[1];
+  var ampm = h >= 12 ? 'pm' : 'am';
+  var h12 = h % 12; if(h12 === 0) h12 = 12;
+  return h12 + (m !== '00' ? ':' + m : '') + ampm;
+}
+/* start+end -> "5–7:30pm" when both share am/pm, "11am–2pm" otherwise;
+   either side alone just shows that one time, matching existing data. */
+function calFormatTimeRange(start, end){
+  if(!start && !end) return '';
+  if(start && !end) return calFormatTime12(start);
+  if(!start && end) return calFormatTime12(end);
+  var sMer = parseInt(start.split(':')[0], 10) >= 12 ? 'pm' : 'am';
+  var eMer = parseInt(end.split(':')[0], 10) >= 12 ? 'pm' : 'am';
+  var startLabel = calFormatTime12(start);
+  if(sMer === eMer) startLabel = startLabel.slice(0, -2); /* drop the shared am/pm off the start half */
+  return startLabel + '–' + calFormatTime12(end);
+}
+
+/* Custom start/end time picker -- plain English hour/minute/AM-PM
+   columns styled to match the year/month dropdowns above (.cal-select),
+   instead of the native <input type="time">, whose picker UI is drawn
+   by the OS/browser in the system locale (e.g. Korean AM/PM labels on
+   a Korean-locale machine) and can't be forced to stay in English. */
+var calTimeState = { start: {h:null, m:null, ap:null}, end: {h:null, m:null, ap:null} };
+function calBuildTimeMenu(field){
+  var hourCol = document.getElementById('as-time-' + field + '-hour');
+  var minCol = document.getElementById('as-time-' + field + '-minute');
+  var apCol = document.getElementById('as-time-' + field + '-ampm');
+  if(!hourCol || !minCol || !apCol) return;
+  hourCol.innerHTML = Array.from({length: 12}, function(_, i){ var h = i + 1; return '<div class="time-menu-opt" data-kind="h" data-val="' + h + '">' + h + '</div>'; }).join('');
+  minCol.innerHTML = ['00', '15', '30', '45'].map(function(m){ return '<div class="time-menu-opt" data-kind="m" data-val="' + m + '">' + m + '</div>'; }).join('');
+  apCol.innerHTML = ['AM', 'PM'].map(function(ap){ return '<div class="time-menu-opt" data-kind="ap" data-val="' + ap + '">' + ap + '</div>'; }).join('');
+  [hourCol, minCol, apCol].forEach(function(col){
+    col.querySelectorAll('.time-menu-opt').forEach(function(opt){
+      opt.addEventListener('click', function(e){
+        e.stopPropagation();
+        var kind = opt.getAttribute('data-kind'), val = opt.getAttribute('data-val');
+        if(kind === 'h') calTimeState[field].h = parseInt(val, 10);
+        if(kind === 'm') calTimeState[field].m = val;
+        if(kind === 'ap') calTimeState[field].ap = val;
+        calRefreshTimeMenuActive(field);
+        calUpdateTimeLabel(field);
+      });
+    });
+  });
+}
+function calRefreshTimeMenuActive(field){
+  var st = calTimeState[field];
+  document.querySelectorAll('#as-time-' + field + '-hour .time-menu-opt').forEach(function(o){ o.classList.toggle('active', st.h !== null && parseInt(o.getAttribute('data-val'), 10) === st.h); });
+  document.querySelectorAll('#as-time-' + field + '-minute .time-menu-opt').forEach(function(o){ o.classList.toggle('active', st.m !== null && o.getAttribute('data-val') === st.m); });
+  document.querySelectorAll('#as-time-' + field + '-ampm .time-menu-opt').forEach(function(o){ o.classList.toggle('active', st.ap !== null && o.getAttribute('data-val') === st.ap); });
+}
+function calUpdateTimeLabel(field){
+  var st = calTimeState[field];
+  var label = document.getElementById('as-time-' + field + '-label');
+  if(!label) return;
+  if(st.h !== null && st.m !== null && st.ap !== null){
+    label.textContent = st.h + ':' + st.m + ' ' + st.ap;
+    label.classList.add('set');
+  } else {
+    label.textContent = field === 'start' ? 'Start time' : 'End time';
+    label.classList.remove('set');
+  }
+}
+function toggleTimeMenu(field){
+  var other = field === 'start' ? 'end' : 'start';
+  var otherField = document.getElementById('as-time-' + other + '-field');
+  if(otherField) otherField.classList.remove('open');
+  document.getElementById('as-time-' + field + '-field').classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.time-field')){
+    ['start', 'end'].forEach(function(field){
+      var f = document.getElementById('as-time-' + field + '-field');
+      if(f) f.classList.remove('open');
+    });
+  }
+});
+/* Picked hour/minute/am-pm -> 24h "HH:MM" string (what calFormatTimeRange expects); '' if nothing picked yet. */
+function calGetTimeValue24(field){
+  var st = calTimeState[field];
+  if(st.h === null || st.m === null || st.ap === null) return '';
+  var h24 = st.h % 12;
+  if(st.ap === 'PM') h24 += 12;
+  return (h24 < 10 ? '0' : '') + h24 + ':' + st.m;
+}
+function calResetTimeField(field){
+  calTimeState[field] = {h: null, m: null, ap: null};
+  calUpdateTimeLabel(field);
+  calRefreshTimeMenuActive(field);
+  var f = document.getElementById('as-time-' + field + '-field');
+  if(f) f.classList.remove('open');
+}
+calBuildTimeMenu('start');
+calBuildTimeMenu('end');
+
+var calCatSelEl = document.getElementById('as-cat');
+if(calCatSelEl){
+  calCatSelEl.addEventListener('change', function(){
+    document.getElementById('as-locAbbr-field').classList.toggle('hidden', this.value !== 'rsvp');
+  });
+}
+var calPosterInputEl = document.getElementById('as-poster');
+if(calPosterInputEl){
+  calPosterInputEl.addEventListener('change', function(input){
+    var file = input.target.files && input.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      calPendingPoster = ev.target.result;
+      document.getElementById('as-poster-preview').src = calPendingPoster;
+      document.getElementById('as-poster-preview-wrap').classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+var calPosterRemoveEl = document.getElementById('as-poster-remove');
+if(calPosterRemoveEl){
+  calPosterRemoveEl.addEventListener('click', function(){
+    calPendingPoster = null;
+    document.getElementById('as-poster').value = '';
+    document.getElementById('as-poster-preview-wrap').classList.add('hidden');
+  });
+}
+
+function calUid(){ return 'e' + Math.random().toString(36).slice(2, 9); }
+function addSchedule(){
+  var title = document.getElementById('as-title').value.trim() || (calIsAdmin() ? 'New Event' : 'New Personal Event');
+  var year = parseInt(document.getElementById('as-year').value, 10);
+  var month = parseInt(document.getElementById('as-month').value, 10);
+  var date = parseInt(document.getElementById('as-day').value, 10);
+  var timeStart = calGetTimeValue24('start');
+  var timeEnd = calGetTimeValue24('end');
+  var time = calFormatTimeRange(timeStart, timeEnd);
+
+  if(calIsAdmin()){
+    var cat = document.getElementById('as-cat').value;
+    var rec = {
+      id: calUid(),
+      cat: cat,
+      title: title,
+      year: year, month: month, date: date,
+      time: time,
+      location: document.getElementById('as-location').value.trim(),
+      org: document.getElementById('as-org').value.trim(),
+      contact: document.getElementById('as-contact').value.trim(),
+      perks: document.getElementById('as-perks').value.trim(),
+      career: document.getElementById('as-career').checked ? 1 : 0,
+      poster: calPendingPoster
+    };
+    if(cat === 'rsvp') rec.locAbbr = document.getElementById('as-locAbbr').value.trim();
+    CAMPUS_EVENTS.push(rec);
+    try { localStorage.setItem(CAL_STORE_KEY, JSON.stringify(CAMPUS_EVENTS)); } catch(e){}
+    closeAddModal();
+    calResetAddForm();
+    renderCalendar();
+    showToast('Registered "' + title + '" as an Official Campus event for ' + monthName(month).slice(0,3) + ' ' + date + ', ' + year);
+    return;
+  }
+
+  personalEvents.push({year: year, month: month, date: date, title: title, time: time});
+  closeAddModal();
+  calResetAddForm();
+  renderCalendar();
+  showToast('Personal schedule added to ' + monthName(month).slice(0,3) + ' ' + date + ', ' + year);
 }
 
 /* ---------------- calendar filters ---------------- */
@@ -56,3 +535,5 @@ function togglePersonal(){
   applyFilters();
   showToast(personalOn ? 'Personal schedule shown' : 'Personal schedule hidden');
 }
+
+renderCalendar();

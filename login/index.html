@@ -33,27 +33,57 @@
     <div class="login-panels">
       <div class="login-panel">
         <span class="badge red">Student Portal Access</span>
-        <h2>Student Login</h2>
-        <p>Sign in with your University ID (UNID) to view departmental campus events, RSVP for workshops, and configure personal schedule sync.</p>
+        <h2 id="studentPanelTitle">Student Login</h2>
+        <p id="studentPanelDesc">Sign in with your University ID (UNID) to view departmental campus events, RSVP for workshops, and configure personal schedule sync.</p>
 
-        <div class="field-label">UNID (University ID)</div>
-        <div class="field">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BE0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9.5" cy="11" r="1.8"/><path d="M6.5 16c0-1.7 1.4-2.5 3-2.5s3 .8 3 2.5"/><path d="M15 10h3M15 13h3"/></svg>
-          <input id="login-unid" placeholder="e.g. u1621896" autocomplete="username" onkeydown="if(event.key==='Enter')tryStudentLogin()">
-        </div>
-        <div class="field-label">Password</div>
-        <div class="field">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B6AEB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-          <input id="login-pw" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')tryStudentLogin()">
+        <div id="loginFields">
+          <div class="field-label">UNID (University ID)</div>
+          <div class="field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BE0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9.5" cy="11" r="1.8"/><path d="M6.5 16c0-1.7 1.4-2.5 3-2.5s3 .8 3 2.5"/><path d="M15 10h3M15 13h3"/></svg>
+            <input id="login-unid" placeholder="e.g. u1621896" autocomplete="username" onkeydown="if(event.key==='Enter')tryStudentLogin()">
+          </div>
+          <div class="field-label">Password</div>
+          <div class="field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B6AEB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input id="login-pw" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')tryStudentLogin()">
+          </div>
         </div>
 
-        <button class="btn btn-red btn-block" onclick="tryStudentLogin()">
+        <div id="signupFields" class="hidden">
+          <div class="field-label">UNID (University ID)</div>
+          <div class="field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BE0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9.5" cy="11" r="1.8"/><path d="M6.5 16c0-1.7 1.4-2.5 3-2.5s3 .8 3 2.5"/><path d="M15 10h3M15 13h3"/></svg>
+            <input id="signup-unid" placeholder="e.g. u1621896" autocomplete="username">
+          </div>
+          <div class="field-label">Full Name</div>
+          <div class="field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B6AEB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+            <input id="signup-name" placeholder="e.g. Garam Kim" autocomplete="name">
+          </div>
+          <div class="field-label">Major</div>
+          <div class="field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B6AEB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/></svg>
+            <input id="signup-major" placeholder="e.g. Business">
+          </div>
+          <div class="field-label">Password</div>
+          <div class="field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B6AEB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input id="signup-pw" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+          </div>
+          <div class="field-label">Confirm Password</div>
+          <div class="field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B6AEB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input id="signup-pw2" type="password" placeholder="Re-enter password" autocomplete="new-password">
+          </div>
+        </div>
+
+        <button class="btn btn-red btn-block" id="studentActionBtn" onclick="tryStudentLogin()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5l7 7-7 7M4 12h16"/></svg>
-          Sign In with UNID
+          <span id="studentActionLabel">Sign In with UNID</span>
         </button>
         <div class="login-foot">
-          <button class="muted" onclick="showToast('A password reset link has been sent to your registered UNID email')">Forgot Password?</button>
-          <button style="color:var(--red);font-weight:700;" onclick="showToast('Redirecting to Utah CIS Central Login…')">Utah CIS Central Login</button>
+          <button class="muted" id="forgotPwBtn" onclick="showToast('A password reset link has been sent to your registered UNID email')">Forgot Password?</button>
+          <button id="studentModeToggle" style="color:var(--red);font-weight:700;" onclick="toggleSignupMode()">Don't have an account? Sign Up</button>
         </div>
       </div>
 
@@ -89,6 +119,7 @@
 <div id="toast-host"></div>
 <script src="../shared/toast.js"></script>
 <script src="../shared/session.js"></script>
+<script src="../shared/store.js"></script>
 <script src="login.js"></script>
 </body>
 </html>

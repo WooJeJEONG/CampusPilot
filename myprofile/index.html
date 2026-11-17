@@ -34,7 +34,7 @@
 
     <div class="main-col">
       <div class="feature-head">
-        <div class="feature-head-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+        <div class="feature-head-icon" style="background:#F0F0F2;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5A5460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
         <div>
           <h1>My Profile</h1>
           <div class="fh-sub" id="fhSub">Manage your account, saved events, and notification preferences</div>
@@ -46,14 +46,14 @@
           <div class="profile-avatar" id="profileAvatar">G</div>
           <div>
             <div class="profile-name" id="profileName">Garam Lee</div>
-            <div class="profile-meta">Computer Science, B.S. — Class of 2027<br>University of Utah Asia Campus (UAC), Songdo</div>
+            <div class="profile-meta" id="profileMeta">Computer Science, B.S. — Class of 2027<br>University of Utah Asia Campus (UAC), Songdo</div>
           </div>
         </div>
         <div class="kv-grid">
-          <div class="kv-item"><div class="kv-label">UNID</div><div class="kv-value">u1621896</div></div>
-          <div class="kv-item"><div class="kv-label">Linked Email</div><div class="kv-value">glee@umail.utah.edu</div></div>
+          <div class="kv-item"><div class="kv-label">UNID</div><div class="kv-value" id="kvUnid">u1621896</div></div>
+          <div class="kv-item"><div class="kv-label">Linked Email</div><div class="kv-value" id="kvEmail">glee@umail.utah.edu</div></div>
           <div class="kv-item"><div class="kv-label">Status</div><div class="kv-value" id="statusValue">Active Student</div></div>
-          <div class="kv-item"><div class="kv-label">Advisor</div><div class="kv-value">Dr. H. Jung — CS Dept.</div></div>
+          <div class="kv-item"><div class="kv-label">Member Since</div><div class="kv-value" id="kvJoined">—</div></div>
         </div>
       </div>
 
@@ -84,11 +84,8 @@
 
       <div class="card">
         <h3>Account</h3>
-        <div class="kv-grid" style="margin-top:0;margin-bottom:16px;">
-          <div class="kv-item"><div class="kv-label">University ID</div><div class="kv-value">u1621896</div></div>
-          <div class="kv-item"><div class="kv-label">Sign-in Method</div><div class="kv-value">Utah CIS SSO</div></div>
-        </div>
-        <button class="btn btn-ghost" onclick="showToast('A password reset link has been sent to your registered UNID email')">Change Password</button>
+        <div class="kv-item" style="margin-bottom:16px;"><div class="kv-label">Sign-in Method</div><div class="kv-value" id="signinMethodValue">Campuspilot Account</div></div>
+        <button class="btn btn-ghost" id="changePwBtn" onclick="mpChangePassword()">Change Password</button>
       </div>
 
       <div class="card hidden" id="adminPanel">
@@ -112,6 +109,21 @@
             <a class="attn-go" href="../calendar/index.html">Open Calendar →</a>
           </div>
         </div>
+      </div>
+
+      <div class="card hidden" id="adminStudentPanel">
+        <h3>Registered Students <span class="admin-badge">ADMIN</span></h3>
+        <input class="roster-search" id="studentSearch" placeholder="Search by UNID or name…" oninput="mpRenderStudentRoster()">
+        <div class="roster-count" id="studentRosterCount"></div>
+        <div class="roster-wrap">
+          <table class="roster-table">
+            <thead>
+              <tr><th>UNID</th><th>Name</th><th>Major</th><th>Joined</th></tr>
+            </thead>
+            <tbody id="studentRosterBody"></tbody>
+          </table>
+        </div>
+        <div class="muted" id="studentRosterEmpty" style="font-size:13px;padding:14px 2px 4px;display:none;">No registered students match that search.</div>
       </div>
     </div>
   </div>

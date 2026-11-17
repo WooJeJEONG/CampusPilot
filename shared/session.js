@@ -12,16 +12,79 @@ function getSession(){
   }catch(e){ return null; }
 }
 
-function setSession(role){
+/* setSession(role, profile) — for 'student', profile is the matched
+   account record from the accounts store below (unid/name/major/
+   joinedAt), so the signed-in identity is always a real, self-registered
+   account rather than a hardcoded demo user. The admin side still has no
+   accounts of its own (fixed departmental passcode), so its session stays
+   fixed. */
+function setSession(role, profile){
   var session = (role === 'admin')
     ? { role:'admin', name:'UAC Admin (Dept. Staff)', initial:'A' }
-    : { role:'student', name:'Garam (u1621896)', initial:'G' };
+    : {
+        role:'student',
+        unid:((profile && profile.unid) || ''),
+        name:((profile && profile.name) || 'Student'),
+        major:((profile && profile.major) || ''),
+        joinedAt:((profile && profile.joinedAt) || null),
+        initial:(((profile && profile.name) || 'S').trim().charAt(0) || 'S').toUpperCase()
+      };
   try{ localStorage.setItem(SESSION_KEY, JSON.stringify(session)); }catch(e){}
   return session;
 }
 
 function clearSession(){
   try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
+}
+
+/* ---------------- shared: student accounts (sign-up / sign-in) ----------------
+   There's no backend, so every registered student account lives in its
+   own localStorage key, keyed by lowercased UNID. login.js uses these for
+   sign-up + sign-in; myprofile.js uses them for the admin student roster
+   and the student "Change Password" flow. Relies on cpLoadJSON/
+   cpSaveJSON from shared/store.js, which every page that loads this file
+   also loads. */
+var ACCOUNTS_KEY = 'campuspilot.accounts.v1';
+
+function getAccounts(){
+  return cpLoadJSON(ACCOUNTS_KEY, {});
+}
+function saveAccounts(accounts){
+  cpSaveJSON(ACCOUNTS_KEY, accounts);
+}
+function findAccount(unid){
+  var accounts = getAccounts();
+  return accounts[(unid || '').trim().toLowerCase()] || null;
+}
+function createAccount(unid, password, name, major){
+  unid = (unid || '').trim().toLowerCase();
+  name = (name || '').trim();
+  var accounts = getAccounts();
+  if(!unid || !password || !name) return { ok:false, error:'Fill in your UNID, name, and password.' };
+  if(accounts[unid]) return { ok:false, error:'That UNID is already registered — sign in instead.' };
+  accounts[unid] = {
+    unid: unid,
+    password: password,
+    name: name,
+    major: (major || '').trim(),
+    joinedAt: Date.now()
+  };
+  saveAccounts(accounts);
+  return { ok:true, account:accounts[unid] };
+}
+function updateAccountPassword(unid, newPassword){
+  var accounts = getAccounts();
+  var key = (unid || '').trim().toLowerCase();
+  if(!accounts[key]) return false;
+  accounts[key].password = newPassword;
+  saveAccounts(accounts);
+  return true;
+}
+function listAccounts(){
+  var accounts = getAccounts();
+  return Object.keys(accounts).map(function(k){ return accounts[k]; }).sort(function(a, b){
+    return (a.joinedAt || 0) - (b.joinedAt || 0);
+  });
 }
 
 /* Redirects to the login page if nobody is signed in; otherwise paints
@@ -57,6 +120,53 @@ function applySessionUI(session){
   document.querySelectorAll('[data-role="student"]').forEach(function(el){
     el.classList.toggle('hidden', session.role !== 'student');
   });
+  mountFullscreenToggle();
+}
+
+/* ---------------- shared: full-screen toggle button (topbar) ----------------
+   Injected into .topbar-right on every protected page so the whole app can
+   be viewed edge-to-edge (e.g. inside a browser preview) with one click. */
+var FS_ICON_EXPAND = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5a1 1 0 0 0-1 1v4"/><path d="M15 4h4a1 1 0 0 1 1 1v4"/><path d="M9 20H5a1 1 0 0 1-1-1v-4"/><path d="M15 20h4a1 1 0 0 0 1-1v-4"/></svg>';
+var FS_ICON_COLLAPSE = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4"/><path d="M20 9V5a1 1 0 0 0-1-1h-4"/><path d="M4 15v4a1 1 0 0 0 1 1h4"/><path d="M20 15v4a1 1 0 0 1-1 1h-4"/></svg>';
+
+function isFullscreenNow(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+function updateFullscreenBtn(btn){
+  if(!btn) return;
+  var on = isFullscreenNow();
+  btn.innerHTML = on ? FS_ICON_COLLAPSE : FS_ICON_EXPAND;
+  btn.title = on ? 'Exit full screen' : 'View full screen';
+  btn.setAttribute('aria-label', btn.title);
+}
+
+function toggleFullscreen(){
+  try{
+    if(isFullscreenNow()){
+      if(document.exitFullscreen) document.exitFullscreen().catch(function(){});
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } else {
+      var el = document.documentElement;
+      var req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if(req) req.call(el).catch(function(){});
+    }
+  }catch(e){}
+}
+
+function mountFullscreenToggle(){
+  var bar = document.querySelector('.topbar-right');
+  if(!bar || bar.querySelector('.topbar-fullscreen')) return;
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'topbar-fullscreen';
+  btn.onclick = toggleFullscreen;
+  updateFullscreenBtn(btn);
+  var logoutEl = bar.querySelector('.topbar-logout');
+  if(logoutEl) bar.insertBefore(btn, logoutEl);
+  else bar.appendChild(btn);
+  document.addEventListener('fullscreenchange', function(){ updateFullscreenBtn(btn); });
+  document.addEventListener('webkitfullscreenchange', function(){ updateFullscreenBtn(btn); });
 }
 
 function logout(){

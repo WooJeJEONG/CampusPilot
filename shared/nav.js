@@ -19,7 +19,7 @@ var NAV_ICONS = {
 var NAV_ORDER = [
   ['home','Home',null,'../home/index.html'],
   ['calendar','Calendar',null,'../calendar/index.html'],
-  ['lostfound','Lost &amp; Found',null,'../lostfound/index.html'],
+  ['lostfound','Lost &amp;&nbsp;Found',null,'../lostfound/index.html'],
   ['gradepilot','GradePilot',null,'../gradepilot/index.html'],
   ['courseinsights','Course Insights',null,'../courseinsights/index.html'],
   ['campusjobs','Campus Jobs',null,'../campusjobs/index.html'],

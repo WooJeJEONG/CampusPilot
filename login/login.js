@@ -1,12 +1,32 @@
 /* Campuspilot — login page logic.
-   Validates the student UNID/password pair and the admin departmental
-   passcode, then hands off to shared/session.js (setSession) and
-   redirects into the app. There's no backend, so these are the two
-   fixed credential pairs this prototype recognizes. */
+   Students self-register (UNID + password + name + major/year) into a
+   localStorage accounts store (createAccount / findAccount, defined in
+   shared/session.js) and then sign in against that record — there is no
+   shared demo password anymore, and no seeded account: every student has
+   to sign up once before they can sign in. The admin side is unchanged:
+   a single fixed departmental passcode, no accounts, no sign-up. */
 
-var STUDENT_UNID = 'u1621896';
-var STUDENT_PASSWORD = 'uacpilot25';
 var ADMIN_PASSCODE = '000000';
+var studentMode = 'login'; // 'login' | 'signup'
+
+function toggleSignupMode(){
+  studentMode = (studentMode === 'login') ? 'signup' : 'login';
+  renderStudentMode();
+}
+
+function renderStudentMode(){
+  var isSignup = studentMode === 'signup';
+  document.getElementById('loginFields').classList.toggle('hidden', isSignup);
+  document.getElementById('signupFields').classList.toggle('hidden', !isSignup);
+  document.getElementById('studentPanelTitle').textContent = isSignup ? 'Create Student Account' : 'Student Login';
+  document.getElementById('studentPanelDesc').textContent = isSignup
+    ? 'Register with your University ID to create your Campuspilot account — then sign in with it below.'
+    : 'Sign in with your University ID (UNID) to view departmental campus events, RSVP for workshops, and configure personal schedule sync.';
+  document.getElementById('studentActionLabel').textContent = isSignup ? 'Create Account' : 'Sign In with UNID';
+  document.getElementById('studentActionBtn').onclick = isSignup ? trySignUp : tryStudentLogin;
+  document.getElementById('forgotPwBtn').classList.toggle('hidden', isSignup);
+  document.getElementById('studentModeToggle').textContent = isSignup ? 'Already have an account? Sign In' : "Don't have an account? Sign Up";
+}
 
 function tryStudentLogin(){
   var unid = (document.getElementById('login-unid').value || '').trim();
@@ -16,12 +36,51 @@ function tryStudentLogin(){
     showToast('Enter your UNID and password.');
     return;
   }
-  if(unid !== STUDENT_UNID || pw !== STUDENT_PASSWORD){
+  var account = findAccount(unid);
+  if(!account || account.password !== pw){
     showToast('Incorrect UNID or password.');
     return;
   }
-  setSession('student');
+  setSession('student', account);
   window.location.href = '../home/index.html';
+}
+
+function trySignUp(){
+  var unid = document.getElementById('signup-unid').value;
+  var name = document.getElementById('signup-name').value;
+  var major = document.getElementById('signup-major').value;
+  var pw = document.getElementById('signup-pw').value;
+  var pw2 = document.getElementById('signup-pw2').value;
+
+  if(!unid.trim() || !name.trim() || !pw){
+    showToast('Fill in your UNID, name, and password.');
+    return;
+  }
+  if(pw.length < 6){
+    showToast('Password must be at least 6 characters.');
+    return;
+  }
+  if(pw !== pw2){
+    showToast('Passwords do not match.');
+    return;
+  }
+
+  var result = createAccount(unid, pw, name, major);
+  if(!result.ok){
+    showToast(result.error);
+    return;
+  }
+
+  showToast('Account created — sign in with your new UNID and password.');
+  document.getElementById('login-unid').value = result.account.unid;
+  document.getElementById('login-pw').value = '';
+  document.getElementById('signup-unid').value = '';
+  document.getElementById('signup-name').value = '';
+  document.getElementById('signup-major').value = '';
+  document.getElementById('signup-pw').value = '';
+  document.getElementById('signup-pw2').value = '';
+  studentMode = 'login';
+  renderStudentMode();
 }
 
 function getOtpValue(){

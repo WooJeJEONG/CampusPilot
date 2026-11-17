@@ -46,6 +46,12 @@ function gpGradeFor(pct, scale){
 
 var gpCourses = {};
 var gpActiveKey = null;
+/* Mirrors exactly what's been typed into a score input while it still has
+   focus (keyed by component id), so a mid-keystroke re-render never snaps
+   a partial value like "8" or "0." back to its already-parsed number and
+   drops the digit/decimal-point the person just typed. Cleared on blur so
+   a later re-render falls back to the clean, clamped value. */
+var gpRawInputDraft = {};
 var gpStagedKey = null;
 var gpStagedFile = '';
 var gpStagedFileObj = null; // the real File object for the uploaded syllabus PDF
@@ -70,8 +76,34 @@ function gpLoadPersisted(){
     return true;
   }catch(e){ return false; }
 }
+/* Two-click confirm built into the button itself, instead of
+   window.confirm() -- a sandboxed preview (e.g. this page viewed inside
+   a published Claude Artifact) silently auto-dismisses confirm()/
+   prompt()/alert(), so a confirm()-gated destructive action would
+   silently no-op there even though it works fine in a real, unsandboxed
+   browser. This button-based version works identically in both. */
+var gpClearArmed = false;
+var gpClearArmTimer = null;
+function gpResetClearBtn(){
+  gpClearArmed = false;
+  clearTimeout(gpClearArmTimer);
+  var btn = document.getElementById('gpClearBtn');
+  var label = document.getElementById('gpClearBtnLabel');
+  if(btn) btn.classList.remove('armed');
+  if(label) label.textContent = 'Clear All';
+}
 function gpClearAll(){
-  if(!confirm('Delete every saved GradePilot course and score on this device? This can\'t be undone.')) return;
+  if(!gpClearArmed){
+    gpClearArmed = true;
+    var btn = document.getElementById('gpClearBtn');
+    var label = document.getElementById('gpClearBtnLabel');
+    if(btn) btn.classList.add('armed');
+    if(label) label.textContent = 'Click again to confirm';
+    clearTimeout(gpClearArmTimer);
+    gpClearArmTimer = setTimeout(gpResetClearBtn, 4000);
+    return;
+  }
+  gpResetClearBtn();
   gpCourses = {};
   gpActiveKey = null;
   gpExpandedGroups = {};
@@ -776,7 +808,7 @@ function gpRenderRows(){
           return '<div class="gp-subrow'+(isDropped?' is-dropped':'')+'">'
             + '<div class="gp-row-name"><span class="gp-dot'+(isDone?' done':'')+'"></span><span class="label'+(isDropped?' is-dropped-label':'')+'">'+m.name+'</span></div>'
             + '<div class="gp-row-wt">'+(Math.round(m.weight*10)/10)+'%</div>'
-            + '<div class="gp-row-score"><input type="number" min="0" max="'+m.total+'" value="'+(isDone?m.earned:'')+'" placeholder="—" oninput="gpSetComponentScore(\''+m.id+'\',this.value)"><span>/'+m.total+'</span></div>'
+            + '<div class="gp-row-score"><input type="text" inputmode="decimal" autocomplete="off" id="gp-score-'+m.id+'" value="'+(Object.prototype.hasOwnProperty.call(gpRawInputDraft,m.id)?gpRawInputDraft[m.id]:(isDone?m.earned:''))+'" placeholder="—" oninput="gpSetComponentScore(\''+m.id+'\',this.value)" onblur="gpClearScoreDraft(\''+m.id+'\')"><span>/'+m.total+'</span></div>'
             + '<div class="gp-row-status">'+gradeCell(m)+'</div>'
             + '</div>';
         }).join('') + '</div>';
@@ -789,7 +821,7 @@ function gpRenderRows(){
       html += '<div class="gp-row'+(isDropped2?' is-dropped':'')+'">'
         + '<div class="gp-row-name"><span class="gp-dot'+(isDone2?' done':'')+'"></span><span class="label'+(isDropped2?' is-dropped-label':'')+'">'+comp.name+'</span></div>'
         + '<div class="gp-row-wt">'+(Math.round(comp.weight*10)/10)+'%</div>'
-        + '<div class="gp-row-score"><input type="number" min="0" max="'+comp.total+'" value="'+(isDone2?comp.earned:'')+'" placeholder="—" oninput="gpSetComponentScore(\''+comp.id+'\',this.value)"><span>/'+comp.total+'</span></div>'
+        + '<div class="gp-row-score"><input type="text" inputmode="decimal" autocomplete="off" id="gp-score-'+comp.id+'" value="'+(Object.prototype.hasOwnProperty.call(gpRawInputDraft,comp.id)?gpRawInputDraft[comp.id]:(isDone2?comp.earned:''))+'" placeholder="—" oninput="gpSetComponentScore(\''+comp.id+'\',this.value)" onblur="gpClearScoreDraft(\''+comp.id+'\')"><span>/'+comp.total+'</span></div>'
         + '<div class="gp-row-status">'+gradeCell(comp)+'</div>'
         + '</div>';
     }
@@ -808,11 +840,36 @@ function gpSetComponentScore(componentId, value){
   if(!c) return;
   var comp = c.components.filter(function(x){ return x.id === componentId; })[0];
   if(!comp) return;
+
+  gpRawInputDraft[componentId] = value; // keep exactly what was typed, decimal point included
   var v = value.trim();
   comp.earned = v === '' ? null : Math.max(0, Math.min(comp.total, parseFloat(v) || 0));
   gpPersist();
+
+  // gpRenderRows() rebuilds every row's HTML (drop-policy status can shift
+  // on any keystroke), which destroys and recreates this very <input> —
+  // normally kicking the cursor out after the very first digit. Capture
+  // focus + caret position first and restore them once the new input for
+  // this same component exists in the DOM.
+  var active = document.activeElement;
+  var inputId = 'gp-score-' + componentId;
+  var hadFocus = active && active.id === inputId;
+  var selStart = hadFocus ? active.selectionStart : null;
+  var selEnd = hadFocus ? active.selectionEnd : null;
+
   gpRenderRows();
   gpCalculate();
+
+  if(hadFocus){
+    var el = document.getElementById(inputId);
+    if(el){
+      el.focus();
+      try{ el.setSelectionRange(selStart, selEnd); }catch(e){}
+    }
+  }
+}
+function gpClearScoreDraft(componentId){
+  delete gpRawInputDraft[componentId];
 }
 
 function gpPromptNewAssessment(){

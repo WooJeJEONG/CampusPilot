@@ -33,11 +33,22 @@
     <aside class="nav-rail" id="navrail"></aside>
 
     <main class="main-col">
+      <div class="feature-head">
+        <div class="feature-head-icon" style="background:var(--red-tint);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#BE0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div>
+        <div>
+          <h1>Calendar</h1>
+          <div class="fh-sub">Official UAC schedule with optional personal event overlay</div>
+        </div>
+      </div>
       <div class="cal-topbar">
         <div class="cal-selects">
-          <div class="cal-select">2026 Year <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
-          <div class="cal-select">September (09) <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
-          <div class="cal-today">Today (Sep 2)</div>
+          <div class="cal-select" id="cal-select-year" onclick="toggleCalSelect('year')"><span class="cal-select-label">2026 Year</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <div class="cal-select-menu" id="cal-select-year-menu"><div class="cal-select-opt" data-value="2024" onclick="selectCalOption(event,'year','2024','2024')">2024</div><div class="cal-select-opt" data-value="2025" onclick="selectCalOption(event,'year','2025','2025')">2025</div><div class="cal-select-opt active" data-value="2026" onclick="selectCalOption(event,'year','2026','2026')">2026</div><div class="cal-select-opt" data-value="2027" onclick="selectCalOption(event,'year','2027','2027')">2027</div><div class="cal-select-opt" data-value="2028" onclick="selectCalOption(event,'year','2028','2028')">2028</div></div>
+          </div>
+          <div class="cal-select" id="cal-select-month" onclick="toggleCalSelect('month')"><span class="cal-select-label">September (09)</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <div class="cal-select-menu" id="cal-select-month-menu"><div class="cal-select-opt" data-value="01" onclick="selectCalOption(event,'month','01','January (01)')">January (01)</div><div class="cal-select-opt" data-value="02" onclick="selectCalOption(event,'month','02','February (02)')">February (02)</div><div class="cal-select-opt" data-value="03" onclick="selectCalOption(event,'month','03','March (03)')">March (03)</div><div class="cal-select-opt" data-value="04" onclick="selectCalOption(event,'month','04','April (04)')">April (04)</div><div class="cal-select-opt" data-value="05" onclick="selectCalOption(event,'month','05','May (05)')">May (05)</div><div class="cal-select-opt" data-value="06" onclick="selectCalOption(event,'month','06','June (06)')">June (06)</div><div class="cal-select-opt" data-value="07" onclick="selectCalOption(event,'month','07','July (07)')">July (07)</div><div class="cal-select-opt" data-value="08" onclick="selectCalOption(event,'month','08','August (08)')">August (08)</div><div class="cal-select-opt active" data-value="09" onclick="selectCalOption(event,'month','09','September (09)')">September (09)</div><div class="cal-select-opt" data-value="10" onclick="selectCalOption(event,'month','10','October (10)')">October (10)</div><div class="cal-select-opt" data-value="11" onclick="selectCalOption(event,'month','11','November (11)')">November (11)</div><div class="cal-select-opt" data-value="12" onclick="selectCalOption(event,'month','12','December (12)')">December (12)</div></div>
+          </div>
+          <div class="cal-today" id="cal-today-btn" onclick="goToToday()" style="cursor:pointer;">Today (Sep 2)</div>
         </div>
         <div class="cal-legend">
           <span><i class="dot" style="background:#BE0000;"></i>My RSVP</span>
@@ -48,10 +59,10 @@
       </div>
 
       <div class="filter-row" id="filter-row">
-        <button class="pill active" data-filter="all">All Campus Events <span class="count">(0)</span></button>
-        <button class="pill red" data-filter="rsvp">🔖 My RSVPs <span class="count">(0)</span></button>
-        <button class="pill" data-filter="food">🍴 Free Food <span class="count">(0)</span></button>
-        <button class="pill" data-filter="career">💼 Career &amp; Jobs <span class="count">(0)</span></button>
+        <button class="pill active" data-filter="all">All Campus Events <span class="count">(3)</span></button>
+        <button class="pill red" data-filter="rsvp">🔖 My RSVPs <span class="count">(1)</span></button>
+        <button class="pill" data-filter="food">🍴 Free Food <span class="count">(1)</span></button>
+        <button class="pill" data-filter="career">💼 Career &amp; Jobs <span class="count">(1)</span></button>
         <button class="pill-toggle" id="personal-toggle" onclick="togglePersonal()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M2.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
           Personal Schedule
@@ -64,57 +75,17 @@
         <div class="cal-dow">
           <div class="sun">SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
         </div>
-        <div class="cal-body" id="cal-body">
-          <div class="cal-cell"><div class="cal-date dim">31</div></div>
-          <div class="cal-cell" data-date="1"><div class="cal-date">1</div></div>
-          <div class="cal-cell today" data-date="2"><div class="date-row"><span class="cal-date" style="color:#BE0000;">2</span><span class="today-chip">TODAY</span></div></div>
-          <div class="cal-cell" data-date="3"><div class="cal-date">3</div></div>
-          <div class="cal-cell" data-date="4"><div class="cal-date">4</div></div>
-          <div class="cal-cell" data-date="5"><div class="cal-date">5</div></div>
-          <div class="cal-cell"><div class="cal-date">6</div></div>
-
-          <div class="cal-cell" data-date="7"><div class="cal-date">7</div></div>
-          <div class="cal-cell" data-date="8"><div class="cal-date">8</div></div>
-          <div class="cal-cell" data-date="9"><div class="cal-date">9</div></div>
-          <div class="cal-cell" data-date="10"><div class="cal-date">10</div></div>
-          <div class="cal-cell" data-date="11"><div class="cal-date">11</div></div>
-          <div class="cal-cell" data-date="12"><div class="cal-date">12</div></div>
-          <div class="cal-cell"><div class="cal-date">13</div></div>
-
-          <div class="cal-cell" data-date="14"><div class="cal-date">14</div></div>
-          <div class="cal-cell" data-date="15"><div class="cal-date">15</div></div>
-          <div class="cal-cell" data-date="16"><div class="cal-date">16</div></div>
-          <div class="cal-cell" data-date="17"><div class="cal-date">17</div></div>
-          <div class="cal-cell" data-date="18"><div class="cal-date">18</div></div>
-          <div class="cal-cell" data-date="19"><div class="cal-date">19</div></div>
-          <div class="cal-cell"><div class="cal-date">20</div></div>
-
-          <div class="cal-cell" data-date="21"><div class="cal-date">21</div></div>
-          <div class="cal-cell" data-date="22"><div class="cal-date">22</div></div>
-          <div class="cal-cell" data-date="23"><div class="cal-date">23</div></div>
-          <div class="cal-cell" data-date="24"><div class="cal-date">24</div></div>
-          <div class="cal-cell" data-date="25"><div class="cal-date">25</div></div>
-          <div class="cal-cell" data-date="26"><div class="cal-date">26</div></div>
-          <div class="cal-cell"><div class="cal-date">27</div></div>
-
-          <div class="cal-cell" data-date="28"><div class="cal-date">28</div></div>
-          <div class="cal-cell" data-date="29"><div class="cal-date">29</div></div>
-          <div class="cal-cell" data-date="30"><div class="cal-date">30</div></div>
-          <div class="cal-cell"><div class="cal-date dim">1</div></div>
-          <div class="cal-cell"><div class="cal-date dim">2</div></div>
-          <div class="cal-cell"><div class="cal-date dim">3</div></div>
-          <div class="cal-cell"><div class="cal-date dim">4</div></div>
-        </div>
+        <div class="cal-body" id="cal-body"></div>
       </div>
     </main>
 
     <aside class="right-panel">
       <div class="rp-head"><div class="rp-head-title">🍴 FREE FOOD EVENTS</div></div>
-      <div class="muted" style="font-size:12.5px;padding:6px 2px;">No free food events posted yet.</div>
+      <div style="font-size:12.5px;padding:6px 2px;line-height:1.5;"><b>Free Pizza Night</b><br><span class="muted">Student Center &middot; Sep 9, 6pm</span></div>
 
       <div class="rp-divider"></div>
       <div class="rp-head"><div class="rp-head-title">🔖 MY RSVPS</div></div>
-      <div class="muted" style="font-size:12.5px;padding:6px 2px;">You haven't RSVP'd to anything yet.</div>
+      <div style="font-size:12.5px;padding:6px 2px;line-height:1.5;"><b>Career Fair &mdash; Tech &amp; Business</b><br><span class="muted">Sep 14, 1pm</span></div>
     </aside>
   </div>
 </div>
@@ -131,32 +102,114 @@
       <h2 id="modal-title">2026 Tech Career Night</h2>
       <div class="detail-rows" id="modal-rows"></div>
       <div style="flex:1;"></div>
-      <div class="modal-rsvp-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open Google Form RSVP</div>
-      <div class="modal-note">Submitted RSVPs display on your calendar with a <b>Red Header</b> badge.</div>
+      <div id="modal-rsvp-section">
+        <div class="modal-rsvp-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open Google Form RSVP</div>
+        <div class="modal-note">Submitted RSVPs display on your calendar with a <b>Red Header</b> badge.</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- calendar-only: add schedule modal -->
+<!-- calendar-only: add schedule modal. For a student this adds a personal
+     entry only they can see; for an admin (see calendar.js openAddModal)
+     the same modal instead registers an Official/RSVP/Free-Food event
+     that every student sees on the shared calendar. -->
 <div class="modal-overlay hidden" id="add-modal" onclick="if(event.target===this)closeAddModal()">
   <div class="add-card">
-    <h3>Add Personal Schedule</h3>
-    <div class="add-sub">This event is visible only to you and won't appear as an Official Campus event.</div>
+    <h3 id="add-modal-title">Add Personal Schedule</h3>
+    <div class="add-sub" id="add-modal-sub">This event is visible only to you and won't appear as an Official Campus event.</div>
+
+    <div id="add-official-fields-top" class="hidden">
+      <div class="add-field">
+        <label>Category</label>
+        <select id="as-cat">
+          <option value="official">Official Campus Event</option>
+          <option value="rsvp">RSVP-Required Event</option>
+          <option value="food">Free Food Event</option>
+        </select>
+      </div>
+    </div>
+
     <div class="add-field">
       <label>Title</label>
       <input id="as-title" placeholder="e.g. Group Study — CS 3500">
     </div>
     <div class="add-field">
-      <label>Date (September 2026)</label>
-      <select id="as-date"></select>
+      <label>Date</label>
+      <div class="add-date-row">
+        <select id="as-year"></select>
+        <select id="as-month"></select>
+        <select id="as-day"></select>
+      </div>
     </div>
     <div class="add-field">
       <label>Time</label>
-      <input id="as-time" placeholder="e.g. 14:00">
+      <div class="add-time-row">
+        <div class="time-field" id="as-time-start-field">
+          <button type="button" class="time-field-btn" onclick="toggleTimeMenu('start')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B93A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            <span class="time-field-label" id="as-time-start-label">Start time</span>
+          </button>
+          <div class="time-menu">
+            <div class="time-menu-col" id="as-time-start-hour"></div>
+            <div class="time-menu-col" id="as-time-start-minute"></div>
+            <div class="time-menu-col" id="as-time-start-ampm"></div>
+          </div>
+        </div>
+        <span class="time-dash">–</span>
+        <div class="time-field" id="as-time-end-field">
+          <button type="button" class="time-field-btn" onclick="toggleTimeMenu('end')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B93A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            <span class="time-field-label" id="as-time-end-label">End time</span>
+          </button>
+          <div class="time-menu">
+            <div class="time-menu-col" id="as-time-end-hour"></div>
+            <div class="time-menu-col" id="as-time-end-minute"></div>
+            <div class="time-menu-col" id="as-time-end-ampm"></div>
+          </div>
+        </div>
+        <span class="muted" style="font-size:12px;">(end optional)</span>
+      </div>
     </div>
+
+    <div id="add-official-fields-bottom" class="hidden">
+      <div class="add-field">
+        <label>Location</label>
+        <input id="as-location" placeholder="e.g. Student Center Gym">
+      </div>
+      <div class="add-field">
+        <label>Host</label>
+        <input id="as-org" placeholder="e.g. Career Services">
+      </div>
+      <div class="add-field">
+        <label>Contact</label>
+        <input id="as-contact" placeholder="e.g. career-uac@utah.edu">
+      </div>
+      <div class="add-field">
+        <label>Perks (optional)</label>
+        <input id="as-perks" placeholder="e.g. Free food & giveaways">
+      </div>
+      <div class="add-field hidden" id="as-locAbbr-field">
+        <label>Short location label (optional, for the RSVP sidebar)</label>
+        <input id="as-locAbbr" placeholder="e.g. Gym">
+      </div>
+      <div class="add-field">
+        <label>Poster photo (optional)</label>
+        <input type="file" id="as-poster" accept="image/*">
+        <div id="as-poster-preview-wrap" class="hidden" style="margin-top:8px;display:flex;align-items:center;gap:10px;">
+          <img id="as-poster-preview" src="" alt="" style="width:56px;height:80px;object-fit:cover;border-radius:6px;border:1.5px solid var(--border);">
+          <button type="button" class="btn btn-ghost" id="as-poster-remove" style="padding:0 10px;min-height:32px;">Remove photo</button>
+        </div>
+      </div>
+      <div class="add-field" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="as-career" style="width:16px;height:16px;">
+        <label style="margin:0;" for="as-career">Show under the "Career &amp; Jobs" filter</label>
+      </div>
+    </div>
+
     <div class="add-actions">
       <button class="btn btn-ghost" style="flex:1;" onclick="closeAddModal()">Cancel</button>
-      <button class="btn btn-red" style="flex:1;" onclick="addSchedule()">Add Schedule</button>
+      <button class="btn btn-red" style="flex:1;" onclick="addSchedule()" id="add-schedule-btn">Add Schedule</button>
     </div>
   </div>
 </div>

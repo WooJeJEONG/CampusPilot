@@ -49,9 +49,9 @@
       <div class="gp-toolbar hidden" id="gpToolbar">
         <div class="gp-pills" id="gpPills"></div>
         <div class="gp-toolbar-actions">
-          <button class="gp-add-course-btn gp-clear-btn" onclick="gpClearAll()" title="Delete every saved course and score on this device">
+          <button class="gp-add-course-btn gp-clear-btn" id="gpClearBtn" onclick="gpClearAll()" title="Delete every saved course and score on this device">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
-            Clear All
+            <span id="gpClearBtnLabel">Clear All</span>
           </button>
           <button class="gp-add-course-btn" onclick="gpShowUpload()">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>

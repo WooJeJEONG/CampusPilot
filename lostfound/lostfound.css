@@ -51,6 +51,7 @@
 /* ================= ADMIN: dashboard ================= */
 .admin-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:20px;flex-wrap:wrap;flex-shrink:0;}
 .admin-head-row h1{font-size:22px;font-weight:700;}
+.admin-head-row .feature-head h1{font-size:20px;font-weight:700;}
 .admin-head-row p{margin-top:5px;font-size:13.5px;color:var(--muted);}
 .lf-stat-row{display:flex;gap:12px;flex-wrap:wrap;}
 .lf-stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 18px;min-width:108px;box-shadow:var(--shadow-card);}

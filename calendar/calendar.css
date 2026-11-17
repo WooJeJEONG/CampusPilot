@@ -38,10 +38,66 @@
 .ev-chip.chip-hidden{display:none;}
 
 /* ---------- MODAL: add schedule (calendar only) ---------- */
-.add-card{width:420px;max-width:100%;background:var(--surface);border-radius:var(--r-lg);padding:26px 26px 22px;box-shadow:0 40px 80px -20px rgba(0,0,0,.4);}
+.add-card{width:420px;max-width:100%;max-height:calc(100vh - 40px);overflow-y:auto;background:var(--surface);border-radius:var(--r-lg);padding:26px 26px 22px;box-shadow:0 40px 80px -20px rgba(0,0,0,.4);}
 .add-card h3{font-size:18px;font-weight:700;margin-bottom:4px;}
 .add-card .add-sub{font-size:13.5px;color:var(--muted);margin-bottom:18px;font-family:'Source Sans 3';}
 .add-field{margin-bottom:14px;}
 .add-field label{font-size:12px;font-weight:700;color:#525A66;display:block;margin-bottom:6px;}
 .add-field input, .add-field select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 13px;font-size:14.5px;font-family:inherit;color:var(--ink);background:#fff;}
+.add-date-row{display:flex;gap:8px;}
+.add-date-row select{min-width:0;}
+.add-date-row select:nth-child(1){flex:1.1;}
+.add-date-row select:nth-child(2){flex:1.4;}
+.add-date-row select:nth-child(3){flex:0.9;}
+.add-time-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.add-time-row span{color:var(--muted);font-weight:700;}
+.time-dash{color:var(--muted);font-weight:700;}
+.time-field{position:relative;flex:1;min-width:128px;}
+.time-field-btn{width:100%;display:flex;align-items:center;gap:8px;border:1.5px solid var(--border);border-radius:8px;padding:11px 13px;font-size:14px;font-family:inherit;color:var(--ink);background:#fff;text-align:left;cursor:pointer;}
+.time-field-btn:hover{border-color:#C9CCD1;}
+.time-field.open .time-field-btn{border-color:var(--ink-2);}
+.time-field-label{color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.time-field-label.set{color:var(--ink);font-weight:700;}
+.time-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 30px -8px rgba(0,0,0,.18);padding:6px;z-index:30;gap:2px;}
+.time-field.open .time-menu{display:flex;}
+.time-menu-col{max-height:168px;overflow-y:auto;min-width:46px;}
+.time-menu-col+.time-menu-col{border-left:1px solid var(--border);margin-left:4px;padding-left:4px;}
+.time-menu-opt{padding:7px 9px;border-radius:6px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;text-align:center;}
+.time-menu-opt:hover{background:#F3F3F5;}
+.time-menu-opt.active{background:var(--red-tint);color:var(--red-dark);font-weight:700;}
 .add-actions{display:flex;gap:10px;margin-top:18px;}
+@media(max-width:700px){
+  .cal-cell{padding:4px;min-height:60px;}
+  .cal-cell .date-row{flex-direction:column;align-items:flex-start;gap:2px;}
+  .today-chip,.dday-chip{font-size:8px;padding:1px 5px;}
+}
+
+/* ---------- year/month select dropdown (functional) ---------- */
+.cal-select{position:relative;cursor:pointer;user-select:none;}
+.cal-select-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 30px -8px rgba(0,0,0,.18);padding:6px;min-width:150px;z-index:20;max-height:220px;overflow-y:auto;}
+.cal-select-menu.open{display:block;}
+.cal-select-opt{padding:8px 10px;border-radius:6px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;}
+.cal-select-opt:hover{background:#F3F3F5;}
+.cal-select-opt.active{background:var(--red-tint);color:var(--red-dark);font-weight:700;}
+
+/* ---------- right-panel: free food highlight box ---------- */
+.rp-food-box{background:var(--gold-tint);border:1px solid #F3DFA3;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12.5px;line-height:1.5;}
+.rp-food-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.rp-food-date{font-size:10.5px;font-weight:800;color:#7A5306;letter-spacing:.03em;}
+.rp-food-time{font-size:10.5px;font-weight:700;color:#8A6D2E;}
+.rp-food-title{font-weight:700;color:#7A5306;margin-bottom:2px;}
+.rp-food-loc{color:#8A6D2E;font-size:12px;}
+.rp-empty{font-size:12.5px;color:var(--muted);padding:6px 2px;}
+
+/* ---------- right-panel: my rsvps box ---------- */
+.rp-rsvp-box{background:var(--red-tint);border:1px solid #F5D0D0;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12.5px;line-height:1.5;}
+.rp-rsvp-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.rp-rsvp-confirmed{font-size:9.5px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--red);padding:2px 6px;border-radius:4px;}
+.rp-rsvp-dday{font-size:10.5px;font-weight:800;color:var(--red-dark);}
+.rp-rsvp-title{font-weight:700;color:var(--red-dark);margin-bottom:2px;}
+.rp-rsvp-sub{color:#A14545;font-size:12px;}
+
+/* ---------- event-detail modal badge colors (calendar categories) ---------- */
+#event-modal .badge.gold{background:var(--gold-tint);color:#7A5306;}
+#event-modal .badge.granite{background:var(--granite-tint);color:#3C4B52;}
+#event-modal .badge.green{background:var(--green-tint);color:#2C5A1E;}

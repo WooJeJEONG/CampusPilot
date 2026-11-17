@@ -36,9 +36,12 @@
 
       <!-- ===================== STUDENT VIEW ===================== -->
       <div id="studentView">
-        <div class="lf-hero">
-          <h1>Lost something on campus?</h1>
-          <p>Search the official UAC registry of found items to reclaim your property.</p>
+        <div class="feature-head">
+          <div class="feature-head-icon" style="background:var(--granite-tint);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#708E99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg></div>
+          <div>
+            <h1>Lost &amp; Found</h1>
+            <div class="fh-sub">Search the official UAC registry of found items to reclaim your property.</div>
+          </div>
         </div>
         <div class="lf-search-row">
           <select id="lfCategorySelect" onchange="lfSetCategory(this.value)">
@@ -59,9 +62,12 @@
       <!-- ===================== ADMIN VIEW ===================== -->
       <div id="adminView" class="hidden">
         <div class="admin-head-row">
-          <div>
-            <h1>Lost &amp; Found — Inventory</h1>
-            <p>Review and manage all items logged within the UAC Lost &amp; Found registry.</p>
+          <div class="feature-head" style="margin-bottom:0">
+            <div class="feature-head-icon" style="background:var(--granite-tint);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#708E99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg></div>
+            <div>
+              <h1>Lost &amp; Found — Inventory</h1>
+              <div class="fh-sub">Review and manage all items logged within the UAC Lost &amp; Found registry.</div>
+            </div>
           </div>
           <div class="lf-stat-row">
             <div class="lf-stat-tile"><div class="lf-stat-num" id="statTotal">0</div><div class="lf-stat-label">Total Items</div></div>
