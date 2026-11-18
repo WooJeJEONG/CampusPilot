@@ -173,8 +173,20 @@
 .mini-day.dim{color:#D8DAE0;}
 .mini-day.pick{cursor:pointer;}
 .mini-day.pick:hover{background:var(--bg);}
-.mini-day.pick.today{box-shadow:inset 0 0 0 1.5px var(--red);color:var(--red);font-weight:700;}
+/* shared/styles.css (loaded before this file) has its own bare
+   .mini-day.today{background:var(--red)} rule for the Home widget; it's
+   lower specificity than this selector but still wins on "background"
+   specifically if this rule doesn't also set it, since the cascade
+   resolves per-property, not per-rule. Setting background explicitly
+   here is what actually keeps this a ring instead of a solid red fill. */
+.mini-day.pick.today{background:transparent;box-shadow:inset 0 0 0 1.5px var(--red);color:var(--red);font-weight:700;}
 .mini-day.sel{background:var(--red);color:#fff;font-weight:700;box-shadow:none;}
+/* today AND the currently-selected date at once: .pick.today's ring+red-text
+   would otherwise win over .sel's white text (higher specificity) while
+   .sel's red background still applies, hiding the number (red-on-red). This
+   4-class selector outranks both, so the combined state gets the same solid
+   fill + white text as a plain selection, instead of the ring treatment. */
+.mini-day.pick.today.sel{background:var(--red);color:#fff;font-weight:700;box-shadow:none;}
 .pickup-actions{display:flex;gap:10px;margin-top:16px;}
 
 #toast-host{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;}

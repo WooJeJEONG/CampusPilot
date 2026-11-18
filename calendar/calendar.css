@@ -30,8 +30,9 @@
 
 .ev-chip{margin-top:4px;font-size:10.5px;font-weight:700;padding:2px 6px 2px 7px;border-left:3px solid #ccc;background:#F6F6F8;border-radius:3px;display:block;width:100%;text-align:left;line-height:1.45;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .ev-chip--official{border-left-color:var(--granite);background:#F3F6F7;color:#3C4B52;}
-.ev-chip--rsvp{border-left-color:var(--red);background:var(--red-tint);color:var(--red-dark);font-weight:800;}
+.ev-chip--career{border-left-color:var(--teal);background:var(--teal-tint);color:#1C5556;}
 .ev-chip--food{border-left-color:var(--gold);background:var(--gold-tint);color:#7A5306;}
+.ev-chip--deadline{border-left-color:var(--red);background:var(--red-tint);color:var(--red-dark);font-weight:800;}
 .ev-chip--personal{border-left-color:var(--green);background:var(--green-tint);color:#2C5A1E;}
 .ev-chip.clickable{cursor:pointer;transition:filter .1s;}
 .ev-chip.clickable:hover{filter:brightness(.96);}
@@ -66,6 +67,18 @@
 .time-menu-opt:hover{background:#F3F3F5;}
 .time-menu-opt.active{background:var(--red-tint);color:var(--red-dark);font-weight:700;}
 .add-actions{display:flex;gap:10px;margin-top:18px;}
+
+/* poster-photo file picker -- a plain native <input type="file"> draws its
+   own "Choose File"/"No file chosen" button in the OS/browser's locale, so
+   on a non-English system it can't be kept in English; this hides the
+   native control and replaces it with a custom English-only button +
+   filename label, matching Lost & Found's upload field. */
+.file-upload-row{position:relative;display:flex;align-items:center;gap:10px;}
+.add-field .file-upload-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.file-upload-btn{display:inline-flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 15px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;flex-shrink:0;}
+.file-upload-btn:hover{background:#EDEEEE;}
+.file-upload-input:focus-visible + .file-upload-btn{outline:2px solid var(--red);outline-offset:1px;}
+.file-upload-name{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 @media(max-width:700px){
   .cal-cell{padding:4px;min-height:60px;}
   .cal-cell .date-row{flex-direction:column;align-items:flex-start;gap:2px;}
@@ -101,3 +114,8 @@
 #event-modal .badge.gold{background:var(--gold-tint);color:#7A5306;}
 #event-modal .badge.granite{background:var(--granite-tint);color:#3C4B52;}
 #event-modal .badge.green{background:var(--green-tint);color:#2C5A1E;}
+#event-modal .badge.teal{background:var(--teal-tint);color:#1C5556;}
+
+/* ---------- event-detail modal: RSVP confirmation checkbox ---------- */
+.modal-rsvp-confirm{display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:12.5px;color:var(--muted);line-height:1.5;cursor:pointer;}
+.modal-rsvp-confirm input{margin-top:2px;width:15px;height:15px;flex-shrink:0;}

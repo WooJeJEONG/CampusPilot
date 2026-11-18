@@ -9,6 +9,59 @@
 var ADMIN_PASSCODE = '000000';
 var studentMode = 'login'; // 'login' | 'signup'
 
+/* UAC_DEPARTMENTS and fillDeptSelect now live in shared/session.js (loaded
+   before this file) so My Profile's "Edit Major" flow can reuse the exact
+   same department list instead of keeping a second copy here. */
+
+function toggleMinorFields(){
+  var box = document.getElementById('signup-minor-fields');
+  var row = document.getElementById('signup-minor-toggle-row');
+  var opening = box.classList.contains('hidden');
+  box.classList.toggle('hidden', !opening);
+  row.classList.toggle('hidden', opening);
+  if(opening){
+    document.getElementById('signup-minor-select').value = '';
+    document.getElementById('signup-minor-other-wrap').classList.add('hidden');
+    document.getElementById('signup-minor-other').value = '';
+  }
+}
+
+function refreshMinorOtherVisibility(){
+  var sel = document.getElementById('signup-minor-select');
+  document.getElementById('signup-minor-other-wrap').classList.toggle('hidden', !sel || sel.value !== '__other__');
+}
+
+function wireMajorSelects(){
+  fillDeptSelect(document.getElementById('signup-major-select'), 'Select your major…');
+  fillDeptSelect(document.getElementById('signup-minor-select'), 'Select a department…');
+  document.getElementById('signup-major-select').addEventListener('change', function(){
+    document.getElementById('signup-major-other-wrap').classList.toggle('hidden', this.value !== '__other__');
+  });
+  document.getElementById('signup-minor-select').addEventListener('change', refreshMinorOtherVisibility);
+}
+
+/* Resolves the primary-major select (+ its "Other" fallback input) into the
+   plain string that gets stored as account.major. */
+function resolveMajorValue(){
+  var sel = document.getElementById('signup-major-select').value;
+  if(sel === '__other__') return (document.getElementById('signup-major-other').value || '').trim();
+  return sel;
+}
+
+/* Resolves the optional double-major/minor block into the formatted label
+   stored as account.major2 ("Double Major: X" / "Minor: Y"), or '' if the
+   student never opened that section or left it blank. */
+function resolveMajor2Value(){
+  var box = document.getElementById('signup-minor-fields');
+  if(box.classList.contains('hidden')) return '';
+  var typeEl = document.querySelector('input[name="signup-minor-type"]:checked');
+  var type = typeEl ? typeEl.value : 'double';
+  var sel = document.getElementById('signup-minor-select').value;
+  var dept = (sel === '__other__') ? (document.getElementById('signup-minor-other').value || '').trim() : sel;
+  if(!dept) return '';
+  return (type === 'minor' ? 'Minor: ' : 'Double Major: ') + dept;
+}
+
 function toggleSignupMode(){
   studentMode = (studentMode === 'login') ? 'signup' : 'login';
   renderStudentMode();
@@ -48,12 +101,17 @@ function tryStudentLogin(){
 function trySignUp(){
   var unid = document.getElementById('signup-unid').value;
   var name = document.getElementById('signup-name').value;
-  var major = document.getElementById('signup-major').value;
+  var major = resolveMajorValue();
+  var major2 = resolveMajor2Value();
   var pw = document.getElementById('signup-pw').value;
   var pw2 = document.getElementById('signup-pw2').value;
 
   if(!unid.trim() || !name.trim() || !pw){
     showToast('Fill in your UNID, name, and password.');
+    return;
+  }
+  if(!major){
+    showToast('Select your major (or choose "Other" and type it in).');
     return;
   }
   if(pw.length < 6){
@@ -65,7 +123,7 @@ function trySignUp(){
     return;
   }
 
-  var result = createAccount(unid, pw, name, major);
+  var result = createAccount(unid, pw, name, major, major2);
   if(!result.ok){
     showToast(result.error);
     return;
@@ -76,7 +134,14 @@ function trySignUp(){
   document.getElementById('login-pw').value = '';
   document.getElementById('signup-unid').value = '';
   document.getElementById('signup-name').value = '';
-  document.getElementById('signup-major').value = '';
+  document.getElementById('signup-major-select').value = '';
+  document.getElementById('signup-major-other-wrap').classList.add('hidden');
+  document.getElementById('signup-major-other').value = '';
+  document.getElementById('signup-minor-fields').classList.add('hidden');
+  document.getElementById('signup-minor-toggle-row').classList.remove('hidden');
+  document.getElementById('signup-minor-select').value = '';
+  document.getElementById('signup-minor-other-wrap').classList.add('hidden');
+  document.getElementById('signup-minor-other').value = '';
   document.getElementById('signup-pw').value = '';
   document.getElementById('signup-pw2').value = '';
   studentMode = 'login';
@@ -140,4 +205,7 @@ function wireOtpBoxes(){
   }
 }
 
-document.addEventListener('DOMContentLoaded', wireOtpBoxes);
+document.addEventListener('DOMContentLoaded', function(){
+  wireOtpBoxes();
+  wireMajorSelects();
+});

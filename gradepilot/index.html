@@ -46,6 +46,7 @@
         </div>
       </div>
 
+      <div data-role="student" id="gpStudentView">
       <div class="gp-toolbar hidden" id="gpToolbar">
         <div class="gp-pills" id="gpPills"></div>
         <div class="gp-toolbar-actions">
@@ -175,6 +176,47 @@
           </div>
         </aside>
       </div>
+
+      <div class="gp-card gp-feedback-card">
+        <div class="gp-card-head">
+          <div><h3>Rate GradePilot</h3><p>Let UAC IT know how the syllabus AI and grade tracker are working for you</p></div>
+        </div>
+        <div class="gp-fb-form">
+          <div class="gp-stars" id="gpFeedbackStars">
+            <span class="gp-star" data-star="1" onclick="gpSetFeedbackStars(1)">★</span><span class="gp-star" data-star="2" onclick="gpSetFeedbackStars(2)">★</span><span class="gp-star" data-star="3" onclick="gpSetFeedbackStars(3)">★</span><span class="gp-star" data-star="4" onclick="gpSetFeedbackStars(4)">★</span><span class="gp-star" data-star="5" onclick="gpSetFeedbackStars(5)">★</span>
+          </div>
+          <textarea id="gpFeedbackComment" placeholder="Anything working great, or not so great? (optional)"></textarea>
+          <button class="btn btn-red" onclick="gpSubmitFeedbackForm()">Submit Feedback</button>
+        </div>
+      </div>
+      </div>
+
+      <div data-role="admin" id="gpAdminView" class="hidden">
+        <div class="gp-stat-grid">
+          <div class="gp-stat-tile"><div class="gp-stat-num" id="gpStatStudents">0</div><div class="gp-stat-label">Registered students</div></div>
+          <div class="gp-stat-tile"><div class="gp-stat-num" id="gpStatAiRequests">0</div><div class="gp-stat-label">Syllabi sent to the AI</div></div>
+          <div class="gp-stat-tile"><div class="gp-stat-num" id="gpStatAiRate">—</div><div class="gp-stat-label">AI parse success rate</div></div>
+          <div class="gp-stat-tile"><div class="gp-stat-num" id="gpStatFeedbackAvg">—</div><div class="gp-stat-label">Avg. feedback rating</div></div>
+          <div class="gp-stat-tile"><div class="gp-stat-num" id="gpStatFeedbackCount">0</div><div class="gp-stat-label">Feedback responses</div></div>
+        </div>
+
+        <div class="gp-admin-grid">
+          <div class="gp-card">
+            <div class="gp-card-head"><div><h3>Majors Among Registered Students</h3><p>From self-registered accounts (Sign Up page)</p></div></div>
+            <div id="gpMajorBars"></div>
+          </div>
+
+          <div class="gp-card">
+            <div class="gp-card-head"><div><h3>Recent AI Analysis Activity</h3><p>Real syllabus-upload requests sent to the grading-rules AI</p></div></div>
+            <div id="gpAiLog"></div>
+          </div>
+        </div>
+
+        <div class="gp-card">
+          <div class="gp-card-head"><div><h3>Student Feedback</h3><p>Submitted from the "Rate GradePilot" card students see</p></div></div>
+          <div id="gpFeedbackList"></div>
+        </div>
+      </div>
     </main>
   </div>
 </div>
@@ -192,12 +234,15 @@
 
 <div id="toast-host"></div>
 <script src="../shared/session.js"></script>
+<script src="../shared/store.js"></script>
 <script src="../shared/toast.js"></script>
 <script src="../shared/nav.js"></script>
+<script src="../shared/feedback.js"></script>
 <script src="gradepilot.js"></script>
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'gradepilot');
+  if(SESSION){ isAdmin = (SESSION.role === 'admin'); gpInit(); }
 </script>
 </body>
 </html>

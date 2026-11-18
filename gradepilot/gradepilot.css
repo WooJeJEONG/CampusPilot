@@ -179,8 +179,51 @@
 .gp-overlay-track{width:100%;height:6px;background:var(--bg);border-radius:var(--r-pill);margin-top:16px;overflow:hidden;}
 .gp-overlay-bar{height:100%;background:var(--red);border-radius:var(--r-pill);width:10%;transition:width .25s ease;}
 
+/* ---------- student: "Rate GradePilot" feedback card ---------- */
+.gp-feedback-card{margin-top:14px;}
+.gp-fb-form{display:flex;flex-direction:column;gap:11px;}
+.gp-stars{display:flex;gap:4px;}
+.gp-star{font-size:26px;line-height:1;color:#E2E4E6;cursor:pointer;transition:color .1s ease;}
+.gp-star:hover{color:var(--gold);}
+.gp-star.on{color:var(--gold);}
+.gp-fb-form textarea{width:100%;min-height:64px;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--ink);resize:vertical;}
+.gp-fb-form textarea:focus{outline:none;border-color:var(--red);}
+.gp-fb-form .btn{align-self:flex-start;}
+
+/* ---------- admin: usage/feedback dashboard ---------- */
+.gp-stat-grid{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.gp-stat-tile{flex:1;min-width:148px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-card);padding:16px 18px;}
+.gp-stat-num{font-family:'Roboto Slab',Georgia,serif;font-size:26px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+.gp-stat-label{font-size:11.5px;color:var(--muted);margin-top:3px;}
+
+.gp-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start;}
+
+.gp-major-row{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12.5px;}
+.gp-major-name{width:130px;flex-shrink:0;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gp-major-bar-track{flex:1;height:8px;background:var(--bg);border-radius:var(--r-pill);overflow:hidden;min-width:0;}
+.gp-major-bar-fill{height:100%;background:var(--red);border-radius:var(--r-pill);}
+.gp-major-count{width:22px;text-align:right;flex-shrink:0;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
+
+.gp-log-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bg);font-size:12.5px;}
+.gp-log-row:last-child{border-bottom:none;}
+.gp-log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.gp-log-dot.ok{background:var(--green);}
+.gp-log-dot.fail{background:var(--red);}
+.gp-log-label{font-weight:700;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1.2;}
+.gp-log-outcome{color:var(--muted);flex:1;}
+.gp-log-time{color:var(--muted-2);font-size:11px;flex-shrink:0;}
+
+.gp-fb-row{padding:10px 0;border-bottom:1px solid var(--bg);}
+.gp-fb-row:last-child{border-bottom:none;}
+.gp-fb-top{display:flex;align-items:center;gap:9px;font-size:12.5px;}
+.gp-fb-stars{color:var(--gold);letter-spacing:1px;font-size:13px;}
+.gp-fb-name{font-weight:700;color:var(--ink);}
+.gp-fb-time{color:var(--muted-2);font-size:11px;margin-left:auto;}
+.gp-fb-comment{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5;}
+
 @media (max-width:960px){
   .gp-upload-grid{grid-template-columns:1fr;}
   .gp-dash-grid{grid-template-columns:1fr;}
   .gp-table-head,.gp-row,.gp-subrow{grid-template-columns:1fr 40px 86px 64px;font-size:11px;}
+  .gp-admin-grid{grid-template-columns:1fr;}
 }

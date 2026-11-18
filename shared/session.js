@@ -26,6 +26,7 @@ function setSession(role, profile){
         unid:((profile && profile.unid) || ''),
         name:((profile && profile.name) || 'Student'),
         major:((profile && profile.major) || ''),
+        major2:((profile && profile.major2) || ''),
         joinedAt:((profile && profile.joinedAt) || null),
         initial:(((profile && profile.name) || 'S').trim().charAt(0) || 'S').toUpperCase()
       };
@@ -56,7 +57,10 @@ function findAccount(unid){
   var accounts = getAccounts();
   return accounts[(unid || '').trim().toLowerCase()] || null;
 }
-function createAccount(unid, password, name, major){
+/* major2 is an already-formatted optional label, e.g. "Double Major: Economics"
+   or "Minor: Communication" -- built by login.js from the second-major/minor
+   fields -- so this just stores it as-is alongside the primary major. */
+function createAccount(unid, password, name, major, major2){
   unid = (unid || '').trim().toLowerCase();
   name = (name || '').trim();
   var accounts = getAccounts();
@@ -67,6 +71,7 @@ function createAccount(unid, password, name, major){
     password: password,
     name: name,
     major: (major || '').trim(),
+    major2: (major2 || '').trim(),
     joinedAt: Date.now()
   };
   saveAccounts(accounts);
@@ -79,6 +84,40 @@ function updateAccountPassword(unid, newPassword){
   accounts[key].password = newPassword;
   saveAccounts(accounts);
   return true;
+}
+/* Lets a student set/update their major (and optional double-major/minor
+   label) on an account that already exists -- e.g. an older account
+   created before the major field existed, or someone who just wants to
+   change it. Signing up again with the same UNID can't do this (it's
+   blocked as "already registered"), so My Profile's "Edit Major" flow
+   calls this directly instead. Returns the updated account, or null if
+   the UNID isn't registered. */
+function updateAccountMajor(unid, major, major2){
+  var accounts = getAccounts();
+  var key = (unid || '').trim().toLowerCase();
+  if(!accounts[key]) return null;
+  accounts[key].major = (major || '').trim();
+  accounts[key].major2 = (major2 || '').trim();
+  saveAccounts(accounts);
+  return accounts[key];
+}
+
+/* ---------------- shared: UAC department list ----------------
+   Used by both the signup form (login.js) and My Profile's "Edit Major"
+   flow, so the two stay in sync and self-registered accounts keep a
+   consistent set of department names instead of free-typed variants
+   like "biz"/"Business "/"business admin". "Other" always stays last
+   and reveals a free-text fallback for anything not listed. */
+var UAC_DEPARTMENTS = ['Accounting (BS)', 'Computer Engineering (BS)', 'Communication (BA/BS)',
+  'Electrical Engineering (BS)', 'Film & Media Arts (BA)', 'Games (BS)', 'Psychology (BS)',
+  'Information Systems (BS)', 'Urban Ecology (BS)'];
+
+function fillDeptSelect(sel, placeholder){
+  if(!sel) return;
+  var html = '<option value="">' + placeholder + '</option>';
+  UAC_DEPARTMENTS.forEach(function(d){ html += '<option value="' + d + '">' + d + '</option>'; });
+  html += '<option value="__other__">Other (not listed)</option>';
+  sel.innerHTML = html;
 }
 function listAccounts(){
   var accounts = getAccounts();

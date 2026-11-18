@@ -156,6 +156,30 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;}
 .modal-rsvp-btn{margin-top:24px;background:var(--red);color:#fff;font-weight:700;font-size:15px;text-align:center;padding:14px 0;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;}
 .modal-note{text-align:center;font-size:11.5px;color:var(--muted-2);margin-top:10px;}
 
+/* ---------- Feedback modal (nav-rail "Feedback" button, every page) ---------- */
+.fb-card{width:420px;max-width:100%;max-height:calc(100vh - 40px);overflow-y:auto;background:var(--surface);border-radius:var(--r-lg);padding:26px 26px 22px;box-shadow:0 40px 80px -20px rgba(0,0,0,.4);}
+.fb-card h3{font-size:18px;font-weight:700;margin-bottom:8px;}
+.fb-sub{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px;}
+.fb-stars-picker{display:flex;gap:6px;margin-bottom:16px;}
+.fb-stars-picker button{width:40px;height:40px;border:0;background:transparent;font-size:28px;color:#D9D9D9;padding:0;line-height:1;}
+.fb-stars-picker button.on{color:var(--gold);}
+.fb-comment{width:100%;min-height:80px;resize:vertical;border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;font-family:inherit;color:var(--ink);margin-bottom:18px;}
+.fb-comment:focus{outline:none;border-color:var(--red);}
+.fb-actions{display:flex;gap:10px;}
+.fb-admin-summary{display:flex;align-items:center;gap:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;margin-bottom:18px;}
+.fb-avg-num{font-family:'Roboto Slab',Georgia,serif;font-size:34px;font-weight:700;line-height:1;}
+.fb-avg-stars{color:var(--gold);font-size:17px;letter-spacing:1px;}
+.fb-avg-count{font-size:12px;color:var(--muted);margin-top:3px;}
+.fb-admin-list{display:flex;flex-direction:column;gap:12px;max-height:280px;overflow-y:auto;margin-bottom:18px;}
+.fb-admin-row{border-bottom:1px solid var(--border);padding-bottom:10px;}
+.fb-admin-row:last-child{border-bottom:none;padding-bottom:0;}
+.fb-admin-row-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.fb-row-stars{color:var(--gold);font-size:13px;letter-spacing:1px;}
+.fb-row-who{font-size:13px;font-weight:700;}
+.fb-row-time{font-size:11.5px;color:var(--muted-2);margin-left:auto;}
+.fb-row-comment{font-size:13px;color:var(--ink);line-height:1.5;margin-top:4px;}
+.fb-admin-empty{font-size:13px;color:var(--muted);padding:6px 0 2px;}
+
 /* ---------- toast ---------- */
 #toast-host{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;}
 .toast{background:var(--ink);color:#fff;font-size:14px;font-weight:600;padding:12px 22px;border-radius:var(--r-pill);box-shadow:0 14px 30px -10px rgba(0,0,0,.4);opacity:0;transform:translateY(8px);transition:opacity .2s ease, transform .2s ease;}

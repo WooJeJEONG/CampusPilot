@@ -21,3 +21,28 @@
 @media (max-width:960px){
   .feature-grid{grid-template-columns:1fr 1fr;}
 }
+
+/* ---------- right-panel: today's schedule & RSVPs rows ---------- */
+.rp-today-row{display:flex;align-items:center;gap:8px;padding:7px 2px;border-radius:6px;font-size:12.5px;line-height:1.4;}
+.rp-today-row.clickable{cursor:pointer;transition:background .1s;}
+.rp-today-row.clickable:hover{background:#F6F6F8;}
+.rp-today-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:#C7CAD1;}
+.rp-today-row.personal .rp-today-dot{background:var(--green);}
+.rp-today-row.confirmed .rp-today-dot{background:var(--red);}
+.rp-today-row.pending .rp-today-dot{background:#B7BDC6;}
+.rp-today-title{flex:1;min-width:0;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rp-today-row.confirmed .rp-today-title{color:var(--red-dark);}
+.rp-today-time{font-size:11px;font-weight:700;color:var(--muted-2);flex-shrink:0;}
+.rp-today-tag{font-size:9.5px;font-weight:800;letter-spacing:.03em;padding:2px 6px;border-radius:4px;flex-shrink:0;background:#EDEEF0;color:var(--muted);}
+.rp-today-tag.confirmed{background:var(--red);color:#fff;}
+.rp-today-tag.pending{background:#EDEEF0;color:var(--muted);}
+
+/* ---------- event-detail modal badge colors (shared with calendar categories) ---------- */
+#event-modal .badge.gold{background:var(--gold-tint);color:#7A5306;}
+#event-modal .badge.granite{background:var(--granite-tint);color:#3C4B52;}
+#event-modal .badge.green{background:var(--green-tint);color:#2C5A1E;}
+#event-modal .badge.teal{background:var(--teal-tint);color:#1C5556;}
+
+/* ---------- event-detail modal: RSVP confirmation checkbox ---------- */
+.modal-rsvp-confirm{display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:12.5px;color:var(--muted);line-height:1.5;cursor:pointer;}
+.modal-rsvp-confirm input{margin-top:2px;width:15px;height:15px;flex-shrink:0;}

@@ -33,7 +33,10 @@ function renderNavRail(activeKey){
     var plainLabel = label.replace(/&amp;/g,'&');
     return '<a class="nav-rail-item'+(active?' active':'')+'" href="'+href+'" title="'+plainLabel+'">'+NAV_ICONS[key]+'<span>'+plainLabel+'</span></a>';
   }).join('');
-  var feedback = '<button class="nav-rail-item nav-rail-feedback" onclick="showToast(\'Thank you — your feedback has been submitted to UAC IT 💬\')" title="Give Feedback"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5Z"/></svg><span>Feedback</span></button>';
+  /* Students get a 5-star rating + comment picker; admins get the
+     aggregated average instead — openFeedbackModal() (shared/
+     feedback.js) decides which based on SESSION.role. */
+  var feedback = '<button class="nav-rail-item nav-rail-feedback" onclick="openFeedbackModal()" title="Give Feedback"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5Z"/></svg><span>Feedback</span></button>';
   return items + feedback;
 }
 

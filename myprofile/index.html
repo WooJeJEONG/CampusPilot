@@ -46,13 +46,16 @@
           <div class="profile-avatar" id="profileAvatar">G</div>
           <div>
             <div class="profile-name" id="profileName">Garam Lee</div>
-            <div class="profile-meta" id="profileMeta">Computer Science, B.S. — Class of 2027<br>University of Utah Asia Campus (UAC), Songdo</div>
+            <div class="profile-meta" id="profileMeta">University of Utah Asia Campus (UAC), Songdo</div>
           </div>
         </div>
         <div class="kv-grid">
           <div class="kv-item"><div class="kv-label">UNID</div><div class="kv-value" id="kvUnid">u1621896</div></div>
           <div class="kv-item"><div class="kv-label">Linked Email</div><div class="kv-value" id="kvEmail">glee@umail.utah.edu</div></div>
-          <div class="kv-item"><div class="kv-label">Status</div><div class="kv-value" id="statusValue">Active Student</div></div>
+          <div class="kv-item"><div class="kv-label">Major</div><div class="kv-value">
+            <span id="kvMajorValue">Active Student</span>
+            <button type="button" class="kv-edit-btn" id="kvMajorEditBtn" onclick="mpOpenEditMajor()">Edit</button>
+          </div></div>
           <div class="kv-item"><div class="kv-label">Member Since</div><div class="kv-value" id="kvJoined">—</div></div>
         </div>
       </div>
@@ -129,11 +132,49 @@
   </div>
 </div>
 
+<!-- Edit Major modal (student only) -->
+<div class="modal-overlay hidden" id="mp-edit-major-modal" onclick="if(event.target===this)mpCloseEditMajor()">
+  <div class="mp-edit-card">
+    <h3>Edit Your Major</h3>
+    <div class="field-label">Major</div>
+    <div class="field">
+      <select id="mp-major-select" onchange="mpRefreshMajorOtherVisibility()"></select>
+    </div>
+    <div class="field hidden" id="mp-major-other-wrap">
+      <input id="mp-major-other" placeholder="Not listed? Type your major">
+    </div>
+
+    <div class="minor-row" id="mp-minor-toggle-row">
+      <button type="button" class="minor-add-btn" onclick="mpToggleMinorFields()">+ Add a double major or minor (optional)</button>
+    </div>
+    <div class="hidden" id="mp-minor-fields">
+      <div class="field-label">Double Major or Minor?</div>
+      <div class="minor-type-row">
+        <label><input type="radio" name="mp-minor-type" value="double" checked> Double Major</label>
+        <label><input type="radio" name="mp-minor-type" value="minor"> Minor</label>
+      </div>
+      <div class="field">
+        <select id="mp-minor-select" onchange="mpRefreshMinorOtherVisibility()"></select>
+      </div>
+      <div class="field hidden" id="mp-minor-other-wrap">
+        <input id="mp-minor-other" placeholder="Not listed? Type the department">
+      </div>
+      <button type="button" class="minor-remove-btn" onclick="mpToggleMinorFields()">Remove</button>
+    </div>
+
+    <div class="mp-edit-actions">
+      <button class="btn btn-ghost" style="flex:1;" onclick="mpCloseEditMajor()">Cancel</button>
+      <button class="btn btn-red" style="flex:1;" onclick="mpSaveEditMajor()">Save</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-host"></div>
 <script src="../shared/session.js"></script>
 <script src="../shared/store.js"></script>
 <script src="../shared/toast.js"></script>
 <script src="../shared/nav.js"></script>
+<script src="../shared/feedback.js"></script>
 <script src="myprofile.js"></script>
 <script>
   var SESSION = requireSession();

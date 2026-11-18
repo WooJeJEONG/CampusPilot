@@ -44,6 +44,9 @@ function gpGradeFor(pct, scale){
   return scale[scale.length-1];
 }
 
+var isAdmin = false;
+var gpFeedbackStars = 0;
+
 var gpCourses = {};
 var gpActiveKey = null;
 /* Mirrors exactly what's been typed into a score input while it still has
@@ -60,6 +63,48 @@ var gpExpandedGroups = {}; // groupId ("courseKey:stem") -> bool
 /* ---- local persistence: scores, courses and the active course survive
    a refresh; "Clear All" is the only way to wipe them. ---- */
 var GP_STORAGE_KEY = 'campuspilot.gradepilot.workspace.v1';
+
+/* ---- admin-only: AI-analysis usage stats + student feedback ----
+   There's no backend, so these are shared localStorage keys (same as every
+   other store in this prototype) -- genuinely real counts/log entries of
+   what's actually happened in THIS browser, not fabricated demo numbers.
+   gpLogAiAttempt() is called only from the real syllabus-analysis path
+   (gpRunRealAnalysis), never from the simulated/sample-file progress bar,
+   so "AI requests" here always means an actual call to the grading-rules
+   API. ---- */
+var GP_AISTATS_KEY = 'campuspilot.gradepilot.aistats.v1';
+var GP_FEEDBACK_KEY = 'campuspilot.gradepilot.feedback.v1';
+
+function gpLoadAiStats(){
+  return cpLoadJSON(GP_AISTATS_KEY, { total:0, success:0, fail:0, log:[] });
+}
+function gpLogAiAttempt(success, label){
+  var stats = gpLoadAiStats();
+  stats.total++;
+  if(success) stats.success++; else stats.fail++;
+  stats.log.unshift({ ts: Date.now(), label: label || 'Untitled syllabus', success: !!success });
+  stats.log = stats.log.slice(0, 25);
+  cpSaveJSON(GP_AISTATS_KEY, stats);
+}
+
+function gpLoadFeedback(){
+  return cpLoadJSON(GP_FEEDBACK_KEY, []);
+}
+function gpSubmitFeedback(rating, comment){
+  if(!rating) { showToast('Pick a star rating first.'); return; }
+  var list = gpLoadFeedback();
+  var session = (typeof SESSION !== 'undefined' && SESSION) ? SESSION : {};
+  list.unshift({
+    id: 'fb' + Date.now(),
+    unid: session.unid || '',
+    name: session.name || 'Student',
+    rating: rating,
+    comment: (comment || '').trim(),
+    ts: Date.now()
+  });
+  cpSaveJSON(GP_FEEDBACK_KEY, list.slice(0, 100));
+  showToast('Thanks for the feedback!');
+}
 function gpPersist(){
   try{
     localStorage.setItem(GP_STORAGE_KEY, JSON.stringify({ courses: gpCourses, activeKey: gpActiveKey }));
@@ -674,12 +719,14 @@ async function gpRunRealAnalysis(overlay, bar, title, sub){
     bar.style.width = '85%';
     var course = gpMapParsedSyllabus(parsed, filename, text);
     bar.style.width = '100%';
+    gpLogAiAttempt(true, course.code || filename);
     setTimeout(function(){
       overlay.classList.add('hidden');
       gpCommitCourse(course, 'REAL_' + Date.now(), 'AI analyzed ' + course.code + ' from your syllabus!');
     }, 250);
   } catch(err){
     console.warn('GradePilot: real syllabus analysis failed, falling back to demo data.', err);
+    gpLogAiAttempt(false, filename);
     overlay.classList.add('hidden');
     showToast('Could not reach the syllabus AI (sandboxed preview or network) — loaded demo data instead.');
     gpFinishAnalysis();
@@ -988,10 +1035,91 @@ function gpCalculate(){
   gpRenderGpaCard();
 }
 
-if(gpLoadPersisted()){
-  gpShowDashboard();
-  gpRenderCourse();
-} else {
-  gpShowUpload();
+/* ---- admin-only dashboard: registered-student / major breakdown, real AI
+   usage stats (see gpLogAiAttempt above) and student feedback -- there's no
+   backend, so these all read the same shared localStorage stores every
+   other admin page in this app already reads from. ---- */
+function gpTimeAgo(ts){
+  var diff = Math.max(0, Date.now() - ts);
+  var mins = Math.floor(diff / 60000);
+  if(mins < 1) return 'just now';
+  if(mins < 60) return mins + 'm ago';
+  var hrs = Math.floor(mins / 60);
+  if(hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
 }
-gpRenderPills();
+function gpEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+function gpRenderAdminDashboard(){
+  var accounts = listAccounts();
+  document.getElementById('gpStatStudents').textContent = accounts.length;
+
+  var aiStats = gpLoadAiStats();
+  document.getElementById('gpStatAiRequests').textContent = aiStats.total;
+  var rate = aiStats.total ? Math.round((aiStats.success / aiStats.total) * 100) : 0;
+  document.getElementById('gpStatAiRate').textContent = aiStats.total ? (rate + '%') : '—';
+
+  var feedback = gpLoadFeedback();
+  document.getElementById('gpStatFeedbackCount').textContent = feedback.length;
+  var avg = feedback.length ? (feedback.reduce(function(s,f){ return s + f.rating; }, 0) / feedback.length) : 0;
+  document.getElementById('gpStatFeedbackAvg').textContent = feedback.length ? (avg.toFixed(1) + ' / 5') : '—';
+
+  var counts = {};
+  accounts.forEach(function(a){
+    var m = (a.major || 'Not set').trim() || 'Not set';
+    counts[m] = (counts[m] || 0) + 1;
+  });
+  var majorRows = Object.keys(counts).map(function(m){ return {m:m, n:counts[m]}; }).sort(function(a,b){ return b.n - a.n; }).slice(0, 8);
+  var maxN = majorRows.length ? majorRows[0].n : 1;
+  document.getElementById('gpMajorBars').innerHTML = majorRows.length ? majorRows.map(function(row){
+    var pct = Math.round((row.n / maxN) * 100);
+    return '<div class="gp-major-row"><span class="gp-major-name">'+gpEsc(row.m)+'</span>'
+      + '<div class="gp-major-bar-track"><div class="gp-major-bar-fill" style="width:'+pct+'%;"></div></div>'
+      + '<span class="gp-major-count">'+row.n+'</span></div>';
+  }).join('') : '<p class="muted">No students registered yet.</p>';
+
+  document.getElementById('gpAiLog').innerHTML = aiStats.log.length ? aiStats.log.map(function(e){
+    return '<div class="gp-log-row"><span class="gp-log-dot '+(e.success?'ok':'fail')+'"></span>'
+      + '<span class="gp-log-label">'+gpEsc(e.label)+'</span>'
+      + '<span class="gp-log-outcome">'+(e.success ? 'Parsed successfully' : 'Fell back to demo data')+'</span>'
+      + '<span class="gp-log-time">'+gpTimeAgo(e.ts)+'</span></div>';
+  }).join('') : '<p class="muted">No syllabus has been analyzed via the live AI yet.</p>';
+
+  document.getElementById('gpFeedbackList').innerHTML = feedback.length ? feedback.slice(0, 12).map(function(f){
+    var stars = '★★★★★☆☆☆☆☆'.slice(5 - f.rating, 10 - f.rating);
+    return '<div class="gp-fb-row"><div class="gp-fb-top"><span class="gp-fb-stars">'+stars+'</span><span class="gp-fb-name">'+gpEsc(f.name)+'</span><span class="gp-fb-time">'+gpTimeAgo(f.ts)+'</span></div>'
+      + (f.comment ? '<p class="gp-fb-comment">'+gpEsc(f.comment)+'</p>' : '') + '</div>';
+  }).join('') : '<p class="muted">No feedback submitted yet.</p>';
+}
+
+/* ---- student-only: a lightweight "rate GradePilot" widget (stars +
+   optional comment) feeding the admin feedback list above. ---- */
+function gpSetFeedbackStars(n){
+  gpFeedbackStars = n;
+  document.querySelectorAll('#gpFeedbackStars .gp-star').forEach(function(el){
+    el.classList.toggle('on', Number(el.getAttribute('data-star')) <= n);
+  });
+}
+function gpSubmitFeedbackForm(){
+  if(!gpFeedbackStars){ showToast('Pick a star rating first.'); return; }
+  gpSubmitFeedback(gpFeedbackStars, document.getElementById('gpFeedbackComment').value);
+  document.getElementById('gpFeedbackComment').value = '';
+  gpSetFeedbackStars(0);
+}
+
+/* Called from index.html's own inline script, AFTER it sets both SESSION
+   (via requireSession()) and isAdmin -- this file loads before that inline
+   script runs, so it can't safely read either one at its own top level. */
+function gpInit(){
+  if(isAdmin){
+    gpRenderAdminDashboard();
+  } else {
+    if(gpLoadPersisted()){
+      gpShowDashboard();
+      gpRenderCourse();
+    } else {
+      gpShowUpload();
+    }
+    gpRenderPills();
+  }
+}

@@ -121,13 +121,18 @@ function mpApplyAdmin(){
   document.getElementById('profileAvatar').textContent = isAdmin ? 'A' : (s.initial || 'S');
   document.getElementById('profileAvatar').className = 'profile-avatar' + (isAdmin ? ' is-admin' : '');
   document.getElementById('profileName').textContent = isAdmin ? 'UAC Admin (Department Admin)' : (s.name || 'Student');
-  document.getElementById('profileMeta').innerHTML = isAdmin
-    ? 'UAC IT &amp; Student Affairs<br>University of Utah Asia Campus (UAC), Songdo'
-    : mpEsc(s.major || 'Major not set yet') + '<br>University of Utah Asia Campus (UAC), Songdo';
+  document.getElementById('profileMeta').textContent = 'University of Utah Asia Campus (UAC), Songdo';
   document.getElementById('kvUnid').textContent = isAdmin ? '—' : (s.unid || '—');
   document.getElementById('kvEmail').textContent = isAdmin ? '—' : (s.unid ? (s.unid + '@umail.utah.edu') : '—');
   document.getElementById('kvJoined').textContent = isAdmin ? '—' : mpFormatJoined(s.joinedAt);
-  document.getElementById('statusValue').textContent = isAdmin ? 'Department Staff — UAC IT Authorized' : 'Active Student';
+  /* "Status" used to just say "Active Student" for every single student,
+     which told nobody anything -- the major (+ optional double-major/
+     minor) is the useful thing to show here instead. Admin has no major,
+     so it keeps a department line of its own. */
+  document.getElementById('kvMajorValue').textContent = isAdmin
+    ? 'UAC IT & Student Affairs'
+    : (s.major || 'Major not set yet') + (s.major2 ? ' · ' + s.major2 : '');
+  document.getElementById('kvMajorEditBtn').classList.toggle('hidden', isAdmin);
   document.getElementById('signinMethodValue').textContent = isAdmin ? 'Departmental Passcode' : 'Campuspilot Account (self-registered)';
   document.getElementById('fhSub').textContent = isAdmin
     ? 'Manage your account, plus a quick overview of what needs platform attention'
@@ -139,4 +144,112 @@ function mpApplyAdmin(){
     mpRenderAdminStats();
     mpRenderStudentRoster();
   }
+}
+
+/* ---------------- Edit Major modal (student only) ----------------
+   Lets a student set or change their major/minor at any time, not just
+   at signup -- important for any account that was created before the
+   major field existed (it just has an empty major), and for anyone who
+   simply wants to change it. Reuses the exact same UAC_DEPARTMENTS /
+   fillDeptSelect helpers login.js's signup form uses, from shared/
+   session.js, so the two stay consistent. */
+function mpOpenEditMajor(){
+  if(isAdmin || !SESSION || !SESSION.unid) return;
+  fillDeptSelect(document.getElementById('mp-major-select'), 'Select your major…');
+  fillDeptSelect(document.getElementById('mp-minor-select'), 'Select a department…');
+
+  var majorSel = document.getElementById('mp-major-select');
+  var major = SESSION.major || '';
+  if(major && UAC_DEPARTMENTS.indexOf(major) === -1){
+    majorSel.value = '__other__';
+    document.getElementById('mp-major-other-wrap').classList.remove('hidden');
+    document.getElementById('mp-major-other').value = major;
+  } else {
+    majorSel.value = major;
+    document.getElementById('mp-major-other-wrap').classList.add('hidden');
+    document.getElementById('mp-major-other').value = '';
+  }
+
+  var major2 = SESSION.major2 || '';
+  var minorBox = document.getElementById('mp-minor-fields');
+  var minorToggleRow = document.getElementById('mp-minor-toggle-row');
+  if(major2){
+    minorBox.classList.remove('hidden');
+    minorToggleRow.classList.add('hidden');
+    var isMinor = major2.indexOf('Minor:') === 0;
+    document.querySelector('input[name="mp-minor-type"][value="' + (isMinor ? 'minor' : 'double') + '"]').checked = true;
+    var dept = major2.replace(/^(Minor|Double Major):\s*/, '');
+    var minorSel = document.getElementById('mp-minor-select');
+    if(UAC_DEPARTMENTS.indexOf(dept) === -1){
+      minorSel.value = '__other__';
+      document.getElementById('mp-minor-other-wrap').classList.remove('hidden');
+      document.getElementById('mp-minor-other').value = dept;
+    } else {
+      minorSel.value = dept;
+      document.getElementById('mp-minor-other-wrap').classList.add('hidden');
+    }
+  } else {
+    minorBox.classList.add('hidden');
+    minorToggleRow.classList.remove('hidden');
+    document.getElementById('mp-minor-select').value = '';
+    document.getElementById('mp-minor-other-wrap').classList.add('hidden');
+    document.getElementById('mp-minor-other').value = '';
+  }
+
+  document.getElementById('mp-edit-major-modal').classList.remove('hidden');
+}
+function mpCloseEditMajor(){
+  document.getElementById('mp-edit-major-modal').classList.add('hidden');
+}
+function mpToggleMinorFields(){
+  var box = document.getElementById('mp-minor-fields');
+  var row = document.getElementById('mp-minor-toggle-row');
+  var opening = box.classList.contains('hidden');
+  box.classList.toggle('hidden', !opening);
+  row.classList.toggle('hidden', opening);
+  if(opening){
+    document.getElementById('mp-minor-select').value = '';
+    document.getElementById('mp-minor-other-wrap').classList.add('hidden');
+    document.getElementById('mp-minor-other').value = '';
+  }
+}
+function mpRefreshMajorOtherVisibility(){
+  var sel = document.getElementById('mp-major-select');
+  document.getElementById('mp-major-other-wrap').classList.toggle('hidden', sel.value !== '__other__');
+}
+function mpRefreshMinorOtherVisibility(){
+  var sel = document.getElementById('mp-minor-select');
+  document.getElementById('mp-minor-other-wrap').classList.toggle('hidden', sel.value !== '__other__');
+}
+function mpResolveMajor(){
+  var sel = document.getElementById('mp-major-select').value;
+  if(sel === '__other__') return (document.getElementById('mp-major-other').value || '').trim();
+  return sel;
+}
+function mpResolveMajor2(){
+  var box = document.getElementById('mp-minor-fields');
+  if(box.classList.contains('hidden')) return '';
+  var typeEl = document.querySelector('input[name="mp-minor-type"]:checked');
+  var type = typeEl ? typeEl.value : 'double';
+  var sel = document.getElementById('mp-minor-select').value;
+  var dept = (sel === '__other__') ? (document.getElementById('mp-minor-other').value || '').trim() : sel;
+  if(!dept) return '';
+  return (type === 'minor' ? 'Minor: ' : 'Double Major: ') + dept;
+}
+function mpSaveEditMajor(){
+  var major = mpResolveMajor();
+  if(!major){
+    showToast('Select your major (or choose "Other" and type it in).');
+    return;
+  }
+  var major2 = mpResolveMajor2();
+  var updated = updateAccountMajor(SESSION.unid, major, major2);
+  if(!updated){
+    showToast("Couldn't find your account — try signing in again.");
+    return;
+  }
+  SESSION = setSession('student', updated);
+  mpCloseEditMajor();
+  mpApplyAdmin();
+  showToast('Major updated.');
 }

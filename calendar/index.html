@@ -42,28 +42,29 @@
       </div>
       <div class="cal-topbar">
         <div class="cal-selects">
-          <div class="cal-select" id="cal-select-year" onclick="toggleCalSelect('year')"><span class="cal-select-label">2026 Year</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            <div class="cal-select-menu" id="cal-select-year-menu"><div class="cal-select-opt" data-value="2024" onclick="selectCalOption(event,'year','2024','2024')">2024</div><div class="cal-select-opt" data-value="2025" onclick="selectCalOption(event,'year','2025','2025')">2025</div><div class="cal-select-opt active" data-value="2026" onclick="selectCalOption(event,'year','2026','2026')">2026</div><div class="cal-select-opt" data-value="2027" onclick="selectCalOption(event,'year','2027','2027')">2027</div><div class="cal-select-opt" data-value="2028" onclick="selectCalOption(event,'year','2028','2028')">2028</div></div>
+          <div class="cal-select" id="cal-select-year" onclick="toggleCalSelect('year')"><span class="cal-select-label">2026</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <div class="cal-select-menu" id="cal-select-year-menu"><div class="cal-select-opt" data-value="2024" onclick="selectCalOption(event,'year','2024')">2024</div><div class="cal-select-opt" data-value="2025" onclick="selectCalOption(event,'year','2025')">2025</div><div class="cal-select-opt active" data-value="2026" onclick="selectCalOption(event,'year','2026')">2026</div><div class="cal-select-opt" data-value="2027" onclick="selectCalOption(event,'year','2027')">2027</div><div class="cal-select-opt" data-value="2028" onclick="selectCalOption(event,'year','2028')">2028</div></div>
           </div>
-          <div class="cal-select" id="cal-select-month" onclick="toggleCalSelect('month')"><span class="cal-select-label">September (09)</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            <div class="cal-select-menu" id="cal-select-month-menu"><div class="cal-select-opt" data-value="01" onclick="selectCalOption(event,'month','01','January (01)')">January (01)</div><div class="cal-select-opt" data-value="02" onclick="selectCalOption(event,'month','02','February (02)')">February (02)</div><div class="cal-select-opt" data-value="03" onclick="selectCalOption(event,'month','03','March (03)')">March (03)</div><div class="cal-select-opt" data-value="04" onclick="selectCalOption(event,'month','04','April (04)')">April (04)</div><div class="cal-select-opt" data-value="05" onclick="selectCalOption(event,'month','05','May (05)')">May (05)</div><div class="cal-select-opt" data-value="06" onclick="selectCalOption(event,'month','06','June (06)')">June (06)</div><div class="cal-select-opt" data-value="07" onclick="selectCalOption(event,'month','07','July (07)')">July (07)</div><div class="cal-select-opt" data-value="08" onclick="selectCalOption(event,'month','08','August (08)')">August (08)</div><div class="cal-select-opt active" data-value="09" onclick="selectCalOption(event,'month','09','September (09)')">September (09)</div><div class="cal-select-opt" data-value="10" onclick="selectCalOption(event,'month','10','October (10)')">October (10)</div><div class="cal-select-opt" data-value="11" onclick="selectCalOption(event,'month','11','November (11)')">November (11)</div><div class="cal-select-opt" data-value="12" onclick="selectCalOption(event,'month','12','December (12)')">December (12)</div></div>
+          <div class="cal-select" id="cal-select-month" onclick="toggleCalSelect('month')"><span class="cal-select-label">September</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0ACA9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <div class="cal-select-menu" id="cal-select-month-menu"><div class="cal-select-opt" data-value="01" onclick="selectCalOption(event,'month','01')">January</div><div class="cal-select-opt" data-value="02" onclick="selectCalOption(event,'month','02')">February</div><div class="cal-select-opt" data-value="03" onclick="selectCalOption(event,'month','03')">March</div><div class="cal-select-opt" data-value="04" onclick="selectCalOption(event,'month','04')">April</div><div class="cal-select-opt" data-value="05" onclick="selectCalOption(event,'month','05')">May</div><div class="cal-select-opt" data-value="06" onclick="selectCalOption(event,'month','06')">June</div><div class="cal-select-opt" data-value="07" onclick="selectCalOption(event,'month','07')">July</div><div class="cal-select-opt" data-value="08" onclick="selectCalOption(event,'month','08')">August</div><div class="cal-select-opt active" data-value="09" onclick="selectCalOption(event,'month','09')">September</div><div class="cal-select-opt" data-value="10" onclick="selectCalOption(event,'month','10')">October</div><div class="cal-select-opt" data-value="11" onclick="selectCalOption(event,'month','11')">November</div><div class="cal-select-opt" data-value="12" onclick="selectCalOption(event,'month','12')">December</div></div>
           </div>
           <div class="cal-today" id="cal-today-btn" onclick="goToToday()" style="cursor:pointer;">Today (Sep 2)</div>
         </div>
         <div class="cal-legend">
-          <span><i class="dot" style="background:#BE0000;"></i>My RSVP</span>
-          <span><i class="dot" style="background:#708E99;"></i>Official Campus</span>
+          <span><i class="dot" style="background:#708E99;"></i>Official Event</span>
+          <span><i class="dot" style="background:#3ABFC0;"></i>Career Event</span>
           <span><i class="dot" style="background:#FFB81D;"></i>Free Food</span>
+          <span><i class="dot" style="background:#BE0000;"></i>Deadline</span>
           <span><i class="dot" style="background:#6CC24A;"></i>Personal Schedule</span>
         </div>
       </div>
 
       <div class="filter-row" id="filter-row">
         <button class="pill active" data-filter="all">All Campus Events <span class="count">(3)</span></button>
-        <button class="pill red" data-filter="rsvp">🔖 My RSVPs <span class="count">(1)</span></button>
+        <button class="pill red" data-filter="rsvp" data-role="student">🔖 My RSVPs <span class="count">(1)</span></button>
         <button class="pill" data-filter="food">🍴 Free Food <span class="count">(1)</span></button>
         <button class="pill" data-filter="career">💼 Career &amp; Jobs <span class="count">(1)</span></button>
-        <button class="pill-toggle" id="personal-toggle" onclick="togglePersonal()">
+        <button class="pill-toggle" id="personal-toggle" data-role="student" onclick="togglePersonal()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M2.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
           Personal Schedule
           <span class="switch on" id="personal-switch"><i></i></span>
@@ -103,8 +104,9 @@
       <div class="detail-rows" id="modal-rows"></div>
       <div style="flex:1;"></div>
       <div id="modal-rsvp-section">
-        <div class="modal-rsvp-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open Google Form RSVP</div>
-        <div class="modal-note">Submitted RSVPs display on your calendar with a <b>Red Header</b> badge.</div>
+        <a class="modal-rsvp-btn" id="modal-rsvp-link" href="#" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open RSVP Form</a>
+        <label class="modal-rsvp-confirm" id="modal-rsvp-done-wrap"><input type="checkbox" id="modal-rsvp-done"> I've submitted the form — add to My RSVPs</label>
+        <div class="modal-note" id="modal-rsvp-note">Checking the box above is what adds this to your My RSVPs — opening the form alone doesn't.</div>
       </div>
     </div>
   </div>
@@ -123,9 +125,10 @@
       <div class="add-field">
         <label>Category</label>
         <select id="as-cat">
-          <option value="official">Official Campus Event</option>
-          <option value="rsvp">RSVP-Required Event</option>
-          <option value="food">Free Food Event</option>
+          <option value="official">Official Event</option>
+          <option value="career">Career Event</option>
+          <option value="food">Free Food</option>
+          <option value="deadline">Deadline</option>
         </select>
       </div>
     </div>
@@ -174,9 +177,10 @@
 
     <div id="add-official-fields-bottom" class="hidden">
       <div class="add-field">
-        <label>Location</label>
-        <input id="as-location" placeholder="e.g. Student Center Gym">
+        <label>Location <span style="color:var(--red);">*</span></label>
+        <input id="as-location" placeholder="e.g. Student Center Gym" required>
       </div>
+      <p class="error" id="as-error" role="alert" style="color:var(--red);font-size:12px;margin:-6px 0 10px;"></p>
       <div class="add-field">
         <label>Host</label>
         <input id="as-org" placeholder="e.g. Career Services">
@@ -189,21 +193,25 @@
         <label>Perks (optional)</label>
         <input id="as-perks" placeholder="e.g. Free food & giveaways">
       </div>
+      <div class="add-field">
+        <label>RSVP link (optional)</label>
+        <input id="as-rsvp-link" type="url" placeholder="e.g. https://forms.office.com/r/abc123">
+      </div>
       <div class="add-field hidden" id="as-locAbbr-field">
         <label>Short location label (optional, for the RSVP sidebar)</label>
         <input id="as-locAbbr" placeholder="e.g. Gym">
       </div>
       <div class="add-field">
         <label>Poster photo (optional)</label>
-        <input type="file" id="as-poster" accept="image/*">
+        <div class="file-upload-row">
+          <input type="file" id="as-poster" class="file-upload-input" accept="image/*">
+          <label for="as-poster" class="file-upload-btn">Choose File</label>
+          <span class="file-upload-name" id="as-poster-filename">No file chosen</span>
+        </div>
         <div id="as-poster-preview-wrap" class="hidden" style="margin-top:8px;display:flex;align-items:center;gap:10px;">
           <img id="as-poster-preview" src="" alt="" style="width:56px;height:80px;object-fit:cover;border-radius:6px;border:1.5px solid var(--border);">
           <button type="button" class="btn btn-ghost" id="as-poster-remove" style="padding:0 10px;min-height:32px;">Remove photo</button>
         </div>
-      </div>
-      <div class="add-field" style="display:flex;align-items:center;gap:8px;">
-        <input type="checkbox" id="as-career" style="width:16px;height:16px;">
-        <label style="margin:0;" for="as-career">Show under the "Career &amp; Jobs" filter</label>
       </div>
     </div>
 
@@ -218,11 +226,15 @@
 <script src="../shared/session.js"></script>
 <script src="../shared/toast.js"></script>
 <script src="../shared/nav.js"></script>
+<script src="../shared/feedback.js"></script>
 <script src="../shared/modal.js"></script>
 <script src="calendar.js"></script>
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'calendar');
+  calLoadPersonal();
+  calLoadMyRsvps();
+  renderCalendar();
 </script>
 </body>
 </html>

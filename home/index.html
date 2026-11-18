@@ -33,7 +33,7 @@
     <aside class="nav-rail" id="navrail"></aside>
 
     <main class="main-col">
-      <div class="page-heading"><h1>Hi, Garam 👋</h1><div class="ph-sub">Here's what's happening on campus today.</div></div>
+      <div class="page-heading"><h1 id="homeGreeting">Hi there 👋</h1><div class="ph-sub">Here's what's happening on campus today.</div></div>
 
       <div class="uac-banner">
         <div class="uac-banner-text">
@@ -110,16 +110,11 @@
     </main>
 
     <aside class="right-panel">
-      <div class="mini-cal-head"><div class="mini-cal-title">September 2026</div><div class="mini-cal-tag">UAC SCHEDULE</div></div>
-      <div class="mini-grid">
-        <div class="dow sun">S</div><div class="dow">M</div><div class="dow">T</div><div class="dow">W</div><div class="dow">T</div><div class="dow">F</div><div class="dow">S</div>
-        <div class="mini-day dim">31</div><div class="mini-day">1</div><div class="mini-day today">2</div><div class="mini-day">3</div><div class="mini-day">4</div><div class="mini-day">5</div><div class="mini-day">6</div>
-        <div class="mini-day">7</div><div class="mini-day">8</div><div class="mini-day">9</div><div class="mini-day">10</div><div class="mini-day">11</div><div class="mini-day">12</div><div class="mini-day">13</div>
-        <div class="mini-day">14</div><div class="mini-day">15</div><div class="mini-day">16</div><div class="mini-day">17</div><div class="mini-day">18</div><div class="mini-day">19</div><div class="mini-day">20</div>
-      </div>
+      <div class="mini-cal-head"><div class="mini-cal-title" id="miniCalTitle">—</div><div class="mini-cal-tag">UAC SCHEDULE</div></div>
+      <div class="mini-grid" id="miniCalGrid"></div>
       <div class="rp-divider"></div>
-      <div class="rp-head"><div class="rp-head-title">TODAY'S SCHEDULE &amp; RSVPS</div><span style="font-size:11px;color:var(--muted-2);font-weight:700;">SEP 2</span></div>
-      <div class="muted" style="font-size:12.5px;padding:6px 2px;">Nothing scheduled yet. Official events and your RSVPs will show up here.</div>
+      <div class="rp-head"><div class="rp-head-title">TODAY'S SCHEDULE &amp; RSVPS</div><span style="font-size:11px;color:var(--muted-2);font-weight:700;" id="rpTodayDate">—</span></div>
+      <div id="rpTodayList"><div class="muted" style="font-size:12.5px;padding:6px 2px;">Nothing scheduled yet. Official events and your RSVPs will show up here.</div></div>
     </aside>
   </div>
 </div>
@@ -136,8 +131,11 @@
       <h2 id="modal-title">2026 Tech Career Night</h2>
       <div class="detail-rows" id="modal-rows"></div>
       <div style="flex:1;"></div>
-      <div class="modal-rsvp-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open Google Form RSVP</div>
-      <div class="modal-note">Submitted RSVPs display on your calendar with a <b>Red Header</b> badge.</div>
+      <div id="modal-rsvp-section">
+        <a class="modal-rsvp-btn" id="modal-rsvp-link" href="#" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open RSVP Form</a>
+        <label class="modal-rsvp-confirm" id="modal-rsvp-done-wrap"><input type="checkbox" id="modal-rsvp-done"> I've submitted the form — add to My RSVPs</label>
+        <div class="modal-note" id="modal-rsvp-note">Checking the box above is what adds this to your My RSVPs — opening the form alone doesn't.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -146,10 +144,13 @@
 <script src="../shared/session.js"></script>
 <script src="../shared/toast.js"></script>
 <script src="../shared/nav.js"></script>
+<script src="../shared/feedback.js"></script>
 <script src="../shared/modal.js"></script>
+<script src="home.js"></script>
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'home');
+  homeInit();
 </script>
 </body>
 </html>

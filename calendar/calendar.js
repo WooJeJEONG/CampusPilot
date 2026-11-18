@@ -7,31 +7,51 @@ function pad2(n){ return n < 10 ? '0'+n : ''+n; }
 function daysInMonth(y,m){ return new Date(y, m, 0).getDate(); }
 function firstWeekday(y,m){ return new Date(y, m-1, 1).getDay(); }
 
-/* Demo campus events live only in September 2026 — the demo's "today".
-   Any other month/year is fully navigable, just shows an empty grid. */
-var TODAY = {year:2026, month:9, date:2};
+/* "Today" always tracks the real, current date -- not a fixed demo
+   date -- so it keeps changing day to day on its own. (The September
+   2026 seed events below are last year's/last semester's history from
+   "today"'s point of view; they stay browsable by navigating the
+   month picker back to September, same as any other past month.) */
+var TODAY = (function(){
+  var d = new Date();
+  return {year: d.getFullYear(), month: d.getMonth() + 1, date: d.getDate()};
+})();
 
-/* Official/RSVP/Free-Food events are admin-managed data, registered
-   through the same "+ Add Schedule" modal on this page (see
-   openAddModal/addSchedule below -- it behaves differently for an
-   admin session), persisted under CAL_STORE_KEY so they show up to
-   every student immediately. CAMPUS_EVENTS_SEED is only the one-time
-   starting content the store is initialized with on first load. */
-var CAL_STORE_KEY = 'campuspilot.calendar.events.v1';
+/* Campus events are admin-managed data, registered through the same
+   "+ Add Schedule" modal on this page (see openAddModal/addSchedule
+   below -- it behaves differently for an admin session), persisted
+   under CAL_STORE_KEY so they show up to every student immediately.
+   CAMPUS_EVENTS_SEED is only the one-time starting content the store
+   is initialized with on first load.
+
+   Category (cat) is one of 'official' / 'career' / 'food' / 'deadline'
+   -- what KIND of event it is. RSVP is a separate, orthogonal concern:
+   any category can optionally carry an rsvpLink (the admin's Google
+   Form / Microsoft Forms / etc. URL for that event); its mere presence
+   is what turns on the RSVP button for students, rather than a
+   dedicated "RSVP-required" category of its own. Bumped to .v2 since
+   older saved events used a different shape (a 'rsvp' category plus a
+   separate 'career' checkbox flag). */
+var CAL_STORE_KEY = 'campuspilot.calendar.events.v2';
 var CAMPUS_EVENTS_SEED = [
   {id:'seed-1',  year:2026, month:9, date:1,  cat:'official', title:'Fall Convocation', time:'10am', location:'Grand Hall, UAC Main Building', org:'Office of the Dean', contact:'dean-office@utah.edu'},
   {id:'seed-2',  year:2026, month:9, date:2,  cat:'official', title:'UAC Fall Club Fair', time:'11am–2pm', location:'Central Plaza', org:'University Activities Council', contact:'uac@utah.edu', perks:'Free club swag & giveaways'},
   {id:'seed-3',  year:2026, month:9, date:4,  cat:'official', title:'Global Leader Forum', time:'4pm', location:'Auditorium A', org:'Office of International Affairs', contact:'oia@utah.edu'},
   {id:'seed-4',  year:2026, month:9, date:5,  cat:'official', title:'IS Welcome Social', time:'6pm', location:'IS Lounge, 3F', org:'Information Systems Dept.', contact:'is-dept@utah.edu', perks:'Light refreshments provided'},
-  {id:'seed-5',  year:2026, month:9, date:10, cat:'official', career:1, title:'Resume Clinic', time:'1–4pm', location:'Career Center, Rm 210', org:'Career Services', contact:'career-uac@utah.edu'},
-  {id:'seed-6',  year:2026, month:9, date:11, cat:'rsvp', career:1, title:'Career Fair Pre-Reg', time:'2pm', location:'Student Center Gym', locAbbr:'Gym', org:'Career Services', contact:'career-uac@utah.edu', perks:'Free resume review & coffee bar'},
-  {id:'seed-7',  year:2026, month:9, date:11, cat:'official', career:1, title:'Alumni Career Talk', time:'2pm', location:'Rm 310', org:'Alumni Association', contact:'alumni@utah.edu'},
+  {id:'seed-5',  year:2026, month:9, date:10, cat:'career', title:'Resume Clinic', time:'1–4pm', location:'Career Center, Rm 210', org:'Career Services', contact:'career-uac@utah.edu'},
+  {id:'seed-6',  year:2026, month:9, date:11, cat:'career', title:'Career Fair Pre-Reg', time:'2pm', location:'Student Center Gym', locAbbr:'Gym', org:'Career Services', contact:'career-uac@utah.edu', perks:'Free resume review & coffee bar', rsvpLink:'https://forms.office.com/r/CampusPilotCareerFairPreReg'},
+  {id:'seed-7',  year:2026, month:9, date:11, cat:'career', title:'Alumni Career Talk', time:'2pm', location:'Rm 310', org:'Alumni Association', contact:'alumni@utah.edu'},
   {id:'seed-8',  year:2026, month:9, date:17, cat:'food', title:'Midterm Pizza Social', time:'12:30pm', location:'1F Student Lounge', perks:'Free pizza & drinks — while supplies last'},
-  {id:'seed-9',  year:2026, month:9, date:18, cat:'rsvp', career:1, title:'Tech Career Night', time:'5–7:30pm', location:'U821 Grand Auditorium (UAC Building 8F)', locAbbr:'U821', org:'UAC IS Student Council & Career Center', contact:'career-uac@utah.edu', perks:'Pizza catering & official UAC tech sticker pack'},
-  {id:'seed-10', year:2026, month:9, date:18, cat:'official', career:1, title:'Alumni Networking', time:'7:30–8:30pm', location:'Grand Hall Lobby', org:'Alumni Association', contact:'alumni@utah.edu'},
-  {id:'seed-11', year:2026, month:9, date:23, cat:'official', career:1, title:'Startup Pitch Day', time:'1–4pm', location:'Innovation Hub', org:'Entrepreneurship Center', contact:'entrepreneurship@utah.edu', perks:'Pitch prizes & networking reception'},
+  {id:'seed-9',  year:2026, month:9, date:18, cat:'career', title:'Tech Career Night', time:'5–7:30pm', location:'U821 Grand Auditorium (UAC Building 8F)', locAbbr:'U821', org:'UAC IS Student Council & Career Center', contact:'career-uac@utah.edu', perks:'Pizza catering & official UAC tech sticker pack', rsvpLink:'https://forms.gle/CampusPilotTechCareerNight'},
+  {id:'seed-10', year:2026, month:9, date:18, cat:'career', title:'Alumni Networking', time:'7:30–8:30pm', location:'Grand Hall Lobby', org:'Alumni Association', contact:'alumni@utah.edu'},
+  {id:'seed-11', year:2026, month:9, date:23, cat:'career', title:'Startup Pitch Day', time:'1–4pm', location:'Innovation Hub', org:'Entrepreneurship Center', contact:'entrepreneurship@utah.edu', perks:'Pitch prizes & networking reception'},
   {id:'seed-12', year:2026, month:9, date:25, cat:'official', title:'SLC Exchange Briefing', time:'3pm', location:'Rm 118', org:'Office of International Affairs', contact:'oia@utah.edu'},
-  {id:'seed-13', year:2026, month:9, date:26, cat:'food', title:'Coffee & Krispy Kreme', time:'10am', location:'5F Career Center'}
+  {id:'seed-13', year:2026, month:9, date:26, cat:'food', title:'Coffee & Krispy Kreme', time:'10am', location:'5F Career Center'},
+  /* this month's own live examples, so the calendar isn't empty just
+     because "today" has moved on from the September seed data above */
+  {id:'seed-14', year:TODAY.year, month:TODAY.month, date: Math.min(20, daysInMonth(TODAY.year, TODAY.month)), cat:'career', title:'Fall Career Fair', time:'1–4pm', location:'Student Center Gym', locAbbr:'Gym', org:'Career Services', contact:'career-uac@utah.edu', perks:'Free resume review & coffee bar', rsvpLink:'https://forms.office.com/r/CampusPilotFallCareerFair'},
+  {id:'seed-15', year:TODAY.year, month:TODAY.month, date: Math.min(20, daysInMonth(TODAY.year, TODAY.month)), cat:'food', title:'Free Pizza Friday', time:'12pm', location:'1F Student Lounge', perks:'Free pizza & drinks — while supplies last'},
+  {id:'seed-16', year:TODAY.year, month:TODAY.month, date: Math.min(23, daysInMonth(TODAY.year, TODAY.month)), cat:'deadline', title:'Course Withdrawal Deadline', location:"Registrar's Office (online portal)", org:'Office of the Registrar', contact:'registrar@utah.edu'}
 ];
 function calLoadEvents(){
   try {
@@ -46,47 +66,163 @@ var CAMPUS_EVENTS = calLoadEvents();
 window.addEventListener('storage', function(e){
   if(e.key === CAL_STORE_KEY){ CAMPUS_EVENTS = calLoadEvents(); renderCalendar(); }
 });
-var personalEvents = [
+/* Personal Schedule is each student's own private calendar, not a
+   shared campus list -- so it's keyed by the signed-in account's unid
+   and loaded/saved only for that one account (never for admin: see
+   calPersonalKey, and the [data-role="student"] Personal Schedule
+   toggle in index.html that keeps the feature out of the admin view
+   entirely). calLoadPersonal() is called once SESSION exists (from the
+   inline script at the bottom of index.html, after requireSession()),
+   since this file itself loads before that. */
+var CAL_PERSONAL_KEY = 'campuspilot.calendar.personal.v1';
+var CAL_PERSONAL_SEED = [
   {year:2026, month:9, date:3,  title:'CS 3500 Study Group', time:''},
   {year:2026, month:9, date:15, title:'Library Study Session', time:''}
-]; /* seeded with the demo's own personal examples; new ones append via "+ Add Schedule": {year,month,date,title,time} */
+];
+var personalEvents = []; /* {year,month,date,title,time}; populated per-account by calLoadPersonal() */
+function calPersonalKey(){
+  return (typeof SESSION !== 'undefined' && SESSION && SESSION.role === 'student' && SESSION.unid) ? SESSION.unid : null;
+}
+function calLoadPersonal(){
+  var key = calPersonalKey();
+  if(!key){ personalEvents = []; return; }
+  var all = {};
+  try { all = JSON.parse(localStorage.getItem(CAL_PERSONAL_KEY)) || {}; } catch(e){}
+  if(!(key in all) || !Array.isArray(all[key])){
+    /* first time this account opens Calendar (or its stored record got
+       corrupted/was left over from an older data shape): seed it with
+       the demo's own two examples, same as before -- just scoped to
+       this one account now instead of shared globally with everyone.
+       The Array.isArray guard matters: without it, a non-array leftover
+       value here gets assigned straight into personalEvents below, and
+       the next personalEvents.filter()/.forEach() call throws -- which
+       silently aborts the rest of the page's init script (including
+       mountNavRail()), leaving the left nav rail empty. */
+    all[key] = CAL_PERSONAL_SEED.slice();
+    try { localStorage.setItem(CAL_PERSONAL_KEY, JSON.stringify(all)); } catch(e){}
+  }
+  personalEvents = all[key];
+}
+function calSavePersonal(){
+  var key = calPersonalKey();
+  if(!key) return;
+  var all = {};
+  try { all = JSON.parse(localStorage.getItem(CAL_PERSONAL_KEY)) || {}; } catch(e){}
+  all[key] = personalEvents;
+  try { localStorage.setItem(CAL_PERSONAL_KEY, JSON.stringify(all)); } catch(e){}
+}
+
+/* My RSVPs: which RSVP-able events (an event is RSVP-able simply by
+   having an rsvpLink) THIS student has actually confirmed they
+   submitted the form for -- same per-account scoping as Personal
+   Schedule above (never shared between students, never shown to
+   admin), but tracked as a list of event ids rather than full event
+   records, since the event itself still lives in the one shared
+   CAMPUS_EVENTS list. Clicking "Open RSVP Form" does NOT add an event
+   here by itself -- only checking "I've submitted the form" in the
+   event-detail modal does (see openCalModal). */
+var CAL_RSVP_KEY = 'campuspilot.calendar.myrsvps.v1';
+var myRsvpIds = [];
+function calLoadMyRsvps(){
+  var key = calPersonalKey();
+  if(!key){ myRsvpIds = []; return; }
+  var all = {};
+  try { all = JSON.parse(localStorage.getItem(CAL_RSVP_KEY)) || {}; } catch(e){}
+  myRsvpIds = Array.isArray(all[key]) ? all[key] : [];
+}
+function calSaveMyRsvps(){
+  var key = calPersonalKey();
+  if(!key) return;
+  var all = {};
+  try { all = JSON.parse(localStorage.getItem(CAL_RSVP_KEY)) || {}; } catch(e){}
+  all[key] = myRsvpIds;
+  try { localStorage.setItem(CAL_RSVP_KEY, JSON.stringify(all)); } catch(e){}
+}
+function calIsRsvpd(eventId){ return !!eventId && myRsvpIds.indexOf(eventId) !== -1; }
+function calSetRsvpd(eventId, done){
+  if(!eventId) return;
+  var idx = myRsvpIds.indexOf(eventId);
+  if(done && idx === -1) myRsvpIds.push(eventId);
+  if(!done && idx !== -1) myRsvpIds.splice(idx, 1);
+  calSaveMyRsvps();
+}
 
 var viewYear = TODAY.year, viewMonth = TODAY.month;
 
 /* ---------------- event-detail modal wiring (shared/modal.js) ---------------- */
+/* cat -> {color, label}: color drives both the chip's border/fill
+   (.ev-chip--<cat> in calendar.css) and the modal badge color
+   (.badge.<color>); label is the modal badge's fallback text when the
+   event has no host (org) of its own. */
+var CAL_CAT_META = {
+  official: {color:'granite', label:'Campus Event'},
+  career:   {color:'teal',    label:'Career Event'},
+  food:     {color:'gold',    label:'Free Food Event'},
+  deadline: {color:'red',     label:'Deadline'},
+  personal: {color:'green',   label:'Personal Schedule'}
+};
 var chipCounter = 0;
 function registerEventDetail(e, cat){
   var key = 'cal-evt-' + (chipCounter++);
   var rows = [];
-  var mainColor = cat==='food' ? 'gold' : (cat==='rsvp' ? 'red' : (cat==='personal' ? 'green' : 'granite'));
+  var meta = CAL_CAT_META[cat] || CAL_CAT_META.official;
   var when = monthName(e.month) + ' ' + e.date + ', ' + e.year + (e.time ? ' · ' + e.time : '');
   /* Every event shows the same five rows, in the same order, so the
      card's height (and the A4-ratio poster panel beside it) stays
      consistent from event to event -- a field the source data doesn't
      have just shows as "—" instead of being left out. */
-  rows.push({color: mainColor, icon:'calendar', label:'Date/Time', value: when});
+  rows.push({color: meta.color, icon:'calendar', label:'Date/Time', value: when});
   rows.push({color:'granite', icon:'pin', label:'Location', value: e.location || '—'});
   rows.push({color:'granite', icon:'people', label:'Host', value: e.org || '—'});
   rows.push({color:'granite', icon:'mail', label:'Contact', value: e.contact || '—'});
   rows.push({color:'gold', icon:'food', label:'Perks', value: e.perks || '—'});
-  var badge = e.org || (cat==='food' ? 'Free Food Event' : (cat==='rsvp' ? 'My RSVP' : (cat==='personal' ? 'Personal Schedule' : 'Campus Event')));
-  var badgeClass = cat==='food' ? 'gold' : (cat==='rsvp' ? 'red' : (cat==='personal' ? 'green' : 'granite'));
-  EVENTS_DETAIL[key] = {badge: badge, title: e.title, rows: rows, badgeClass: badgeClass, poster: e.poster || null};
+  EVENTS_DETAIL[key] = {
+    badge: e.org || meta.label,
+    title: e.title,
+    rows: rows,
+    badgeClass: meta.color,
+    poster: e.poster || null,
+    rsvpLink: e.rsvpLink || null,
+    eventId: e.id || null
+  };
   return key;
 }
 /* Placeholder markup for events with no admin-uploaded poster photo
    (the default state for every event until one is added). */
 var CAL_POSTER_PLACEHOLDER = '<svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#8B93A0" stroke-width="1.3"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/><path d="M8 14h2M8 17h2M14 14h2M14 17h2"/></svg>';
-function openCalModal(key, cat){
+function openCalModal(key){
+  var det = EVENTS_DETAIL[key];
   openModal(key);
   var b = document.getElementById('modal-badge');
-  if(b) b.className = 'badge ' + (EVENTS_DETAIL[key].badgeClass || 'red');
+  if(b) b.className = 'badge ' + (det.badgeClass || 'red');
   var rsvpSection = document.getElementById('modal-rsvp-section');
-  if(rsvpSection) rsvpSection.style.display = (cat === 'official' || cat === 'rsvp') ? '' : 'none';
+  var rsvpLinkEl = document.getElementById('modal-rsvp-link');
+  var rsvpDoneWrap = document.getElementById('modal-rsvp-done-wrap');
+  var rsvpDoneBox = document.getElementById('modal-rsvp-done');
+  var rsvpNote = document.getElementById('modal-rsvp-note');
+  if(rsvpSection){
+    if(det.rsvpLink){
+      rsvpSection.style.display = '';
+      if(rsvpLinkEl) rsvpLinkEl.href = det.rsvpLink;
+      var admin = calIsAdmin();
+      if(rsvpDoneWrap) rsvpDoneWrap.classList.toggle('hidden', admin);
+      if(rsvpNote) rsvpNote.textContent = admin
+        ? 'Students see a confirmation checkbox here once they open the form.'
+        : "Checking the box above is what adds this to your My RSVPs — opening the form alone doesn't.";
+      if(!admin && rsvpDoneBox){
+        rsvpDoneBox.checked = calIsRsvpd(det.eventId);
+        rsvpDoneBox.onchange = function(){
+          calSetRsvpd(det.eventId, this.checked);
+          renderCalendar();
+        };
+      }
+    } else {
+      rsvpSection.style.display = 'none';
+    }
+  }
   var posterEl = document.getElementById('modal-poster');
   if(posterEl){
-    var poster = EVENTS_DETAIL[key].poster;
-    posterEl.innerHTML = poster ? '<img src="' + poster + '" alt="Event poster">' : CAL_POSTER_PLACEHOLDER;
+    posterEl.innerHTML = det.poster ? '<img src="' + det.poster + '" alt="Event poster">' : CAL_POSTER_PLACEHOLDER;
   }
 }
 
@@ -94,14 +230,14 @@ function makeChip(e){
   var span = document.createElement('span');
   span.className = 'ev-chip ev-chip--' + e.cat + ' clickable';
   span.setAttribute('data-cat', e.cat);
-  if(e.career) span.setAttribute('data-career', '1');
-  var prefix = e.cat === 'rsvp' ? "[RSVP'd] " : '';
+  if(e.id) span.setAttribute('data-event-id', e.id);
+  var prefix = (e.rsvpLink && calIsRsvpd(e.id)) ? "[RSVP'd] " : '';
   var bits = [prefix + e.title];
   if(e.location) bits.push('— ' + e.location);
   if(e.time) bits.push('· ' + e.time);
   span.textContent = bits.join(' ');
   var key = registerEventDetail(e, e.cat);
-  span.addEventListener('click', function(){ openCalModal(key, e.cat); });
+  span.addEventListener('click', function(){ openCalModal(key); });
   return span;
 }
 
@@ -111,7 +247,7 @@ function makePersonalChip(e){
   span.setAttribute('data-cat', 'personal');
   span.textContent = '[Personal] ' + e.title + (e.time ? ' · ' + e.time : '');
   var key = registerEventDetail(e, 'personal');
-  span.addEventListener('click', function(){ openCalModal(key, 'personal'); });
+  span.addEventListener('click', function(){ openCalModal(key); });
   return span;
 }
 
@@ -173,7 +309,13 @@ function renderRightPanel(){
   var panel = document.querySelector('.right-panel');
   var monthEvents = CAMPUS_EVENTS.filter(function(e){ return e.year === viewYear && e.month === viewMonth; });
   var foodEvents = monthEvents.filter(function(e){ return e.cat === 'food'; });
-  var rsvpEvents = monthEvents.filter(function(e){ return e.cat === 'rsvp'; });
+  /* "My RSVPs" is per-student now: any event with an rsvpLink qualifies,
+     but it only shows up here once THIS student has checked "I've
+     submitted the form" on it (see calIsRsvpd/openCalModal) -- never
+     just because it exists on the shared campus calendar. For admin,
+     calIsRsvpd() is always false (no personal unid to key off of), so
+     this list is naturally always empty for them. */
+  var rsvpEvents = monthEvents.filter(function(e){ return e.rsvpLink && calIsRsvpd(e.id); });
   var html = '';
   if(foodEvents.length){
     html += '<div class="rp-head"><div class="rp-head-title">🍴 FREE FOOD EVENTS</div></div>';
@@ -211,9 +353,9 @@ function updateFilterCounts(){
   var monthEvents = CAMPUS_EVENTS.filter(function(e){ return e.year === viewYear && e.month === viewMonth; });
   var counts = {all: monthEvents.length, rsvp: 0, food: 0, career: 0};
   monthEvents.forEach(function(e){
-    if(e.cat === 'rsvp') counts.rsvp++;
+    if(e.rsvpLink && calIsRsvpd(e.id)) counts.rsvp++;
     if(e.cat === 'food') counts.food++;
-    if(e.career) counts.career++;
+    if(e.cat === 'career') counts.career++;
   });
   var setCount = function(sel, n){
     var el = document.querySelector(sel);
@@ -229,8 +371,8 @@ function updateFilterCounts(){
 function updateSelectLabels(){
   var yLabel = document.querySelector('#cal-select-year .cal-select-label');
   var mLabel = document.querySelector('#cal-select-month .cal-select-label');
-  if(yLabel) yLabel.textContent = viewYear + ' Year';
-  if(mLabel) mLabel.textContent = monthName(viewMonth) + ' (' + pad2(viewMonth) + ')';
+  if(yLabel) yLabel.textContent = viewYear;
+  if(mLabel) mLabel.textContent = monthName(viewMonth);
   document.querySelectorAll('#cal-select-year-menu .cal-select-opt').forEach(function(o){
     o.classList.toggle('active', parseInt(o.getAttribute('data-value'), 10) === viewYear);
   });
@@ -304,14 +446,16 @@ function calResetAddForm(){
   var contact = document.getElementById('as-contact'); if(contact) contact.value = '';
   var perks = document.getElementById('as-perks'); if(perks) perks.value = '';
   var locAbbr = document.getElementById('as-locAbbr'); if(locAbbr) locAbbr.value = '';
-  var career = document.getElementById('as-career'); if(career) career.checked = false;
+  var rsvpLink = document.getElementById('as-rsvp-link'); if(rsvpLink) rsvpLink.value = '';
   var posterInput = document.getElementById('as-poster'); if(posterInput) posterInput.value = '';
+  var posterName = document.getElementById('as-poster-filename'); if(posterName) posterName.textContent = 'No file chosen';
   var catSel = document.getElementById('as-cat'); if(catSel) catSel.value = 'official';
   calPendingPoster = null;
   var preview = document.getElementById('as-poster-preview-wrap');
   if(preview) preview.classList.add('hidden');
   var locAbbrField = document.getElementById('as-locAbbr-field');
   if(locAbbrField) locAbbrField.classList.add('hidden');
+  var errEl = document.getElementById('as-error'); if(errEl) errEl.textContent = '';
 }
 function openAddModal(){
   var admin = calIsAdmin();
@@ -368,7 +512,9 @@ function calBuildTimeMenu(field){
   var apCol = document.getElementById('as-time-' + field + '-ampm');
   if(!hourCol || !minCol || !apCol) return;
   hourCol.innerHTML = Array.from({length: 12}, function(_, i){ var h = i + 1; return '<div class="time-menu-opt" data-kind="h" data-val="' + h + '">' + h + '</div>'; }).join('');
-  minCol.innerHTML = ['00', '15', '30', '45'].map(function(m){ return '<div class="time-menu-opt" data-kind="m" data-val="' + m + '">' + m + '</div>'; }).join('');
+  /* every minute 0-59, not just 00/15/30/45 -- a meeting at, say, 2:10
+     should be settable exactly, not rounded to the nearest quarter-hour. */
+  minCol.innerHTML = Array.from({length: 60}, function(_, m){ var mm = (m < 10 ? '0' : '') + m; return '<div class="time-menu-opt" data-kind="m" data-val="' + mm + '">' + mm + '</div>'; }).join('');
   apCol.innerHTML = ['AM', 'PM'].map(function(ap){ return '<div class="time-menu-opt" data-kind="ap" data-val="' + ap + '">' + ap + '</div>'; }).join('');
   [hourCol, minCol, apCol].forEach(function(col){
     col.querySelectorAll('.time-menu-opt').forEach(function(opt){
@@ -406,7 +552,20 @@ function toggleTimeMenu(field){
   var other = field === 'start' ? 'end' : 'start';
   var otherField = document.getElementById('as-time-' + other + '-field');
   if(otherField) otherField.classList.remove('open');
-  document.getElementById('as-time-' + field + '-field').classList.toggle('open');
+  var el = document.getElementById('as-time-' + field + '-field');
+  var opening = !el.classList.contains('open');
+  el.classList.toggle('open');
+  if(opening){
+    /* the minute column has 60 rows -- jump straight to whatever is
+       already picked (or to :00) instead of making every open start
+       scrolled to the top. */
+    ['hour', 'minute', 'ampm'].forEach(function(part){
+      var col = document.getElementById('as-time-' + field + '-' + part);
+      if(!col) return;
+      var active = col.querySelector('.time-menu-opt.active') || col.querySelector('.time-menu-opt');
+      if(active) col.scrollTop = active.offsetTop - col.offsetTop - (col.clientHeight / 2) + (active.clientHeight / 2);
+    });
+  }
 }
 document.addEventListener('click', function(e){
   if(!e.target.closest('.time-field')){
@@ -434,10 +593,14 @@ function calResetTimeField(field){
 calBuildTimeMenu('start');
 calBuildTimeMenu('end');
 
-var calCatSelEl = document.getElementById('as-cat');
-if(calCatSelEl){
-  calCatSelEl.addEventListener('change', function(){
-    document.getElementById('as-locAbbr-field').classList.toggle('hidden', this.value !== 'rsvp');
+/* the short location label is only useful once an event is RSVP-able
+   (it's what shows on the My RSVPs sidebar card), so it only reveals
+   itself once an RSVP link is actually entered -- not tied to category
+   anymore, since any category can carry an RSVP link now. */
+var calRsvpLinkEl = document.getElementById('as-rsvp-link');
+if(calRsvpLinkEl){
+  calRsvpLinkEl.addEventListener('input', function(){
+    document.getElementById('as-locAbbr-field').classList.toggle('hidden', !this.value.trim());
   });
 }
 var calPosterInputEl = document.getElementById('as-poster');
@@ -445,6 +608,8 @@ if(calPosterInputEl){
   calPosterInputEl.addEventListener('change', function(input){
     var file = input.target.files && input.target.files[0];
     if(!file) return;
+    var nameEl = document.getElementById('as-poster-filename');
+    if(nameEl) nameEl.textContent = file.name;
     var reader = new FileReader();
     reader.onload = function(ev){
       calPendingPoster = ev.target.result;
@@ -459,6 +624,8 @@ if(calPosterRemoveEl){
   calPosterRemoveEl.addEventListener('click', function(){
     calPendingPoster = null;
     document.getElementById('as-poster').value = '';
+    var nameEl = document.getElementById('as-poster-filename');
+    if(nameEl) nameEl.textContent = 'No file chosen';
     document.getElementById('as-poster-preview-wrap').classList.add('hidden');
   });
 }
@@ -475,20 +642,28 @@ function addSchedule(){
 
   if(calIsAdmin()){
     var cat = document.getElementById('as-cat').value;
+    var location = document.getElementById('as-location').value.trim();
+    var errEl = document.getElementById('as-error');
+    if(!location){
+      if(errEl) errEl.textContent = 'Location is required.';
+      return;
+    }
+    if(errEl) errEl.textContent = '';
+    var rsvpLink = document.getElementById('as-rsvp-link').value.trim();
     var rec = {
       id: calUid(),
       cat: cat,
       title: title,
       year: year, month: month, date: date,
       time: time,
-      location: document.getElementById('as-location').value.trim(),
+      location: location,
       org: document.getElementById('as-org').value.trim(),
       contact: document.getElementById('as-contact').value.trim(),
       perks: document.getElementById('as-perks').value.trim(),
-      career: document.getElementById('as-career').checked ? 1 : 0,
+      rsvpLink: rsvpLink,
       poster: calPendingPoster
     };
-    if(cat === 'rsvp') rec.locAbbr = document.getElementById('as-locAbbr').value.trim();
+    if(rsvpLink) rec.locAbbr = document.getElementById('as-locAbbr').value.trim();
     CAMPUS_EVENTS.push(rec);
     try { localStorage.setItem(CAL_STORE_KEY, JSON.stringify(CAMPUS_EVENTS)); } catch(e){}
     closeAddModal();
@@ -499,6 +674,7 @@ function addSchedule(){
   }
 
   personalEvents.push({year: year, month: month, date: date, title: title, time: time});
+  calSavePersonal();
   closeAddModal();
   calResetAddForm();
   renderCalendar();
@@ -511,11 +687,11 @@ var personalOn = true;
 function applyFilters(){
   document.querySelectorAll('.ev-chip').forEach(function(chip){
     var cat = chip.getAttribute('data-cat');
-    var career = chip.getAttribute('data-career') === '1';
+    var eventId = chip.getAttribute('data-event-id');
     var pass = true;
-    if(currentFilter === 'rsvp') pass = cat === 'rsvp';
+    if(currentFilter === 'rsvp') pass = calIsRsvpd(eventId);
     else if(currentFilter === 'food') pass = cat === 'food';
-    else if(currentFilter === 'career') pass = career;
+    else if(currentFilter === 'career') pass = cat === 'career';
     if(cat === 'personal' && !personalOn) pass = false;
     chip.classList.toggle('chip-hidden', !pass);
   });
@@ -536,4 +712,14 @@ function togglePersonal(){
   showToast(personalOn ? 'Personal schedule shown' : 'Personal schedule hidden');
 }
 
+/* keeps the "Today (...)" button's label in sync with the real TODAY
+   computed at the top of this file -- it's never a stale hardcoded
+   string, so it reads correctly no matter what day this loads on. */
+function calUpdateTodayBtnLabel(){
+  var btn = document.getElementById('cal-today-btn');
+  if(btn) btn.textContent = 'Today (' + monthName(TODAY.month).slice(0,3) + ' ' + TODAY.date + ')';
+}
+
+calUpdateTodayBtnLabel();
+updateSelectLabels();
 renderCalendar();
