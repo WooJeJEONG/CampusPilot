@@ -143,10 +143,19 @@
     return { jobs: [], staff: [], posts: [], messages: [] };
   }
   var mem = null;
+  /* On an empty store this just caches an in-memory/local default -- it
+     must NOT call save() (which pushes to the server), since load() can
+     run before this device's cpSyncPull has resolved. Pushing an empty
+     seed here would race the pull and can overwrite another device's
+     real data. The server only gets written to by a real user action
+     (add job, post, etc.), exactly like lostfound.js's pattern. */
   function load() {
     try { var raw = localStorage.getItem(STORE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
     if (mem) return mem;
-    var fresh = seed(); save(fresh); return fresh;
+    var fresh = seed();
+    mem = fresh;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(fresh)); } catch (e) {}
+    return fresh;
   }
   function save(data) {
     mem = data;

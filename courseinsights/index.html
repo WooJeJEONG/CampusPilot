@@ -190,7 +190,13 @@ const CI_STORE_KEY='campuspilot.courseinsights.v1';
    empty until a real course is added (via "+ Add a course") and real
    reviews are written for it. */
 function ciSeed(){return {courses:[],reviews:[],reports:[]}}
-function ciLoad(){try{const raw=localStorage.getItem(CI_STORE_KEY);if(raw)return JSON.parse(raw)}catch{}const seed=ciSeed();ciSave(seed);return seed}
+/* On an empty store this just caches an in-memory/local default -- it
+   must NOT call ciSave() (which pushes to the server): ciLoad() can run
+   before, or if, this device's cpSyncPull has resolved (e.g. a pull
+   that failed over the network), and pushing an empty seed here would
+   overwrite another device's real data. The server only gets written
+   to by a real user action (add course, write a review, etc.). */
+function ciLoad(){try{const raw=localStorage.getItem(CI_STORE_KEY);if(raw)return JSON.parse(raw)}catch{}const seed=ciSeed();try{localStorage.setItem(CI_STORE_KEY,JSON.stringify(seed))}catch{}return seed}
 function ciSave(s){try{localStorage.setItem(CI_STORE_KEY,JSON.stringify(s))}catch{}if(typeof cpSyncPush==='function')cpSyncPush(CI_STORE_KEY,s)}
 let courses=[],reviews=[],selected=null,department='All departments',query='',sort='name',mine=false,adminTab='reports';
 function toast(msg){showToast(msg)}
