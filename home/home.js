@@ -76,6 +76,7 @@ function homeSetRsvpd(eventId, done){
   if(!done && idx !== -1) ids.splice(idx, 1);
   all[key] = ids;
   try { localStorage.setItem(HOME_RSVP_KEY, JSON.stringify(all)); } catch(e){}
+  if(typeof cpSyncPush === 'function') cpSyncPush(HOME_RSVP_KEY, all);
 }
 
 function homeRenderGreeting(){
@@ -127,17 +128,15 @@ function homeRenderStats(){
 
   if(homeIsAdmin()){
     var totalEl = document.getElementById('statTotalStudents');
-    if(totalEl){
-      /* Reads the same shared accounts store shared/session.js's
-         getAccounts() reads (campuspilot.accounts.v1) -- store.js isn't
-         loaded on this page, so this reads localStorage directly rather
-         than calling getAccounts()/cpLoadJSON(), which would throw. */
-      var studentCount = 0;
-      try {
-        var accounts = JSON.parse(localStorage.getItem('campuspilot.accounts.v1')) || {};
-        studentCount = Object.keys(accounts).filter(function(k){ return accounts[k] && accounts[k].role === 'student'; }).length;
-      } catch(e){}
-      totalEl.textContent = studentCount;
+    if(totalEl && typeof listAccounts === 'function'){
+      /* Every self-registered account IS a student account (admin has no
+         account row of its own -- see shared/session.js), and this now
+         reads the server's real roster (api/accounts/list) instead of a
+         per-browser localStorage copy, so it reflects sign-ups from every
+         device, not just this one. listAccounts() returns a Promise. */
+      listAccounts().then(function(accounts){
+        totalEl.textContent = accounts.length;
+      });
     }
     var adminUpEl = document.getElementById('statAdminUpcoming');
     if(adminUpEl) adminUpEl.textContent = upcoming;

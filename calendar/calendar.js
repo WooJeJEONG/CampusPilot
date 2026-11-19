@@ -33,26 +33,12 @@ var TODAY = (function(){
    older saved events used a different shape (a 'rsvp' category plus a
    separate 'career' checkbox flag). */
 var CAL_STORE_KEY = 'campuspilot.calendar.events.v2';
-var CAMPUS_EVENTS_SEED = [
-  {id:'seed-1',  year:2026, month:9, date:1,  cat:'official', title:'Fall Convocation', time:'10am', location:'Grand Hall, UAC Main Building', org:'Office of the Dean', contact:'dean-office@utah.edu'},
-  {id:'seed-2',  year:2026, month:9, date:2,  cat:'official', title:'UAC Fall Club Fair', time:'11am–2pm', location:'Central Plaza', org:'University Activities Council', contact:'uac@utah.edu', perks:'Free club swag & giveaways'},
-  {id:'seed-3',  year:2026, month:9, date:4,  cat:'official', title:'Global Leader Forum', time:'4pm', location:'Auditorium A', org:'Office of International Affairs', contact:'oia@utah.edu'},
-  {id:'seed-4',  year:2026, month:9, date:5,  cat:'official', title:'IS Welcome Social', time:'6pm', location:'IS Lounge, 3F', org:'Information Systems Dept.', contact:'is-dept@utah.edu', perks:'Light refreshments provided'},
-  {id:'seed-5',  year:2026, month:9, date:10, cat:'career', title:'Resume Clinic', time:'1–4pm', location:'Career Center, Rm 210', org:'Career Services', contact:'career-uac@utah.edu'},
-  {id:'seed-6',  year:2026, month:9, date:11, cat:'career', title:'Career Fair Pre-Reg', time:'2pm', location:'Student Center Gym', locAbbr:'Gym', org:'Career Services', contact:'career-uac@utah.edu', perks:'Free resume review & coffee bar', rsvpLink:'https://forms.office.com/r/CampusPilotCareerFairPreReg'},
-  {id:'seed-7',  year:2026, month:9, date:11, cat:'career', title:'Alumni Career Talk', time:'2pm', location:'Rm 310', org:'Alumni Association', contact:'alumni@utah.edu'},
-  {id:'seed-8',  year:2026, month:9, date:17, cat:'food', title:'Midterm Pizza Social', time:'12:30pm', location:'1F Student Lounge', perks:'Free pizza & drinks — while supplies last'},
-  {id:'seed-9',  year:2026, month:9, date:18, cat:'career', title:'Tech Career Night', time:'5–7:30pm', location:'U821 Grand Auditorium (UAC Building 8F)', locAbbr:'U821', org:'UAC IS Student Council & Career Center', contact:'career-uac@utah.edu', perks:'Pizza catering & official UAC tech sticker pack', rsvpLink:'https://forms.gle/CampusPilotTechCareerNight'},
-  {id:'seed-10', year:2026, month:9, date:18, cat:'career', title:'Alumni Networking', time:'7:30–8:30pm', location:'Grand Hall Lobby', org:'Alumni Association', contact:'alumni@utah.edu'},
-  {id:'seed-11', year:2026, month:9, date:23, cat:'career', title:'Startup Pitch Day', time:'1–4pm', location:'Innovation Hub', org:'Entrepreneurship Center', contact:'entrepreneurship@utah.edu', perks:'Pitch prizes & networking reception'},
-  {id:'seed-12', year:2026, month:9, date:25, cat:'official', title:'SLC Exchange Briefing', time:'3pm', location:'Rm 118', org:'Office of International Affairs', contact:'oia@utah.edu'},
-  {id:'seed-13', year:2026, month:9, date:26, cat:'food', title:'Coffee & Krispy Kreme', time:'10am', location:'5F Career Center'},
-  /* this month's own live examples, so the calendar isn't empty just
-     because "today" has moved on from the September seed data above */
-  {id:'seed-14', year:TODAY.year, month:TODAY.month, date: Math.min(20, daysInMonth(TODAY.year, TODAY.month)), cat:'career', title:'Fall Career Fair', time:'1–4pm', location:'Student Center Gym', locAbbr:'Gym', org:'Career Services', contact:'career-uac@utah.edu', perks:'Free resume review & coffee bar', rsvpLink:'https://forms.office.com/r/CampusPilotFallCareerFair'},
-  {id:'seed-15', year:TODAY.year, month:TODAY.month, date: Math.min(20, daysInMonth(TODAY.year, TODAY.month)), cat:'food', title:'Free Pizza Friday', time:'12pm', location:'1F Student Lounge', perks:'Free pizza & drinks — while supplies last'},
-  {id:'seed-16', year:TODAY.year, month:TODAY.month, date: Math.min(23, daysInMonth(TODAY.year, TODAY.month)), cat:'deadline', title:'Course Withdrawal Deadline', location:"Registrar's Office (online portal)", org:'Office of the Registrar', contact:'registrar@utah.edu'}
-];
+/* No seed/demo events -- the calendar starts genuinely empty until an
+   admin registers a real official event via "+ Add Schedule". Students
+   just see an empty month grid (and "No events today" in the day-detail
+   areas that read this list) until that happens, same as any other
+   empty-state in this app. */
+var CAMPUS_EVENTS_SEED = [];
 function calLoadEvents(){
   try {
     var raw = localStorage.getItem(CAL_STORE_KEY);
@@ -60,6 +46,10 @@ function calLoadEvents(){
   } catch(e){}
   try { localStorage.setItem(CAL_STORE_KEY, JSON.stringify(CAMPUS_EVENTS_SEED)); } catch(e){}
   return CAMPUS_EVENTS_SEED.slice();
+}
+function calPersistEvents(){
+  try { localStorage.setItem(CAL_STORE_KEY, JSON.stringify(CAMPUS_EVENTS)); } catch(e){}
+  if(typeof cpSyncPush === 'function') cpSyncPush(CAL_STORE_KEY, CAMPUS_EVENTS);
 }
 var CAMPUS_EVENTS = calLoadEvents();
 /* Pick up a change made from another tab/page immediately. */
@@ -75,10 +65,9 @@ window.addEventListener('storage', function(e){
    inline script at the bottom of index.html, after requireSession()),
    since this file itself loads before that. */
 var CAL_PERSONAL_KEY = 'campuspilot.calendar.personal.v1';
-var CAL_PERSONAL_SEED = [
-  {year:2026, month:9, date:3,  title:'CS 3500 Study Group', time:''},
-  {year:2026, month:9, date:15, title:'Library Study Session', time:''}
-];
+/* No seed/demo entries -- a new account's Personal Schedule starts
+   genuinely empty until the student adds their own events. */
+var CAL_PERSONAL_SEED = [];
 var personalEvents = []; /* {year,month,date,title,time}; populated per-account by calLoadPersonal() */
 function calPersonalKey(){
   return (typeof SESSION !== 'undefined' && SESSION && SESSION.role === 'student' && SESSION.unid) ? SESSION.unid : null;
@@ -110,6 +99,7 @@ function calSavePersonal(){
   try { all = JSON.parse(localStorage.getItem(CAL_PERSONAL_KEY)) || {}; } catch(e){}
   all[key] = personalEvents;
   try { localStorage.setItem(CAL_PERSONAL_KEY, JSON.stringify(all)); } catch(e){}
+  if(typeof cpSyncPush === 'function') cpSyncPush(CAL_PERSONAL_KEY, all);
 }
 
 /* My RSVPs: which RSVP-able events (an event is RSVP-able simply by
@@ -137,6 +127,7 @@ function calSaveMyRsvps(){
   try { all = JSON.parse(localStorage.getItem(CAL_RSVP_KEY)) || {}; } catch(e){}
   all[key] = myRsvpIds;
   try { localStorage.setItem(CAL_RSVP_KEY, JSON.stringify(all)); } catch(e){}
+  if(typeof cpSyncPush === 'function') cpSyncPush(CAL_RSVP_KEY, all);
 }
 function calIsRsvpd(eventId){ return !!eventId && myRsvpIds.indexOf(eventId) !== -1; }
 function calSetRsvpd(eventId, done){
@@ -764,7 +755,7 @@ function addSchedule(){
     };
     if(rsvpLink) rec.locAbbr = document.getElementById('as-locAbbr').value.trim();
     CAMPUS_EVENTS.push(rec);
-    try { localStorage.setItem(CAL_STORE_KEY, JSON.stringify(CAMPUS_EVENTS)); } catch(e){}
+    calPersistEvents();
     closeAddModal();
     calResetAddForm();
     renderCalendar();

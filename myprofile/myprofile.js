@@ -79,26 +79,33 @@ function mpRenderRsvps(){
 function mpRenderAdminStats(){
   var lf = cpLoadJSON('campuspilot.lostfound.v1', null);
   var lfPending = (lf && lf.items) ? lf.items.filter(function(it){ return it.status === 'pending'; }).length : 0;
-  var jobs = cpLoadJSON('campuspilot.campusjobs.v1', []) || [];
-  var jobsOpen = jobs.filter(function(j){ return j.status === 'open'; }).length;
+  /* Campus Jobs' real storage key is campuspilot.campusJobs.v2 (set by
+     campusjobs/index.html + admin.html), shape {jobs:[...]}. There's no
+     open/closed concept on a job posting in that data model, so this
+     counts every posted job rather than inventing a status that doesn't
+     exist in the real data. */
+  var cj = cpLoadJSON('campuspilot.campusJobs.v2', null);
+  var jobsOpen = (cj && Array.isArray(cj.jobs)) ? cj.jobs.length : 0;
   document.getElementById('mpStatLF').textContent = lfPending;
   document.getElementById('mpStatJobs').textContent = jobsOpen;
   document.getElementById('mpAttnLF').textContent = lfPending
     ? (lfPending + ' open Lost & Found report' + (lfPending === 1 ? '' : 's') + ' awaiting pickup')
     : 'No open Lost & Found reports right now';
   document.getElementById('mpAttnJobs').textContent = jobsOpen
-    ? (jobsOpen + ' open job listing' + (jobsOpen === 1 ? '' : 's') + ' posted')
+    ? (jobsOpen + ' job listing' + (jobsOpen === 1 ? '' : 's') + ' posted')
     : 'No Campus Jobs listings posted yet';
 }
 
 /* Admin-only: table of every self-registered student account, searchable
-   by UNID or name. Reads the same accounts store (campuspilot.accounts.v1)
-   that login.js writes to on sign-up — there's no separate admin-side
-   copy, so a new sign-up shows up here immediately. */
-function mpRenderStudentRoster(){
+   by UNID or name. Reads the server's accounts table (api/accounts/list)
+   that login.js's sign-up writes to — there's no separate admin-side
+   copy, and it's the same list from any device, so a new sign-up shows
+   up here immediately regardless of which browser/computer it happened
+   on. listAccounts() now returns a Promise. */
+async function mpRenderStudentRoster(){
   var searchEl = document.getElementById('studentSearch');
   var q = (searchEl ? searchEl.value : '').toLowerCase().trim();
-  var accounts = listAccounts();
+  var accounts = await listAccounts();
   var filtered = accounts.filter(function(a){
     return !q || (a.unid + ' ' + a.name).toLowerCase().indexOf(q) !== -1;
   });
@@ -125,7 +132,7 @@ function mpRenderStudentRoster(){
    based, consistent with this prototype's other lightweight dialogs).
    Admin: there's no admin account to change — the passcode is fixed and
    managed by IT, so this just explains that instead. */
-function mpChangePassword(){
+async function mpChangePassword(){
   if(isAdmin){
     showToast('Admin passcodes are managed by UAC IT directly.');
     return;
@@ -136,11 +143,6 @@ function mpChangePassword(){
   }
   var current = window.prompt('Enter your current password:');
   if(current === null) return;
-  var account = findAccount(SESSION.unid);
-  if(!account || account.password !== current){
-    showToast('Current password is incorrect.');
-    return;
-  }
   var next = window.prompt('Enter your new password (at least 6 characters):');
   if(next === null) return;
   if(next.length < 6){
@@ -153,7 +155,14 @@ function mpChangePassword(){
     showToast('New passwords did not match.');
     return;
   }
-  updateAccountPassword(SESSION.unid, next);
+  /* The server verifies "current" against the real record itself now
+     (there's no local account/password list to check against any
+     more) -- see api/accounts/update-password. */
+  var result = await updateAccountPassword(SESSION.unid, current, next);
+  if(!result || !result.ok){
+    showToast((result && result.error) || 'Could not update password.');
+    return;
+  }
   showToast('Password updated.');
 }
 
@@ -184,7 +193,7 @@ function mpApplyAdmin(){
   document.getElementById('adminStudentPanel').classList.toggle('hidden', !isAdmin);
   if(isAdmin){
     mpRenderAdminStats();
-    mpRenderStudentRoster();
+    mpRenderStudentRoster(); // async (server-backed roster) -- paints in once it resolves
   } else {
     mpRenderRsvps();
   }
@@ -280,19 +289,19 @@ function mpResolveMajor2(){
   if(!dept) return '';
   return (type === 'minor' ? 'Minor: ' : 'Double Major: ') + dept;
 }
-function mpSaveEditMajor(){
+async function mpSaveEditMajor(){
   var major = mpResolveMajor();
   if(!major){
     showToast('Select your major (or choose "Other" and type it in).');
     return;
   }
   var major2 = mpResolveMajor2();
-  var updated = updateAccountMajor(SESSION.unid, major, major2);
-  if(!updated){
-    showToast("Couldn't find your account — try signing in again.");
+  var result = await updateAccountMajor(SESSION.unid, major, major2);
+  if(!result || !result.ok){
+    showToast((result && result.error) || "Couldn't find your account — try signing in again.");
     return;
   }
-  SESSION = setSession('student', updated);
+  SESSION = setSession('student', result.account);
   mpCloseEditMajor();
   mpApplyAdmin();
   showToast('Major updated.');

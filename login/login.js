@@ -81,7 +81,17 @@ function renderStudentMode(){
   document.getElementById('studentModeToggle').textContent = isSignup ? 'Already have an account? Sign In' : "Don't have an account? Sign Up";
 }
 
-function tryStudentLogin(){
+/* UNID must be "u" followed by exactly 7 digits (e.g. u1621896) -- same
+   pattern the server enforces (shared/session.js's isValidUnid /
+   api/accounts/*), checked here too just so a badly-formatted UNID gets
+   an immediate, specific message instead of waiting on a round trip. */
+function unidFormatError(unid){
+  return (typeof isValidUnid === 'function' && !isValidUnid(unid))
+    ? 'UNID must be "u" followed by 7 digits, e.g. u1621896.'
+    : null;
+}
+
+async function tryStudentLogin(){
   var unid = (document.getElementById('login-unid').value || '').trim();
   var pw = (document.getElementById('login-pw').value || '').trim();
 
@@ -89,16 +99,23 @@ function tryStudentLogin(){
     showToast('Enter your UNID and password.');
     return;
   }
-  var account = findAccount(unid);
-  if(!account || account.password !== pw){
-    showToast('Incorrect UNID or password.');
+  var fmtErr = unidFormatError(unid);
+  if(fmtErr){ showToast(fmtErr); return; }
+
+  var btn = document.getElementById('studentActionBtn');
+  if(btn) btn.disabled = true;
+  var result = await loginAccount(unid, pw);
+  if(btn) btn.disabled = false;
+
+  if(!result || !result.ok){
+    showToast((result && result.error) || 'Incorrect UNID or password.');
     return;
   }
-  setSession('student', account);
+  setSession('student', result.account);
   window.location.href = '../home/index.html';
 }
 
-function trySignUp(){
+async function trySignUp(){
   var unid = document.getElementById('signup-unid').value;
   var name = document.getElementById('signup-name').value;
   var major = resolveMajorValue();
@@ -110,6 +127,8 @@ function trySignUp(){
     showToast('Fill in your UNID, name, and password.');
     return;
   }
+  var fmtErr = unidFormatError(unid);
+  if(fmtErr){ showToast(fmtErr); return; }
   if(!major){
     showToast('Select your major (or choose "Other" and type it in).');
     return;
@@ -123,9 +142,13 @@ function trySignUp(){
     return;
   }
 
-  var result = createAccount(unid, pw, name, major, major2);
-  if(!result.ok){
-    showToast(result.error);
+  var btn = document.getElementById('studentActionBtn');
+  if(btn) btn.disabled = true;
+  var result = await createAccount(unid, pw, name, major, major2);
+  if(btn) btn.disabled = false;
+
+  if(!result || !result.ok){
+    showToast((result && result.error) || 'Could not create account. Please try again.');
     return;
   }
 

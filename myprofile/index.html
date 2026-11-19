@@ -179,7 +179,12 @@
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'myprofile');
-  if(SESSION){ isAdmin = (SESSION.role === 'admin'); mpApplyAdmin(); }
+  if(SESSION){
+    isAdmin = (SESSION.role === 'admin');
+    cpSyncPull(['campuspilot.lostfound.v1', 'campuspilot.campusJobs.v2', MP_CAL_STORE_KEY, MP_RSVP_KEY]).then(function(){
+      mpApplyAdmin();
+    });
+  }
 </script>
 </body>
 </html>

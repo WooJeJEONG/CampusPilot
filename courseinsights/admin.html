@@ -185,35 +185,12 @@ const $=s=>document.querySelector(s), esc=v=>String(v??'').replace(/[&<>"']/g,c=
    student sees it -- this just pluralizes any "N word" label correctly. */
 const plural=(n,word)=>n+' '+word+(n===1?'':'s');
 const departments=['All departments','Business','Communication','Engineering','Film & Media Arts','Computer Science'];
-/* A single IS 2010 entry was the only course that ever showed up here --
-   every other department looked completely empty. Added a few more
-   sample courses spread across the other departments the filter list
-   already offers, each with its own realistic reviews, so Course
-   Insights isn't a ghost town outside of IS 2010. */
-const demo=[
-  {id:'demo-1',professor:'Alex Morgan',department:'Business',code:'IS 2010',title:'Introduction to Information Systems',average:5,review_count:1},
-  {id:'demo-2',professor:'Sarah Kim',department:'Business',code:'ACCTG 2600',title:'Financial Accounting I',average:4.3,review_count:3},
-  {id:'demo-3',professor:'David Han',department:'Communication',code:'COMM 1010',title:'Introduction to Communication',average:3.8,review_count:2},
-  {id:'demo-4',professor:'Mike Park',department:'Engineering',code:'ENGR 1010',title:'Introduction to Engineering',average:4.6,review_count:2},
-  {id:'demo-5',professor:'Yuna Cho',department:'Film & Media Arts',code:'FMA 2500',title:'Digital Filmmaking I',average:4.9,review_count:1},
-  {id:'demo-6',professor:'Chris Han',department:'Computer Science',code:'CS 1400',title:'Introduction to Programming',average:3.2,review_count:2}
-];
 const CI_STORE_KEY='campuspilot.courseinsights.v1';
-function ciSeed(){return {courses:demo.map(c=>({...c,active:true})),reviews:[
-  {id:'r1',course_id:'demo-1',course_label:'IS 2010 · Alex Morgan',rating:5,difficulty:2,term:'Spring 2026',body:'Clear weekly expectations and useful feedback. The projects take steady work, so keeping up each week makes a difference.',created_at:'2026-06-01',status:'published',is_mine:false},
-  {id:'r2',course_id:'demo-2',course_label:'ACCTG 2600 · Sarah Kim',rating:5,difficulty:3,term:'Fall 2025',body:'Tough but fair. Weekly problem sets actually prepare you for the exams, unlike a lot of intro courses.',created_at:'2025-12-10',status:'published',is_mine:false},
-  {id:'r3',course_id:'demo-2',course_label:'ACCTG 2600 · Sarah Kim',rating:4,difficulty:4,term:'Spring 2026',body:'Heavy workload but office hours are genuinely helpful. Worth it if you put in the time early.',created_at:'2026-06-02',status:'published',is_mine:false},
-  {id:'r4',course_id:'demo-2',course_label:'ACCTG 2600 · Sarah Kim',rating:4,difficulty:3,term:'Fall 2024',body:'Good foundation for the rest of the accounting track. Group project could use clearer rubrics.',created_at:'2024-12-15',status:'published',is_mine:false},
-  {id:'r5',course_id:'demo-3',course_label:'COMM 1010 · David Han',rating:4,difficulty:2,term:'Spring 2026',body:'Easy to follow lectures and a lot of class discussion. Grading on the final presentation felt a bit inconsistent.',created_at:'2026-05-20',status:'published',is_mine:false},
-  {id:'r6',course_id:'demo-3',course_label:'COMM 1010 · David Han',rating:3,difficulty:2,term:'Fall 2025',body:'Fine intro course, not much depth. Good if you just need the credit.',created_at:'2025-12-18',status:'published',is_mine:false},
-  {id:'r7',course_id:'demo-4',course_label:'ENGR 1010 · Mike Park',rating:5,difficulty:3,term:'Fall 2025',body:'Great hands-on labs and the professor clearly cares about teaching. Highly recommend for first-year engineering students.',created_at:'2025-12-20',status:'published',is_mine:false},
-  {id:'r8',course_id:'demo-4',course_label:'ENGR 1010 · Mike Park',rating:4,difficulty:3,term:'Spring 2026',body:'Solid intro course. The design project at the end ties everything together well.',created_at:'2026-06-05',status:'published',is_mine:false},
-  {id:'r9',course_id:'demo-5',course_label:'FMA 2500 · Yuna Cho',rating:5,difficulty:2,term:'Spring 2026',body:'One of the best classes I have taken here. Equipment access was easy and feedback on projects was detailed.',created_at:'2026-05-28',status:'published',is_mine:false},
-  {id:'r10',course_id:'demo-6',course_label:'CS 1400 · Chris Han',rating:3,difficulty:5,term:'Fall 2025',body:'Fast-paced if you have never coded before. Doable with the TA office hours but budget extra time for assignments.',created_at:'2025-12-22',status:'published',is_mine:false},
-  {id:'r11',course_id:'demo-6',course_label:'CS 1400 · Chris Han',rating:4,difficulty:4,term:'Spring 2026',body:'Challenging but the final project is genuinely fun to build. Worth sticking with it.',created_at:'2026-06-08',status:'published',is_mine:false}
-],reports:[{id:'rep1',review_id:'r1',report_id:'rep1',course_label:'IS 2010 · Alex Morgan',body:'Clear weekly expectations and useful feedback. The projects take steady work, so keeping up each week makes a difference.',reason:'This reads like it was posted by a TA, not a student.',status:'open'}]}}
+/* No seed/demo courses or reviews -- Course Insights starts genuinely
+   empty until a real course is added and real reviews are written. */
+function ciSeed(){return {courses:[],reviews:[],reports:[]}}
 function ciLoad(){try{const raw=localStorage.getItem(CI_STORE_KEY);if(raw)return JSON.parse(raw)}catch{}const seed=ciSeed();ciSave(seed);return seed}
-function ciSave(s){try{localStorage.setItem(CI_STORE_KEY,JSON.stringify(s))}catch{}}
+function ciSave(s){try{localStorage.setItem(CI_STORE_KEY,JSON.stringify(s))}catch{}if(typeof cpSyncPush==='function')cpSyncPush(CI_STORE_KEY,s)}
 let courses=[],reviews=[],selected=null,department='All departments',query='',sort='name',mine=false,adminTab='reports';
 function toast(msg){showToast(msg)}
 function modal(html){$('#modalContent').innerHTML=html;$('#modal').showModal()}
@@ -235,7 +212,7 @@ function adminShell(){const s=ciLoad();const pendingCount=s.reviews.filter(r=>r.
 function adminLoad(){const area=$('#adminBody');const s=ciLoad();if(adminTab==='courses'){area.innerHTML='<button id="newCourse">Add a course +</button>'+s.courses.map(c=>`<article class="review"><strong>${esc(c.code)} · ${esc(c.professor)}</strong><p style="margin-top:4px">${esc(c.title)} / ${esc(c.department)} ${c.active===false?'· Archived':''}</p><div class="actions"><button class="text" data-manage="${c.id}">Edit course</button></div></article>`).join('');$('#newCourse').onclick=()=>courseForm();area.querySelectorAll('[data-manage]').forEach(b=>b.onclick=()=>courseForm(s.courses.find(c=>c.id===b.dataset.manage)));return}let rows=[];if(adminTab==='reports')rows=s.reports.filter(r=>r.status!=='resolved').map(r=>({id:r.review_id,report_id:r.report_id,course_label:r.course_label,body:r.body,reason:r.reason,status:'reported'}));else rows=s.reviews.filter(r=>r.status==='pending').map(r=>({id:r.id,report_id:'',course_label:r.course_label,body:r.body,reason:'',status:'pending'}));area.innerHTML=rows.map(r=>`<article class="review"><span class="badge">${esc(r.status)}</span><h3 style="margin-top:10px">${esc(r.course_label)}</h3><p style="margin-top:6px">${esc(r.body)}</p>${r.reason?`<p style="margin-top:8px"><strong>Report:</strong> ${esc(r.reason)}</p>`:''}<div class="actions"><button data-mod="${r.id}" data-action="publish" data-report-id="${r.report_id||''}">${adminTab==='reports'?'Keep & resolve':'Approve'}</button><button class="secondary" data-mod="${r.id}" data-action="hide" data-report-id="${r.report_id||''}">Hide review</button></div></article>`).join('')||'<div class="empty"><h2>All caught up.</h2><p>No items need attention.</p></div>';area.querySelectorAll('[data-mod]').forEach(b=>b.onclick=()=>moderate(b.dataset))}
 function moderate(d){const s=ciLoad();const rev=s.reviews.find(r=>r.id===d.mod);if(rev)rev.status=d.action==='publish'?'published':'hidden';if(d.reportId)s.reports=s.reports.filter(r=>r.report_id!==d.reportId);ciSave(s);adminShell();adminLoad();toast('Decision saved.')}
 function courseForm(c){modal(`<h2>${c?'Edit':'Add'} course</h2><form id="courseForm">${[['professor','Professor'],['code','Course code'],['title','Course title'],['department','Department']].map(([key,label])=>`<label for="c_${key}">${label}</label><input id="c_${key}" required maxlength="150" value="${esc(c?.[key]||'')}">`).join('')}<label class="check"><input id="c_active" type="checkbox" ${!c||c.active?'checked':''}>Active (uncheck to archive)</label><p class="error" role="alert"></p><div class="actions"><button type="submit">Save course</button></div></form>`);$('#courseForm').onsubmit=e=>{e.preventDefault();submit(e.target,async()=>{const vals={professor:$('#c_professor').value.trim(),code:$('#c_code').value.trim(),title:$('#c_title').value.trim(),department:$('#c_department').value.trim(),active:$('#c_active').checked};const s=ciLoad();if(c){Object.assign(s.courses.find(x=>x.id===c.id),vals)}else{s.courses.push({id:'demo-'+Date.now(),...vals,average:0,review_count:0})}ciSave(s);$('#modal').close();adminShell();adminLoad();toast('Course saved.')})}}
-start();
+if(typeof cpSyncPull==='function'){cpSyncPull([CI_STORE_KEY]).then(start)}else{start()}
 </script>
 </body>
 </html>

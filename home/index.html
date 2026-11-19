@@ -157,7 +157,9 @@
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'home');
-  homeInit();
+  cpSyncPull(['campuspilot.calendar.events.v2', 'campuspilot.calendar.personal.v1', 'campuspilot.calendar.myrsvps.v1']).then(function(){
+    homeInit();
+  });
 </script>
 </body>
 </html>

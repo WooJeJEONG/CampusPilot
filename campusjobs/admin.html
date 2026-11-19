@@ -99,72 +99,11 @@
     { id: 'tech', label: 'Tech Support' },
     { id: 'tutor', label: 'Tutoring' }
   ];
+  /* No seed/demo jobs, staff, posts or messages -- the board starts
+     genuinely empty until an admin adds a real job (+ Add job) and real
+     staff (+ Add Staff), and students post real questions/reviews. */
   function seed() {
-    return {
-      jobs: [
-        { id: 'biz', title: 'Biz Coordinator', dept: 'School of Business Office', cat: 'office', hours: 'About 7 hrs/week', officeHours: 'None', pay: '$10.50/hr', hiring: 'Every semester, around week 10', visible: true,
-          desc: 'Supports the business school office with student events, program emails and day-to-day admin.',
-          todo: ['Prepare and staff business school events', 'Draft program emails and announcements', 'Help with office admin and student questions'] },
-        { id: 'ta', title: 'Teaching Assistant – Accounting & Finance', dept: 'School of Business', cat: 'ta', hours: '8–10 hrs/week', officeHours: '2 hrs/week', pay: '$14.00/hr', hiring: 'Before each semester (professor recommendation)', visible: true,
-          desc: 'Assists ACCTG and FIN professors with grading, office hours and exam review sessions.',
-          todo: ['Hold weekly office hours', 'Grade homework and quizzes', 'Run review sessions before exams'] },
-        { id: 'lib', title: 'Library Assistant', dept: 'UAC Library', cat: 'library', hours: '10–12 hrs/week', officeHours: 'None (desk shifts)', pay: '$10.50/hr', hiring: 'Rolling, when a spot opens', visible: true,
-          desc: 'Runs the library front desk: check-outs, study-room bookings and helping students find resources.',
-          todo: ['Staff the circulation desk', 'Manage study-room reservations', 'Shelve returned materials'] },
-        { id: 'amb', title: 'Student Ambassador', dept: 'Office of Admissions', cat: 'ambassador', hours: '4–8 hrs/week (event-based)', officeHours: 'None', pay: '$10.50/hr', hiring: 'Once a year, in spring', visible: true,
-          desc: 'Represents UAC at campus tours, open houses and high-school visits.',
-          todo: ['Lead campus tours', 'Answer questions at open-house events', 'Share student life on admissions channels'] },
-        { id: 'it', title: 'IT Help Desk Assistant', dept: 'IT Services', cat: 'tech', hours: '10 hrs/week', officeHours: 'None (desk shifts)', pay: '$11.00/hr', hiring: 'Rolling', visible: true,
-          desc: 'First-line support for Wi-Fi, Canvas, printers and classroom AV.',
-          todo: ['Resolve Wi-Fi, Canvas and printer issues', 'Log support tickets', 'Set up classroom AV'] },
-        { id: 'wc', title: 'Writing Center Peer Tutor', dept: 'Writing Center', cat: 'tutor', hours: '6–8 hrs/week', officeHours: 'Tutoring slots, 6 hrs/week', pay: '$12.50/hr', hiring: 'Fall semester, faculty referral', visible: true,
-          desc: 'One-on-one feedback sessions on essays, reports and résumés.',
-          todo: ['Hold 30-minute tutoring sessions', 'Give feedback on structure and grammar', 'Attend monthly tutor training'] }
-      ],
-      staff: [
-        { id: 's1', jobId: 'biz', name: 'Minji Park', major: 'Business Administration', since: 'Fall 2025', email: 'minji.park@example.edu', intro: 'Ask me about workload and event weeks!', contactable: true },
-        { id: 's2', jobId: 'biz', name: 'Daniel Lee', major: 'Business Administration', since: 'Spring 2025', email: 'daniel.lee@example.edu', intro: 'Happy to talk about the interview process.', contactable: true },
-        { id: 's3', jobId: 'ta', name: 'Seoyeon Kim', major: 'Business Administration', since: 'Fall 2025', email: 'seoyeon.kim@example.edu', intro: 'TA for ACCTG 2600. Questions about grading load welcome.', contactable: true },
-        { id: 's4', jobId: 'ta', name: 'Jun Choi', major: 'Economics', since: 'Spring 2026', email: 'jun.choi@example.edu', intro: 'TA for FIN 3040.', contactable: false },
-        { id: 's5', jobId: 'lib', name: 'Hana Yoon', major: 'Psychology', since: 'Spring 2026', email: 'hana.yoon@example.edu', intro: 'Quiet shifts = study time :)', contactable: true },
-        { id: 's6', jobId: 'amb', name: 'Ethan Jung', major: 'Communication', since: 'Spring 2026', email: 'ethan.jung@example.edu', intro: 'Ask me about tours and open houses.', contactable: true },
-        { id: 's7', jobId: 'it', name: 'Chris Han', major: 'Computer Science', since: 'Fall 2026', email: 'chris.han@example.edu', intro: 'No coding needed for this job!', contactable: true },
-        { id: 's8', jobId: 'wc', name: 'Yerin Song', major: 'English Language', since: 'Fall 2025', email: 'yerin.song@example.edu', intro: 'Peer tutor for essays and résumés.', contactable: true }
-      ],
-      posts: [
-        { id: 'p1', jobId: 'biz', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 2 * D, likes: 6, liked: false, reports: [],
-          text: 'Is Biz Coordinator a lot of work? Do you have office hours?',
-          comments: [
-            { id: 'c1', author: 'Minji Park', role: 'staff', time: NOW - 2 * D + 3 * H, text: 'No office hours for Biz Coordi! It’s about 7 hours a week, mostly event prep and emails.', reports: [] },
-            { id: 'c2', author: 'Anonymous', role: 'student', time: NOW - D, text: 'It gets busier around midterms and the career fair week.', reports: [] }
-          ] },
-        { id: 'p2', jobId: 'biz', type: 'r', rating: 4, author: 'Anonymous', role: 'student', time: NOW - 6 * D, likes: 9, liked: false, reports: [],
-          text: 'Flexible schedule and you get to know the business school staff well. Event weeks are busy but the rest is chill.', comments: [] },
-        { id: 'p3', jobId: 'biz', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 9 * D, likes: 3, liked: false, reports: [],
-          text: 'When do they usually hire for spring semester?',
-          comments: [
-            { id: 'c3', author: 'CIDC Office', role: 'admin', time: NOW - 8 * D, text: 'Spring hiring opens around week 10 of the fall semester. We will post it on CampusPilot.', reports: [] }
-          ] },
-        { id: 'p4', jobId: 'ta', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 3 * D, likes: 4, liked: false, reports: [],
-          text: 'How many office hours do TAs have per week? And how long does grading take?',
-          comments: [
-            { id: 'c4', author: 'Seoyeon Kim', role: 'staff', time: NOW - 3 * D + 5 * H, text: '2 hours of office hours, then about 5 hours of grading. Exam weeks are heavier.', reports: [] }
-          ] },
-        { id: 'p5', jobId: 'ta', type: 'r', rating: 5, author: 'Anonymous', role: 'student', time: NOW - 12 * D, likes: 11, liked: false, reports: [],
-          text: 'Best campus job if you liked the course. Explaining things to others really helped my own grades.', comments: [] },
-        { id: 'p6', jobId: 'lib', type: 'r', rating: 4, author: 'Anonymous', role: 'student', time: NOW - 5 * D, likes: 5, liked: false, reports: [],
-          text: 'Weekday evening shifts are quiet, so you can study at the desk. Finals week is the only busy time.', comments: [] },
-        { id: 'p7', jobId: 'amb', type: 'q', rating: 0, author: 'Anonymous', role: 'student', time: NOW - 4 * D, likes: 2, liked: false, reports: [],
-          text: 'Do you need to speak Korean fluently to be an ambassador?',
-          comments: [
-            { id: 'c5', author: 'Ethan Jung', role: 'staff', time: NOW - 4 * D + 2 * H, text: 'English is the main language for tours, but Korean helps a lot with parents at open houses.', reports: [] }
-          ] },
-        { id: 'p8', jobId: 'amb', type: 'r', rating: 1, author: 'Anonymous', role: 'student', time: NOW - D, likes: 0, liked: false,
-          reports: [{ reason: 'Personal attack or harassment', time: NOW - 20 * H }, { reason: 'Personal attack or harassment', time: NOW - 10 * H }],
-          text: 'Total waste of time. The supervisor is the worst person on campus, do not apply.', comments: [] }
-      ],
-      messages: []
-    };
+    return { jobs: [], staff: [], posts: [], messages: [] };
   }
   var mem = null;
   function load() {
@@ -175,6 +114,7 @@
   function save(data) {
     mem = data;
     try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
+    if (typeof cpSyncPush === 'function') cpSyncPush(STORE_KEY, data);
   }
   function resetData() {
     try { localStorage.removeItem(STORE_KEY); } catch (e) {}
@@ -522,7 +462,11 @@
   });
   window.addEventListener('storage', function (e) { if (e.key === STORE_KEY) { data = load(); renderAll(); } });
 
-  renderAll();
+  if(typeof cpSyncPull === 'function'){
+    cpSyncPull([STORE_KEY]).then(function(){ data = load(); renderAll(); });
+  } else {
+    renderAll();
+  }
 
 })();
 

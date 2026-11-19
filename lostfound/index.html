@@ -266,7 +266,13 @@
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'lostfound');
-  if(SESSION){ isAdmin = (SESSION.role === 'admin'); lfApplyAdmin(); }
+  if(SESSION){
+    isAdmin = (SESSION.role === 'admin');
+    cpSyncPull(['campuspilot.lostfound.v1']).then(function(){
+      lfLoadFromStorage(); // re-read now that the pull may have refreshed localStorage
+      lfApplyAdmin();
+    });
+  }
 </script>
 </body>
 </html>

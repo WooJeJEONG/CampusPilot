@@ -2,8 +2,9 @@
   "name": "campuspilot",
   "private": true,
   "version": "1.0.0",
-  "description": "Campuspilot — UAC student portal (static frontend) + GradePilot syllabus-parsing API (Vercel serverless function).",
+  "description": "Campuspilot — UAC student portal (static frontend) + GradePilot syllabus-parsing API + shared Postgres data (accounts, kv store) — all Vercel serverless functions.",
   "dependencies": {
-    "groq-sdk": "^1.6.0"
+    "groq-sdk": "^1.6.0",
+    "@vercel/postgres": "^0.10.0"
   }
 }

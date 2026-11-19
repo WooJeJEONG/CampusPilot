@@ -105,9 +105,21 @@ function gpSubmitFeedback(rating, comment){
   cpSaveJSON(GP_FEEDBACK_KEY, list.slice(0, 100));
   showToast('Thanks for the feedback!');
 }
+/* GradePilot's workspace is each student's own data, so it's synced to a
+   key namespaced by UNID server-side (GP_STORAGE_KEY + '::' + unid) even
+   though it's stored locally under one flat key -- that way two students
+   sharing a browser, or the same student on two different devices, never
+   collide or overwrite each other's grades. Admin has no workspace. */
+function gpRemoteWorkspaceKey(){
+  var s = (typeof SESSION !== 'undefined') ? SESSION : null;
+  return (s && s.unid) ? (GP_STORAGE_KEY + '::' + s.unid) : null;
+}
 function gpPersist(){
   try{
-    localStorage.setItem(GP_STORAGE_KEY, JSON.stringify({ courses: gpCourses, activeKey: gpActiveKey }));
+    var payload = { courses: gpCourses, activeKey: gpActiveKey };
+    localStorage.setItem(GP_STORAGE_KEY, JSON.stringify(payload));
+    var rk = gpRemoteWorkspaceKey();
+    if(rk && typeof cpSyncPush === 'function') cpSyncPush(GP_STORAGE_KEY, payload, rk);
   }catch(e){ /* private mode / quota exceeded — persistence is best-effort */ }
 }
 function gpLoadPersisted(){
@@ -153,6 +165,8 @@ function gpClearAll(){
   gpActiveKey = null;
   gpExpandedGroups = {};
   try{ localStorage.removeItem(GP_STORAGE_KEY); }catch(e){}
+  var rk = gpRemoteWorkspaceKey();
+  if(rk && typeof cpSyncPush === 'function') cpSyncPush(GP_STORAGE_KEY, null, rk);
   gpShowUpload();
   gpRenderPills();
   showToast('All GradePilot data on this device has been cleared.');
@@ -1080,8 +1094,8 @@ function gpTimeAgo(ts){
 }
 function gpEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
-function gpRenderAdminDashboard(){
-  var accounts = listAccounts();
+async function gpRenderAdminDashboard(){
+  var accounts = await listAccounts();
   document.getElementById('gpStatStudents').textContent = accounts.length;
 
   var aiStats = gpLoadAiStats();
@@ -1142,14 +1156,19 @@ function gpSubmitFeedbackForm(){
    script runs, so it can't safely read either one at its own top level. */
 function gpInit(){
   if(isAdmin){
-    gpRenderAdminDashboard();
+    var statsKeys = (typeof cpSyncPull === 'function') ? cpSyncPull([GP_AISTATS_KEY, GP_FEEDBACK_KEY]) : Promise.resolve();
+    statsKeys.then(function(){ gpRenderAdminDashboard(); });
   } else {
-    if(gpLoadPersisted()){
-      gpShowDashboard();
-      gpRenderCourse();
-    } else {
-      gpShowUpload();
-    }
-    gpRenderPills();
+    var rk = gpRemoteWorkspaceKey();
+    var pull = (rk && typeof cpSyncPull === 'function') ? cpSyncPull([[GP_STORAGE_KEY, rk]]) : Promise.resolve();
+    pull.then(function(){
+      if(gpLoadPersisted()){
+        gpShowDashboard();
+        gpRenderCourse();
+      } else {
+        gpShowUpload();
+      }
+      gpRenderPills();
+    });
   }
 }

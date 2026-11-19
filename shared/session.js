@@ -38,68 +38,116 @@ function clearSession(){
   try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
 }
 
-/* ---------------- shared: student accounts (sign-up / sign-in) ----------------
-   There's no backend, so every registered student account lives in its
-   own localStorage key, keyed by lowercased UNID. login.js uses these for
-   sign-up + sign-in; myprofile.js uses them for the admin student roster
-   and the student "Change Password" flow. Relies on cpLoadJSON/
-   cpSaveJSON from shared/store.js, which every page that loads this file
-   also loads. */
-var ACCOUNTS_KEY = 'campuspilot.accounts.v1';
+/* ---------------- shared: server-backed data sync (Vercel Postgres) ----------------
+   There's a real backend now (api/kv, api/accounts/*) so admin can see
+   every student's activity -- and a student can see their own data --
+   from ANY device/browser, not just the one a given action happened on.
+   Every page still reads/writes localStorage exactly as it always has
+   (every existing cpLoadJSON/raw-localStorage call is untouched); these
+   two helpers just sit alongside that:
+     - cpSyncPull(keys) is called once, on page load, BEFORE that page's
+       normal (synchronous) init reads localStorage -- it fetches the
+       latest value for each key from the server and overwrites
+       localStorage with it, so the page always starts from the shared
+       source of truth instead of whatever this one browser happened to
+       cache last time.
+     - cpSyncPush(key, value) is called every time something saves to
+       localStorage -- it pushes that same value to the server in the
+       background (fire-and-forget), so the next pull (from this device
+       or any other) picks it up.
+   Each entry in cpSyncPull's list can be a plain key string (local name
+   === remote name, the common case), or [localKey, remoteKey] when they
+   differ -- e.g. GradePilot's per-student workspace, which is stored
+   locally under one flat key but remotely under a key namespaced by
+   UNID, so two students sharing a browser (or the same student on two
+   different devices) never collide. If the server is unreachable
+   (offline, or Postgres isn't provisioned yet), pulls/pushes just fail
+   silently and the page falls back to whatever's already cached in
+   localStorage -- exactly how every page already behaved before this
+   existed. */
+function cpSyncPush(localKey, value, remoteKey){
+  try{
+    fetch('/api/kv', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: remoteKey || localKey, value: value })
+    }).catch(function(){});
+  }catch(e){}
+}
+function cpSyncPull(keys){
+  var list = (keys || []).map(function(k){ return Array.isArray(k) ? k : [k, k]; });
+  var remoteKeys = list.map(function(p){ return p[1]; });
+  if(!remoteKeys.length) return Promise.resolve();
+  return fetch('/api/kv?keys=' + encodeURIComponent(remoteKeys.join(',')))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(map){
+      if(!map) return;
+      list.forEach(function(p){
+        var localKey = p[0], remoteKey = p[1];
+        if(!Object.prototype.hasOwnProperty.call(map, remoteKey)) return; // never saved server-side yet -- keep local seed/cache
+        var v = map[remoteKey];
+        try{
+          if(v === null || v === undefined) localStorage.removeItem(localKey);
+          else localStorage.setItem(localKey, JSON.stringify(v));
+        }catch(e){}
+      });
+    })
+    .catch(function(){});
+}
 
-function getAccounts(){
-  return cpLoadJSON(ACCOUNTS_KEY, {});
+/* ---------------- shared: student accounts (sign-up / sign-in) ----------------
+   Backed by the server's Postgres database (api/accounts/*), not a
+   per-browser localStorage copy -- so a self-registered student account,
+   and the admin's view of who has registered, is the same real record
+   from any browser or device. UNID must be the real "u" + 7-digit format
+   (e.g. u1621896) and a name is required -- a loosely/carelessly typed
+   value can't create or sign in to an account. login.js uses these for
+   sign-up + sign-in; myprofile.js uses them for the admin student roster,
+   the "Change Password" flow, and the "Edit Major" flow. All of these
+   return a Promise (they call the server), unlike the old localStorage
+   versions. */
+var UNID_PATTERN = /^u\d{7}$/i;
+function isValidUnid(unid){
+  return UNID_PATTERN.test((unid || '').trim());
 }
-function saveAccounts(accounts){
-  cpSaveJSON(ACCOUNTS_KEY, accounts);
+function apiPostJson(url, body){
+  return fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body || {}) })
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return { ok:false, error:'Server error. Please try again.' }; });
 }
-function findAccount(unid){
-  var accounts = getAccounts();
-  return accounts[(unid || '').trim().toLowerCase()] || null;
-}
-/* major2 is an already-formatted optional label, e.g. "Double Major: Economics"
-   or "Minor: Communication" -- built by login.js from the second-major/minor
-   fields -- so this just stores it as-is alongside the primary major. */
 function createAccount(unid, password, name, major, major2){
-  unid = (unid || '').trim().toLowerCase();
+  unid = (unid || '').trim();
   name = (name || '').trim();
-  var accounts = getAccounts();
-  if(!unid || !password || !name) return { ok:false, error:'Fill in your UNID, name, and password.' };
-  if(accounts[unid]) return { ok:false, error:'That UNID is already registered — sign in instead.' };
-  accounts[unid] = {
-    unid: unid,
-    password: password,
-    name: name,
-    major: (major || '').trim(),
-    major2: (major2 || '').trim(),
-    joinedAt: Date.now()
-  };
-  saveAccounts(accounts);
-  return { ok:true, account:accounts[unid] };
+  if(!isValidUnid(unid)) return Promise.resolve({ ok:false, error:'UNID must be "u" followed by 7 digits, e.g. u1621896.' });
+  if(!password || !name) return Promise.resolve({ ok:false, error:'Fill in your UNID, name, and password.' });
+  return apiPostJson('/api/accounts/signup', { unid:unid, password:password, name:name, major:major, major2:major2 });
 }
-function updateAccountPassword(unid, newPassword){
-  var accounts = getAccounts();
-  var key = (unid || '').trim().toLowerCase();
-  if(!accounts[key]) return false;
-  accounts[key].password = newPassword;
-  saveAccounts(accounts);
-  return true;
+function loginAccount(unid, password){
+  unid = (unid || '').trim();
+  if(!isValidUnid(unid)) return Promise.resolve({ ok:false, error:'UNID must be "u" followed by 7 digits, e.g. u1621896.' });
+  return apiPostJson('/api/accounts/login', { unid:unid, password:password });
+}
+function updateAccountPassword(unid, currentPassword, newPassword){
+  return apiPostJson('/api/accounts/update-password', { unid:unid, currentPassword:currentPassword, newPassword:newPassword });
 }
 /* Lets a student set/update their major (and optional double-major/minor
    label) on an account that already exists -- e.g. an older account
    created before the major field existed, or someone who just wants to
    change it. Signing up again with the same UNID can't do this (it's
    blocked as "already registered"), so My Profile's "Edit Major" flow
-   calls this directly instead. Returns the updated account, or null if
-   the UNID isn't registered. */
+   calls this directly instead. Resolves to {ok:true, account} or
+   {ok:false, error}. */
 function updateAccountMajor(unid, major, major2){
-  var accounts = getAccounts();
-  var key = (unid || '').trim().toLowerCase();
-  if(!accounts[key]) return null;
-  accounts[key].major = (major || '').trim();
-  accounts[key].major2 = (major2 || '').trim();
-  saveAccounts(accounts);
-  return accounts[key];
+  return apiPostJson('/api/accounts/update-major', { unid:unid, major:major, major2:major2 });
+}
+/* Every self-registered student account, passwords never included --
+   resolves to a plain array (empty on any server error), same shape the
+   old synchronous version returned, just asynchronous now. */
+function listAccounts(){
+  return fetch('/api/accounts/list')
+    .then(function(r){ return r.ok ? r.json() : { accounts: [] }; })
+    .then(function(data){ return (data && Array.isArray(data.accounts)) ? data.accounts : []; })
+    .catch(function(){ return []; });
 }
 
 /* ---------------- shared: UAC department list ----------------
@@ -118,12 +166,6 @@ function fillDeptSelect(sel, placeholder){
   UAC_DEPARTMENTS.forEach(function(d){ html += '<option value="' + d + '">' + d + '</option>'; });
   html += '<option value="__other__">Other (not listed)</option>';
   sel.innerHTML = html;
-}
-function listAccounts(){
-  var accounts = getAccounts();
-  return Object.keys(accounts).map(function(k){ return accounts[k]; }).sort(function(a, b){
-    return (a.joinedAt || 0) - (b.joinedAt || 0);
-  });
 }
 
 /* Redirects to the login page if nobody is signed in; otherwise paints

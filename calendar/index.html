@@ -237,10 +237,13 @@
 <script>
   var SESSION = requireSession();
   mountNavRail('navrail', 'calendar');
-  calLoadPersonal();
-  calLoadMyRsvps();
-  calApplyRoleUI();
-  renderCalendar();
+  cpSyncPull(['campuspilot.calendar.events.v2', 'campuspilot.calendar.personal.v1', 'campuspilot.calendar.myrsvps.v1']).then(function(){
+    CAMPUS_EVENTS = calLoadEvents(); // re-read now that the pull may have refreshed localStorage
+    calLoadPersonal();
+    calLoadMyRsvps();
+    calApplyRoleUI();
+    renderCalendar();
+  });
 </script>
 </body>
 </html>

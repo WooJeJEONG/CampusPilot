@@ -34,37 +34,18 @@ function fmtDateTime(iso){
 var LF_STORAGE_KEY = 'campuspilot.lostfound.v1';
 var lfItems = [];
 var lfNextId = 1;
-(function(){
+/* No seed/demo items -- the registry starts genuinely empty until an
+   admin registers a real found item (the "No items yet" empty state
+   below handles that correctly). Pulled out into a named function (not
+   just an IIFE) so it can also be re-run after cpSyncPull refreshes
+   localStorage from the server on page load — see lostfound/index.html. */
+function lfLoadFromStorage(){
   var data = cpLoadJSON(LF_STORAGE_KEY, null);
   if(data && data.items){ lfItems = data.items; lfNextId = data.nextId || (lfItems.length + 1); }
-  else { lfSeedDefaults(); } /* first-ever visit on this device — nothing registered yet */
-})();
-function lfPersist(){ cpSaveJSON(LF_STORAGE_KEY, { items: lfItems, nextId: lfNextId }); }
-
-/* A handful of plausible starting items so the registry isn't completely
-   empty on a first run (which otherwise reads as "search found nothing"
-   even for someone who never searched) — only ever runs once, when no
-   lostfound.v1 data exists in localStorage yet; never overwrites a real,
-   already-in-progress registry. Dates are relative to today, not pinned
-   to a fixed demo date, so they stay plausible whenever this is tested. */
-function lfSeedDefaults(){
-  var today = new Date();
-  function daysAgo(n){
-    var d = new Date(today.getTime() - n * 86400000);
-    var mm = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
-    var dd = (d.getDate() < 10 ? '0' : '') + d.getDate();
-    return d.getFullYear() + '-' + mm + '-' + dd;
-  }
-  lfItems = [
-    { id: 1, name: 'Black Umbrella', category: 'Other', location: 'Library, 2nd Floor', date: daysAgo(2), desc: 'Compact black umbrella, left near the study carrels.', status: 'pending', claimedBy: null, image: null },
-    { id: 2, name: 'iPhone 13 (Blue Case)', category: 'Electronics', location: 'Student Union, Food Court', date: daysAgo(4), desc: 'Found on a table near the food court registers.', status: 'pending', claimedBy: null, image: null },
-    { id: 3, name: 'UAC Student ID Card — M. Park', category: 'Keys & Wallets', location: 'Gym Entrance', date: daysAgo(6), desc: '', status: 'pending', claimedBy: null, image: null },
-    { id: 4, name: 'Logitech Wireless Mouse', category: 'Electronics', location: 'Computer Lab, Room 310', date: daysAgo(9), desc: 'Left plugged into a lab computer after close.', status: 'pending', claimedBy: null, image: null },
-    { id: 5, name: 'Intro to Macroeconomics Textbook', category: 'Books & Study', location: 'Business School Lounge', date: daysAgo(14), desc: '3rd edition, some highlighting inside.', status: 'completed', claimedBy: 'u1698213 · ' + fmtDate(daysAgo(3)), image: null }
-  ];
-  lfNextId = 6;
-  lfPersist();
+  else { lfItems = []; lfNextId = 1; }
 }
+lfLoadFromStorage();
+function lfPersist(){ cpSaveJSON(LF_STORAGE_KEY, { items: lfItems, nextId: lfNextId }); }
 
 function catIcon(){
   return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';

@@ -11,4 +11,12 @@ function cpLoadJSON(key, fallback){
 }
 function cpSaveJSON(key, value){
   try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){ /* private mode / quota exceeded — best effort */ }
+  /* Also push to the shared server store (shared/session.js, loaded
+     before this file on every page) so this same data shows up to
+     every device/browser, not just this one -- see cpSyncPull/
+     cpSyncPush there for the full explanation. Guarded by typeof since
+     a handful of very old cached pages could theoretically still load
+     this file without session.js; cpSaveJSON keeps working exactly as
+     before (local-only) in that case. */
+  if(typeof cpSyncPush === 'function') cpSyncPush(key, value);
 }

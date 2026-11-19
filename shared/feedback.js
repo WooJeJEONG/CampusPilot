@@ -21,6 +21,7 @@ function fbLoad(){
 }
 function fbSave(list){
   try{ localStorage.setItem(FB_KEY, JSON.stringify(list)); }catch(e){ /* private mode / quota exceeded — best effort */ }
+  if(typeof cpSyncPush === 'function') cpSyncPush(FB_KEY, list);
 }
 
 function fbEsc(s){
@@ -65,9 +66,12 @@ function fbMount(){
 function openFeedbackModal(){
   fbMount();
   var isAdminView = (typeof SESSION !== 'undefined' && SESSION && SESSION.role === 'admin');
-  if(isAdminView) fbRenderAdminView();
-  else fbRenderStudentView();
-  document.getElementById('fb-modal').classList.remove('hidden');
+  var pull = (typeof cpSyncPull === 'function') ? cpSyncPull([FB_KEY]) : Promise.resolve();
+  pull.then(function(){
+    if(isAdminView) fbRenderAdminView();
+    else fbRenderStudentView();
+    document.getElementById('fb-modal').classList.remove('hidden');
+  });
 }
 
 function closeFeedbackModal(){
