@@ -205,6 +205,61 @@ function wireOtpBoxes(){
   }
 }
 
+/* ---------------- Forgot Password modal ----------------
+   Used to show "A password reset link has been sent..." with no email
+   ever collected. Now actually asks for a UNID/email first. This is a
+   static prototype with no real backend/email service, so nothing is
+   actually sent -- but the confirmation now honestly reflects what the
+   person typed instead of claiming to have emailed an address nobody
+   entered. */
+function openForgotPwModal(){
+  document.getElementById('forgotPwInput').value = '';
+  document.getElementById('forgotPwModal').classList.remove('hidden');
+  document.getElementById('forgotPwInput').focus();
+}
+function closeForgotPwModal(){
+  document.getElementById('forgotPwModal').classList.add('hidden');
+}
+function submitForgotPw(){
+  var raw = (document.getElementById('forgotPwInput').value || '').trim();
+  if(!raw){
+    showToast('Enter your UNID or school email first.');
+    return;
+  }
+  if(raw.indexOf('@') !== -1 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)){
+    showToast('Enter a valid email address, or just your UNID.');
+    return;
+  }
+  var target = raw.indexOf('@') !== -1 ? raw : (raw + '@umail.utah.edu');
+  closeForgotPwModal();
+  showToast('A password reset link has been sent to ' + target);
+}
+
+/* ---------------- Request Department Key modal ----------------
+   Same issue as above -- used to confirm a review with zero input. Now
+   collects name, department, and a short reason before confirming. */
+function openDeptKeyModal(){
+  document.getElementById('deptKeyName').value = '';
+  document.getElementById('deptKeyDept').value = '';
+  document.getElementById('deptKeyReason').value = '';
+  document.getElementById('deptKeyModal').classList.remove('hidden');
+  document.getElementById('deptKeyName').focus();
+}
+function closeDeptKeyModal(){
+  document.getElementById('deptKeyModal').classList.add('hidden');
+}
+function submitDeptKeyRequest(){
+  var name = (document.getElementById('deptKeyName').value || '').trim();
+  var dept = (document.getElementById('deptKeyDept').value || '').trim();
+  var reason = (document.getElementById('deptKeyReason').value || '').trim();
+  if(!name || !dept || !reason){
+    showToast('Fill in your name, department, and reason for access.');
+    return;
+  }
+  closeDeptKeyModal();
+  showToast('Department key requests are reviewed by UAC IT within 1 business day');
+}
+
 document.addEventListener('DOMContentLoaded', function(){
   wireOtpBoxes();
   wireMajorSelects();

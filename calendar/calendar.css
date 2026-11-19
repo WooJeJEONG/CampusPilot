@@ -1,4 +1,6 @@
 /* Campuspilot — CALENDAR page only. Loaded after shared/styles.css. */
+#modal-personal-delete-btn.armed{background:var(--red-dark);box-shadow:0 0 0 3px rgba(190,0,0,.25);}
+
 .cal-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
 .cal-selects{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .cal-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px;}

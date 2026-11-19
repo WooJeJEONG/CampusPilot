@@ -162,20 +162,28 @@ var CAL_CAT_META = {
   personal: {color:'green',   label:'Personal Schedule'}
 };
 var chipCounter = 0;
-function registerEventDetail(e, cat){
+function registerEventDetail(e, cat, personalIdx){
   var key = 'cal-evt-' + (chipCounter++);
-  var rows = [];
   var meta = CAL_CAT_META[cat] || CAL_CAT_META.official;
   var when = monthName(e.month) + ' ' + e.date + ', ' + e.year + (e.time ? ' · ' + e.time : '');
-  /* Every event shows the same five rows, in the same order, so the
-     card's height (and the A4-ratio poster panel beside it) stays
-     consistent from event to event -- a field the source data doesn't
-     have just shows as "—" instead of being left out. */
-  rows.push({color: meta.color, icon:'calendar', label:'Date/Time', value: when});
-  rows.push({color:'granite', icon:'pin', label:'Location', value: e.location || '—'});
-  rows.push({color:'granite', icon:'people', label:'Host', value: e.org || '—'});
-  rows.push({color:'granite', icon:'mail', label:'Contact', value: e.contact || '—'});
-  rows.push({color:'gold', icon:'food', label:'Perks', value: e.perks || '—'});
+  var rows = [];
+  if(cat === 'personal'){
+    /* A personal entry has no location/host/contact/perks at all --
+       showing those as a wall of "—" only confused people, so a personal
+       event's card just gets the one row that actually applies, plus
+       Edit/Delete buttons (wired up below) in place of the RSVP section. */
+    rows.push({color: meta.color, icon:'calendar', label:'Date/Time', value: when});
+  } else {
+    /* Every official-type event shows the same five rows, in the same
+       order, so the card's height (and the A4-ratio poster panel beside
+       it) stays consistent from event to event -- a field the source
+       data doesn't have just shows as "—" instead of being left out. */
+    rows.push({color: meta.color, icon:'calendar', label:'Date/Time', value: when});
+    rows.push({color:'granite', icon:'pin', label:'Location', value: e.location || '—'});
+    rows.push({color:'granite', icon:'people', label:'Host', value: e.org || '—'});
+    rows.push({color:'granite', icon:'mail', label:'Contact', value: e.contact || '—'});
+    rows.push({color:'gold', icon:'food', label:'Perks', value: e.perks || '—'});
+  }
   EVENTS_DETAIL[key] = {
     badge: e.org || meta.label,
     title: e.title,
@@ -183,18 +191,25 @@ function registerEventDetail(e, cat){
     badgeClass: meta.color,
     poster: e.poster || null,
     rsvpLink: e.rsvpLink || null,
-    eventId: e.id || null
+    eventId: e.id || null,
+    isPersonal: cat === 'personal',
+    personalIdx: (typeof personalIdx === 'number') ? personalIdx : null
   };
   return key;
 }
 /* Placeholder markup for events with no admin-uploaded poster photo
    (the default state for every event until one is added). */
 var CAL_POSTER_PLACEHOLDER = '<svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#8B93A0" stroke-width="1.3"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/><path d="M8 14h2M8 17h2M14 14h2M14 17h2"/></svg>';
+var calCurrentModalKey = null;
 function openCalModal(key){
   var det = EVENTS_DETAIL[key];
+  calCurrentModalKey = key;
+  calResetPersonalDeleteArm();
   openModal(key);
   var b = document.getElementById('modal-badge');
   if(b) b.className = 'badge ' + (det.badgeClass || 'red');
+  var personalActions = document.getElementById('modal-personal-actions');
+  if(personalActions) personalActions.classList.toggle('hidden', !det.isPersonal);
   var rsvpSection = document.getElementById('modal-rsvp-section');
   var rsvpLinkEl = document.getElementById('modal-rsvp-link');
   var rsvpDoneWrap = document.getElementById('modal-rsvp-done-wrap');
@@ -226,6 +241,48 @@ function openCalModal(key){
   }
 }
 
+/* Edit/Delete for a personal schedule entry, from inside its detail
+   modal. Delete uses the two-click "arm then confirm" pattern (not
+   window.confirm/alert) since this app is also viewed inside a
+   sandboxed preview where native confirm() dialogs are silently
+   auto-dismissed and would make the button a silent no-op there. */
+var calPersonalDeleteArmed = false;
+var calPersonalDeleteArmTimer = null;
+function calResetPersonalDeleteArm(){
+  calPersonalDeleteArmed = false;
+  clearTimeout(calPersonalDeleteArmTimer);
+  var btn = document.getElementById('modal-personal-delete-btn');
+  var label = document.getElementById('modal-personal-delete-label');
+  if(btn) btn.classList.remove('armed');
+  if(label) label.textContent = 'Delete';
+}
+function calEditPersonalFromModal(){
+  var det = EVENTS_DETAIL[calCurrentModalKey];
+  if(!det || !det.isPersonal || det.personalIdx === null) return;
+  closeModal();
+  openAddModal(det.personalIdx);
+}
+function calDeletePersonalFromModal(){
+  var det = EVENTS_DETAIL[calCurrentModalKey];
+  if(!det || !det.isPersonal || det.personalIdx === null) return;
+  if(!calPersonalDeleteArmed){
+    calPersonalDeleteArmed = true;
+    var btn = document.getElementById('modal-personal-delete-btn');
+    var label = document.getElementById('modal-personal-delete-label');
+    if(btn) btn.classList.add('armed');
+    if(label) label.textContent = 'Click again to confirm';
+    clearTimeout(calPersonalDeleteArmTimer);
+    calPersonalDeleteArmTimer = setTimeout(calResetPersonalDeleteArm, 4000);
+    return;
+  }
+  calResetPersonalDeleteArm();
+  var removed = personalEvents.splice(det.personalIdx, 1)[0];
+  calSavePersonal();
+  closeModal();
+  renderCalendar();
+  showToast('Deleted "' + (removed ? removed.title : 'event') + '" from your Personal Schedule');
+}
+
 function makeChip(e){
   var span = document.createElement('span');
   span.className = 'ev-chip ev-chip--' + e.cat + ' clickable';
@@ -246,7 +303,8 @@ function makePersonalChip(e){
   span.className = 'ev-chip ev-chip--personal clickable';
   span.setAttribute('data-cat', 'personal');
   span.textContent = '[Personal] ' + e.title + (e.time ? ' · ' + e.time : '');
-  var key = registerEventDetail(e, 'personal');
+  var idx = personalEvents.indexOf(e);
+  var key = registerEventDetail(e, 'personal', idx);
   span.addEventListener('click', function(){ openCalModal(key); });
   return span;
 }
@@ -457,23 +515,51 @@ function calResetAddForm(){
   if(locAbbrField) locAbbrField.classList.add('hidden');
   var errEl = document.getElementById('as-error'); if(errEl) errEl.textContent = '';
 }
-function openAddModal(){
+/* editIdx: pass a personalEvents array index to open this same modal in
+   "edit" mode for that entry (used by calEditPersonalFromModal). Leave
+   out / pass nothing for the normal add flow. */
+var calEditingPersonalIdx = null;
+function openAddModal(editIdx){
   var admin = calIsAdmin();
+  calEditingPersonalIdx = (typeof editIdx === 'number') ? editIdx : null;
+  var editing = calEditingPersonalIdx !== null;
+  calResetAddForm();
   document.getElementById('add-official-fields-top').classList.toggle('hidden', !admin);
   document.getElementById('add-official-fields-bottom').classList.toggle('hidden', !admin);
-  document.getElementById('add-modal-title').textContent = admin ? 'Register Official Event' : 'Add Personal Schedule';
+  document.getElementById('add-modal-title').textContent = editing ? 'Edit Personal Schedule' : (admin ? 'Register Official Event' : 'Add Personal Schedule');
   document.getElementById('add-modal-sub').textContent = admin
-    ? 'This publishes to the shared Calendar — every student will see it right away.'
+    ? "This publishes to the shared Calendar data used across the app. (Demo note: this prototype stores data in this browser only, so it won't appear on other devices or browsers.)"
     : "This event is visible only to you and won't appear as an Official Campus event.";
-  document.getElementById('add-schedule-btn').textContent = admin ? 'Register Event' : 'Add Schedule';
-  /* default the date pick to whatever month the grid is currently on,
-     but it can be freely changed to any year/month/day from here */
-  document.getElementById('as-year').value = viewYear;
-  document.getElementById('as-month').value = viewMonth;
-  calRefreshDaySelect(false);
+  document.getElementById('add-schedule-btn').textContent = editing ? 'Save Changes' : (admin ? 'Register Event' : 'Add Schedule');
+  var titleInput = document.getElementById('as-title');
+  if(titleInput) titleInput.placeholder = admin ? 'e.g. 2026 Fall Career Fair' : 'e.g. Study group — CS 3500';
+
+  if(editing){
+    var ev = personalEvents[calEditingPersonalIdx];
+    if(ev){
+      if(titleInput) titleInput.value = ev.title;
+      document.getElementById('as-year').value = ev.year;
+      document.getElementById('as-month').value = ev.month;
+      calRefreshDaySelect(false);
+      document.getElementById('as-day').value = ev.date;
+    }
+    /* Time is re-entered rather than parsed back from its saved display
+       string ("6–7:30pm") -- simpler and safer than reverse-parsing that
+       string into exact hour/minute/am-pm picks, and it's required below
+       just like a new entry, so nothing saves until it's set again. */
+  } else {
+    /* Always defaults to the REAL current day, never whatever month the
+       grid happens to be showing -- so leaving every field untouched
+       and hitting Add never silently creates a junk entry on the wrong
+       date. */
+    document.getElementById('as-year').value = TODAY.year;
+    document.getElementById('as-month').value = TODAY.month;
+    calRefreshDaySelect(false);
+    document.getElementById('as-day').value = TODAY.date;
+  }
   document.getElementById('add-modal').classList.remove('hidden');
 }
-function closeAddModal(){ document.getElementById('add-modal').classList.add('hidden'); }
+function closeAddModal(){ document.getElementById('add-modal').classList.add('hidden'); calEditingPersonalIdx = null; }
 document.getElementById('as-year').addEventListener('change', function(){ calRefreshDaySelect(true); });
 document.getElementById('as-month').addEventListener('change', function(){ calRefreshDaySelect(true); });
 calFillYearMonthSelects();
@@ -632,18 +718,31 @@ if(calPosterRemoveEl){
 
 function calUid(){ return 'e' + Math.random().toString(36).slice(2, 9); }
 function addSchedule(){
-  var title = document.getElementById('as-title').value.trim() || (calIsAdmin() ? 'New Event' : 'New Personal Event');
+  var title = document.getElementById('as-title').value.trim();
   var year = parseInt(document.getElementById('as-year').value, 10);
   var month = parseInt(document.getElementById('as-month').value, 10);
   var date = parseInt(document.getElementById('as-day').value, 10);
   var timeStart = calGetTimeValue24('start');
   var timeEnd = calGetTimeValue24('end');
   var time = calFormatTimeRange(timeStart, timeEnd);
+  var errEl = document.getElementById('as-error');
+
+  /* Title and a start time used to be optional and silently fell back to
+     a placeholder like "New Personal Event" -- that just produced junk
+     entries on the calendar, so both are required now, for the admin
+     official-event form and the student personal-schedule form alike. */
+  if(!title){
+    if(errEl) errEl.textContent = 'Title is required.';
+    return;
+  }
+  if(!timeStart){
+    if(errEl) errEl.textContent = 'A start time is required.';
+    return;
+  }
 
   if(calIsAdmin()){
     var cat = document.getElementById('as-cat').value;
     var location = document.getElementById('as-location').value.trim();
-    var errEl = document.getElementById('as-error');
     if(!location){
       if(errEl) errEl.textContent = 'Location is required.';
       return;
@@ -670,6 +769,18 @@ function addSchedule(){
     calResetAddForm();
     renderCalendar();
     showToast('Registered "' + title + '" as an Official Campus event for ' + monthName(month).slice(0,3) + ' ' + date + ', ' + year);
+    return;
+  }
+
+  if(errEl) errEl.textContent = '';
+  if(calEditingPersonalIdx !== null && personalEvents[calEditingPersonalIdx]){
+    var existing = personalEvents[calEditingPersonalIdx];
+    existing.title = title; existing.year = year; existing.month = month; existing.date = date; existing.time = time;
+    calSavePersonal();
+    closeAddModal();
+    calResetAddForm();
+    renderCalendar();
+    showToast('Updated "' + title + '" on ' + monthName(month).slice(0,3) + ' ' + date + ', ' + year);
     return;
   }
 
@@ -720,6 +831,18 @@ function calUpdateTodayBtnLabel(){
   if(btn) btn.textContent = 'Today (' + monthName(TODAY.month).slice(0,3) + ' ' + TODAY.date + ')';
 }
 
+/* The page-level trigger button used to always read "+ Add Schedule"
+   even for admin, who actually gets a modal titled "Register Official
+   Event" -- a naming mismatch. It (and the breadcrumb) now matches
+   whichever role opened the page. */
+function calApplyRoleUI(){
+  var admin = calIsAdmin();
+  var addBtn = document.getElementById('calAddBtn');
+  if(addBtn) addBtn.textContent = admin ? '+ Register Event' : '+ Add Schedule';
+  var portalEl = document.getElementById('calPortalLabel');
+  if(portalEl) portalEl.textContent = admin ? 'Admin Portal' : 'Student Portal';
+}
+calApplyRoleUI();
 calUpdateTodayBtnLabel();
 updateSelectLabels();
 renderCalendar();

@@ -14,6 +14,8 @@ var lfAdminStatus = 'all';
 var lfPendingImage = null;
 var lfActiveItem = null;
 var lfPickupItemId = null;
+var lfEditingId = null;
+var lfDeleteArmed = {};
 var CURRENT_STUDENT_NAME = 'Garam (u1621896)';
 
 function fmtDateTime(iso){
@@ -35,8 +37,34 @@ var lfNextId = 1;
 (function(){
   var data = cpLoadJSON(LF_STORAGE_KEY, null);
   if(data && data.items){ lfItems = data.items; lfNextId = data.nextId || (lfItems.length + 1); }
+  else { lfSeedDefaults(); } /* first-ever visit on this device — nothing registered yet */
 })();
 function lfPersist(){ cpSaveJSON(LF_STORAGE_KEY, { items: lfItems, nextId: lfNextId }); }
+
+/* A handful of plausible starting items so the registry isn't completely
+   empty on a first run (which otherwise reads as "search found nothing"
+   even for someone who never searched) — only ever runs once, when no
+   lostfound.v1 data exists in localStorage yet; never overwrites a real,
+   already-in-progress registry. Dates are relative to today, not pinned
+   to a fixed demo date, so they stay plausible whenever this is tested. */
+function lfSeedDefaults(){
+  var today = new Date();
+  function daysAgo(n){
+    var d = new Date(today.getTime() - n * 86400000);
+    var mm = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
+    var dd = (d.getDate() < 10 ? '0' : '') + d.getDate();
+    return d.getFullYear() + '-' + mm + '-' + dd;
+  }
+  lfItems = [
+    { id: 1, name: 'Black Umbrella', category: 'Other', location: 'Library, 2nd Floor', date: daysAgo(2), desc: 'Compact black umbrella, left near the study carrels.', status: 'pending', claimedBy: null, image: null },
+    { id: 2, name: 'iPhone 13 (Blue Case)', category: 'Electronics', location: 'Student Union, Food Court', date: daysAgo(4), desc: 'Found on a table near the food court registers.', status: 'pending', claimedBy: null, image: null },
+    { id: 3, name: 'UAC Student ID Card — M. Park', category: 'Keys & Wallets', location: 'Gym Entrance', date: daysAgo(6), desc: '', status: 'pending', claimedBy: null, image: null },
+    { id: 4, name: 'Logitech Wireless Mouse', category: 'Electronics', location: 'Computer Lab, Room 310', date: daysAgo(9), desc: 'Left plugged into a lab computer after close.', status: 'pending', claimedBy: null, image: null },
+    { id: 5, name: 'Intro to Macroeconomics Textbook', category: 'Books & Study', location: 'Business School Lounge', date: daysAgo(14), desc: '3rd edition, some highlighting inside.', status: 'completed', claimedBy: 'u1698213 · ' + fmtDate(daysAgo(3)), image: null }
+  ];
+  lfNextId = 6;
+  lfPersist();
+}
 
 function catIcon(){
   return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
@@ -72,7 +100,14 @@ function lfRenderStudent(){
   var list = lfFilteredStudent();
   var grid = document.getElementById('lfGrid');
   if(!list.length){
-    grid.innerHTML = '<div class="lf-empty">No items match your search.</div>';
+    /* "No items match your search" implies a search happened -- wrong on a
+       genuinely empty registry (nothing registered at all, or every item
+       hidden), so that copy is reserved for when a search/filter actually
+       narrowed a non-empty registry down to nothing. */
+    var hasAnyVisible = lfItems.some(function(it){ return !it.hidden; });
+    grid.innerHTML = hasAnyVisible
+      ? '<div class="lf-empty">No items match your search.</div>'
+      : '<div class="lf-empty">No items have been reported yet.</div>';
     return;
   }
   grid.innerHTML = list.map(function(it){
@@ -299,15 +334,41 @@ function lfCloseDetail(){ document.getElementById('detail-modal').classList.add(
 function lfHandleImage(input){
   var file = input.files && input.files[0];
   document.getElementById('regImageName').textContent = file ? file.name : 'No file chosen';
-  if(!file){ lfPendingImage = null; document.getElementById('regImgPreview').textContent = 'No image selected'; document.getElementById('regImgPreview').style.backgroundImage=''; return; }
+  if(!file){ lfClearPendingImage(); return; }
   var reader = new FileReader();
   reader.onload = function(e){
     lfPendingImage = e.target.result;
     var prev = document.getElementById('regImgPreview');
     prev.style.backgroundImage = "url('"+lfPendingImage+"')";
     prev.textContent = '';
+    document.getElementById('regImgRemoveBtn').classList.remove('hidden');
   };
   reader.readAsDataURL(file);
+}
+
+/* Clears whichever photo is currently staged for the Register/Edit form --
+   either one just picked from the file input, or (while editing) an
+   existing item's photo the admin wants to drop -- so a wrong file can
+   always be swapped out before Register/Save is clicked. */
+function lfClearPendingImage(){
+  lfPendingImage = null;
+  document.getElementById('regImage').value = '';
+  document.getElementById('regImageName').textContent = 'No file chosen';
+  var prev = document.getElementById('regImgPreview');
+  prev.style.backgroundImage = '';
+  prev.textContent = 'No image selected';
+  document.getElementById('regImgRemoveBtn').classList.add('hidden');
+}
+
+function lfResetRegForm(){
+  document.getElementById('regName').value = '';
+  document.getElementById('regCategory').value = '';
+  document.getElementById('regLocation').value = '';
+  document.getElementById('regDate').value = '';
+  document.getElementById('regDateLabel').textContent = 'Select a date';
+  document.querySelectorAll('#regDateGrid .mini-day.pick').forEach(function(el){ el.classList.remove('sel'); });
+  document.getElementById('regDesc').value = '';
+  lfClearPendingImage();
 }
 
 function lfRegisterItem(){
@@ -320,6 +381,24 @@ function lfRegisterItem(){
     showToast('Please fill in item name, category, location, and date.');
     return;
   }
+
+  if(lfEditingId){
+    var existing = lfItems.filter(function(x){ return x.id === lfEditingId; })[0];
+    if(existing){
+      existing.name = name;
+      existing.category = category;
+      existing.location = location;
+      existing.date = date;
+      existing.desc = desc;
+      existing.image = lfPendingImage;
+      lfPersist();
+      showToast('Item updated.');
+    }
+    lfCancelEdit();
+    lfRenderAdmin();
+    return;
+  }
+
   lfItems.unshift({
     id: lfNextId++,
     name: name,
@@ -331,21 +410,102 @@ function lfRegisterItem(){
     claimedBy: null,
     image: lfPendingImage
   });
-  document.getElementById('regName').value = '';
-  document.getElementById('regCategory').value = '';
-  document.getElementById('regLocation').value = '';
-  document.getElementById('regDate').value = '';
-  document.getElementById('regDateLabel').textContent = 'Select a date';
-  document.querySelectorAll('#regDateGrid .mini-day.pick').forEach(function(el){ el.classList.remove('sel'); });
-  document.getElementById('regDesc').value = '';
-  document.getElementById('regImage').value = '';
-  document.getElementById('regImgPreview').textContent = 'No image selected';
-  document.getElementById('regImgPreview').style.backgroundImage = '';
-  document.getElementById('regImageName').textContent = 'No file chosen';
-  lfPendingImage = null;
+  lfResetRegForm();
   lfPersist();
   showToast('Item registered — now visible in the student search registry.');
   lfRenderAdmin();
+}
+
+/* Reuses the same Register panel as an edit form, instead of a second
+   duplicate form -- pre-fills every field from the existing item, flips
+   the form into "editing" mode (title/button text + a Cancel button), and
+   lfRegisterItem() above branches on lfEditingId to update in place
+   rather than create a new row. */
+function lfEditItem(id){
+  var it = lfItems.filter(function(x){ return x.id === id; })[0];
+  if(!it) return;
+  lfEditingId = id;
+  document.getElementById('regName').value = it.name;
+  document.getElementById('regCategory').value = it.category;
+  document.getElementById('regLocation').value = it.location;
+  lfSetDatePicker('reg', it.date);
+  document.getElementById('regDesc').value = it.desc || '';
+  if(it.image){
+    lfPendingImage = it.image;
+    var prev = document.getElementById('regImgPreview');
+    prev.style.backgroundImage = "url('"+it.image+"')";
+    prev.textContent = '';
+    document.getElementById('regImgRemoveBtn').classList.remove('hidden');
+    document.getElementById('regImageName').textContent = 'Current photo';
+  } else {
+    lfClearPendingImage();
+  }
+  document.getElementById('regFormTitle').textContent = 'Edit Item';
+  document.getElementById('regSubmitBtn').textContent = 'Save Changes';
+  document.getElementById('regCancelEditBtn').classList.remove('hidden');
+  document.getElementById('regName').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function lfCancelEdit(){
+  lfEditingId = null;
+  lfResetRegForm();
+  document.getElementById('regFormTitle').textContent = 'Register New Item';
+  document.getElementById('regSubmitBtn').textContent = 'Register Item';
+  document.getElementById('regCancelEditBtn').classList.add('hidden');
+}
+
+/* Two-click confirm built into the button itself (matches the pattern
+   already used in gradepilot/gradepilot.js's gpClearAll/gpResetClearBtn)
+   instead of window.confirm(), which a sandboxed preview silently
+   auto-dismisses. First click arms just that row's Delete button (red,
+   "click again" tooltip) with a 4s auto-reset; the second click within
+   that window actually deletes. */
+function lfDeleteItem(id, btn){
+  if(!lfDeleteArmed[id]){
+    lfDeleteArmed[id] = setTimeout(function(){
+      delete lfDeleteArmed[id];
+      var b = document.querySelector('[data-delete-id="'+id+'"]');
+      if(b){ b.classList.remove('armed'); b.title = 'Delete'; }
+    }, 4000);
+    btn.classList.add('armed');
+    btn.title = 'Click again to confirm delete';
+    return;
+  }
+  clearTimeout(lfDeleteArmed[id]);
+  delete lfDeleteArmed[id];
+  var it = lfItems.filter(function(x){ return x.id === id; })[0];
+  lfItems = lfItems.filter(function(x){ return x.id !== id; });
+  if(lfEditingId === id) lfCancelEdit();
+  lfPersist();
+  showToast((it ? it.name : 'Item') + ' deleted.');
+  lfRenderAdmin();
+}
+
+function lfCsvEscape(v){
+  v = String(v == null ? '' : v);
+  if(/[",\n]/.test(v)) return '"' + v.replace(/"/g,'""') + '"';
+  return v;
+}
+/* A real CSV of whatever the admin table is currently showing (same
+   status/search filters, same month view) instead of the old placeholder
+   toast that just claimed a download would happen "on your live site". */
+function lfExportCsv(){
+  var rows = lfFilteredAdmin().slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+  var header = ['Status','Item','Category','Location','Date Found','Claim Details','Hidden'];
+  var lines = [header.map(lfCsvEscape).join(',')];
+  rows.forEach(function(it){
+    var claim = it.status === 'completed' ? ('Picked up — ' + it.claimedBy) : 'Awaiting claim';
+    lines.push([it.status, it.name, it.category, it.location, it.date, claim, it.hidden ? 'Yes' : 'No'].map(lfCsvEscape).join(','));
+  });
+  var blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'lostfound-' + LF_VIEW_MONTH.y + '-' + (LF_VIEW_MONTH.m + 1) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  showToast(rows.length ? ('CSV exported — ' + rows.length + ' item' + (rows.length === 1 ? '' : 's') + '.') : 'CSV exported — no items in the current view.');
 }
 
 function lfSetAdminFilter(v){ lfAdminStatus = v; lfRenderAdmin(); }
@@ -438,6 +598,8 @@ function lfRenderAdmin(){
     var hideToggleBtn = it.hidden
       ? '<button class="danger" title="Hidden from students — click to unhide" onclick="lfToggleHidden('+it.id+')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><path d="M4 4l16 16"/></svg></button>'
       : '<button class="ok" title="Visible to students — click to hide" onclick="lfToggleHidden('+it.id+')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>';
+    var editBtn = '<button class="ok" title="Edit" onclick="lfEditItem('+it.id+')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>';
+    var deleteBtn = '<button class="danger" data-delete-id="'+it.id+'" title="Delete" onclick="lfDeleteItem('+it.id+',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>';
     rows.push('<tr>'
       + '<td><span class="status-chip '+it.status+'">'+label+'</span>'+hiddenBadge+'</td>'
       + '<td style="display:flex;align-items:center;gap:9px;">'+thumb+'<span>'+it.name+'<br><span style="color:var(--muted-2);font-size:11px;">'+it.category+'</span></span></td>'
@@ -447,6 +609,8 @@ function lfRenderAdmin(){
       + '<td><div class="row-actions">'
       + actionBtn
       + hideToggleBtn
+      + editBtn
+      + deleteBtn
       + '</div></td></tr>');
   });
   body.innerHTML = rows.join('');
@@ -505,6 +669,7 @@ function lfToggleHidden(id){
 
 /* ---------------- role gate ---------------- */
 function lfApplyAdmin(){
+  document.getElementById('lfPortalLabel').textContent = isAdmin ? 'Admin Portal' : 'Student Portal';
   document.getElementById('lfCrumb').textContent = isAdmin ? 'Lost & Found \u2014 Admin' : 'Lost & Found';
   document.getElementById('studentView').classList.toggle('hidden', isAdmin);
   document.getElementById('adminView').classList.toggle('hidden', !isAdmin);

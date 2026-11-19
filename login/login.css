@@ -28,3 +28,9 @@
 @media (max-width:960px){
   .login-panels{flex-direction:column;align-items:center;}
 }
+
+/* ---- Forgot Password / Request Department Key modals ---- */
+.login-modal-card{width:400px;max-width:100%;background:var(--surface);border-radius:var(--r-lg);padding:26px 26px 22px;box-shadow:0 40px 80px -20px rgba(0,0,0,.4);}
+.login-modal-card h3{font-size:18px;font-weight:700;margin-bottom:8px;}
+.login-modal-sub{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px;}
+.login-modal-actions{display:flex;gap:10px;margin-top:4px;}

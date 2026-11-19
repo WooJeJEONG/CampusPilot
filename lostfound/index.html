@@ -24,7 +24,7 @@
   <div class="breadcrumb-bar">
     <div class="breadcrumb-left">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg>
-      Student Portal &nbsp;&rsaquo;&nbsp; <b id="lfCrumb">Lost &amp; Found</b>
+      <span id="lfPortalLabel">Student Portal</span> &nbsp;&rsaquo;&nbsp; <b id="lfCrumb">Lost &amp; Found</b>
     </div>
     <div class="breadcrumb-right">Fall Semester 2026</div>
   </div>
@@ -95,7 +95,7 @@
         <div class="admin-two-col">
           <div class="admin-left">
             <div class="admin-panel">
-              <h2>Register New Item</h2>
+              <h2 id="regFormTitle">Register New Item</h2>
               <div class="lf-field">
                 <label>Item Name</label>
                 <input type="text" id="regName" placeholder="e.g. Blue Hydroflask">
@@ -140,13 +140,19 @@
                   <label for="regImage" class="file-upload-btn">Choose File</label>
                   <span class="file-upload-name" id="regImageName">No file chosen</span>
                 </div>
-                <div class="lf-img-preview" id="regImgPreview">No image selected</div>
+                <div class="lf-img-preview-row">
+                  <div class="lf-img-preview" id="regImgPreview">No image selected</div>
+                  <button type="button" class="lf-img-remove hidden" id="regImgRemoveBtn" onclick="lfClearPendingImage()" title="Remove photo" aria-label="Remove photo">✕</button>
+                </div>
               </div>
               <div class="lf-field">
                 <label>Description</label>
                 <textarea id="regDesc" placeholder="Optional description of the item"></textarea>
               </div>
-              <button class="btn btn-red btn-block" onclick="lfRegisterItem()">Register Item</button>
+              <div class="lf-reg-actions">
+                <button class="btn btn-red btn-block" id="regSubmitBtn" onclick="lfRegisterItem()">Register Item</button>
+                <button type="button" class="btn btn-ghost hidden" id="regCancelEditBtn" onclick="lfCancelEdit()">Cancel</button>
+              </div>
             </div>
             <div class="protocol-note">
               <strong>Admin Access</strong>
@@ -163,7 +169,7 @@
                   <option value="completed">Completed</option>
                   <option value="hidden">Hidden</option>
                 </select>
-                <button onclick="showToast('CSV exported — this will download a real .csv file on your live site')">Export CSV</button>
+                <button onclick="lfExportCsv()">Export CSV</button>
                 <input type="text" id="adminFilterInput" placeholder="Filter by name, category, or location..." oninput="lfSetAdminQuery(this.value)">
               </div>
               <div class="table-wrapper">

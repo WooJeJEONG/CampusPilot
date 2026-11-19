@@ -24,7 +24,7 @@
   <div class="breadcrumb-bar">
     <div class="breadcrumb-left">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/></svg>
-      Student Portal &nbsp;›&nbsp; <b>Calendar</b>
+      <span id="calPortalLabel">Student Portal</span> &nbsp;›&nbsp; <b>Calendar</b>
     </div>
     <div class="breadcrumb-right">Fall Semester 2026</div>
   </div>
@@ -69,7 +69,7 @@
           Personal Schedule
           <span class="switch on" id="personal-switch"><i></i></span>
         </button>
-        <button class="pill-add" onclick="openAddModal()">+ Add Schedule</button>
+        <button class="pill-add" id="calAddBtn" onclick="openAddModal()">+ Add Schedule</button>
       </div>
 
       <div class="cal-grid-wrap">
@@ -105,8 +105,13 @@
       <div style="flex:1;"></div>
       <div id="modal-rsvp-section">
         <a class="modal-rsvp-btn" id="modal-rsvp-link" href="#" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open RSVP Form</a>
+        <div class="modal-note" style="margin-top:4px;">Demo link — this prototype's RSVP form isn't a real, submittable form.</div>
         <label class="modal-rsvp-confirm" id="modal-rsvp-done-wrap"><input type="checkbox" id="modal-rsvp-done"> I've submitted the form — add to My RSVPs</label>
         <div class="modal-note" id="modal-rsvp-note">Checking the box above is what adds this to your My RSVPs — opening the form alone doesn't.</div>
+      </div>
+      <div id="modal-personal-actions" class="hidden" style="display:flex;gap:8px;">
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="calEditPersonalFromModal()">Edit</button>
+        <button type="button" class="btn btn-red" style="flex:1;" id="modal-personal-delete-btn" onclick="calDeletePersonalFromModal()"><span id="modal-personal-delete-label">Delete</span></button>
       </div>
     </div>
   </div>
@@ -174,13 +179,13 @@
         <span class="muted" style="font-size:12px;">(end optional)</span>
       </div>
     </div>
+    <p class="error" id="as-error" role="alert" style="color:var(--red);font-size:12px;margin:-6px 0 10px;"></p>
 
     <div id="add-official-fields-bottom" class="hidden">
       <div class="add-field">
         <label>Location <span style="color:var(--red);">*</span></label>
         <input id="as-location" placeholder="e.g. Student Center Gym" required>
       </div>
-      <p class="error" id="as-error" role="alert" style="color:var(--red);font-size:12px;margin:-6px 0 10px;"></p>
       <div class="add-field">
         <label>Host</label>
         <input id="as-org" placeholder="e.g. Career Services">
@@ -234,6 +239,7 @@
   mountNavRail('navrail', 'calendar');
   calLoadPersonal();
   calLoadMyRsvps();
+  calApplyRoleUI();
   renderCalendar();
 </script>
 </body>

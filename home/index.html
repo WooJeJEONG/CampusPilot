@@ -24,7 +24,7 @@
   <div class="breadcrumb-bar">
     <div class="breadcrumb-left">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg>
-      Student Portal &nbsp;›&nbsp; <b>Home</b>
+      <span id="homePortalLabel">Student Portal</span> &nbsp;›&nbsp; <b>Home</b>
     </div>
     <div class="breadcrumb-right">Fall Semester 2026</div>
   </div>
@@ -69,10 +69,16 @@
         </div>
       </div>
 
-      <div class="stat-row">
-        <div class="stat-tile"><div><div class="st-label">Upcoming Events</div><div class="st-value">3</div></div><div class="stat-icon" style="background:var(--red-tint);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#BE0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div></div>
-        <div class="stat-tile"><div><div class="st-label">Confirmed RSVPs</div><div class="st-value">1</div></div><div class="stat-icon" style="background:var(--ink-2);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4Z"/></svg></div></div>
-        <div class="stat-tile"><div><div class="st-label">Free Food Events</div><div class="st-value">1</div></div><div class="stat-icon" style="background:var(--gold-tint);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFB81D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M18 3v18M18 3c-2 0-3 2-3 5v3h3"/></svg></div></div>
+      <div class="stat-row" data-role="student">
+        <div class="stat-tile"><div><div class="st-label">Upcoming Events</div><div class="st-value" id="statUpcomingEvents">0</div></div><div class="stat-icon" style="background:var(--red-tint);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#BE0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div></div>
+        <div class="stat-tile"><div><div class="st-label">Confirmed RSVPs</div><div class="st-value" id="statConfirmedRsvps">0</div></div><div class="stat-icon" style="background:var(--ink-2);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4Z"/></svg></div></div>
+        <div class="stat-tile"><div><div class="st-label">Free Food Events</div><div class="st-value" id="statFoodEvents">0</div></div><div class="stat-icon" style="background:var(--gold-tint);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFB81D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M18 3v18M18 3c-2 0-3 2-3 5v3h3"/></svg></div></div>
+      </div>
+
+      <div class="stat-row hidden" data-role="admin">
+        <div class="stat-tile"><div><div class="st-label">Total Students</div><div class="st-value" id="statTotalStudents">0</div></div><div class="stat-icon" style="background:var(--ink-2);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 19c0-3.4 3-5.4 6.5-5.4s6.5 2 6.5 5.4"/><circle cx="18" cy="8.6" r="2.6"/><path d="M15.7 13.9c2.6.3 4.8 2 4.8 5.1"/></svg></div></div>
+        <div class="stat-tile"><div><div class="st-label">Upcoming Campus Events</div><div class="st-value" id="statAdminUpcoming">0</div></div><div class="stat-icon" style="background:var(--red-tint);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#BE0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div></div>
+        <div class="stat-tile"><div><div class="st-label">Today's Events</div><div class="st-value" id="statAdminToday">0</div></div><div class="stat-icon" style="background:var(--gold-tint);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFB81D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M18 3v18M18 3c-2 0-3 2-3 5v3h3"/></svg></div></div>
       </div>
 
       <div class="feature-grid">
@@ -83,12 +89,12 @@
         </a>
         <a class="feature-card" href="../lostfound/index.html">
           <div class="fc-icon" style="background:var(--granite-tint);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#708E99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg></div>
-          <div class="fc-title">Lost &amp; Found</div><div class="fc-sub">Real-time campus property registry and retrieval</div>
+          <div class="fc-title">Lost &amp; Found</div><div class="fc-sub">Report and search for lost or found items on campus</div>
           <div class="fc-link">View Registry <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
         </a>
         <a class="feature-card" href="../gradepilot/index.html">
           <div class="fc-icon" style="background:var(--green-tint);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6CC24A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 8 8h-8Z" fill="#6CC24A" stroke="none"/></svg></div>
-          <div class="fc-title">GradePilot</div><div class="fc-sub">Interactive GPA simulator and degree audit tracking</div>
+          <div class="fc-title">GradePilot</div><div class="fc-sub">Upload your syllabus and get your exact course grade calculated</div>
           <div class="fc-link">Simulate GPA <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
         </a>
         <a class="feature-card" href="../courseinsights/index.html">
@@ -98,12 +104,12 @@
         </a>
         <a class="feature-card" href="../campusjobs/index.html">
           <div class="fc-icon" style="background:var(--teal-tint);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3ABFC0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg></div>
-          <div class="fc-title">Campus Jobs</div><div class="fc-sub">Teaching Assistant, RA, and student worker listings</div>
+          <div class="fc-title">Campus Jobs</div><div class="fc-sub">Ask current student staff what the job is really like — Q&amp;A and reviews</div>
           <div class="fc-link">Explore Jobs <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
         </a>
         <a class="feature-card" href="../myprofile/index.html">
           <div class="fc-icon" style="background:#F0F0F2;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A5460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-          <div class="fc-title">My Profile</div><div class="fc-sub">Manage confirmed RSVPs and account preferences</div>
+          <div class="fc-title">My Profile</div><div class="fc-sub" id="myProfileCardSub">Manage confirmed RSVPs and account preferences</div>
           <div class="fc-link">Edit Settings <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></div>
         </a>
       </div>
@@ -113,7 +119,7 @@
       <div class="mini-cal-head"><div class="mini-cal-title" id="miniCalTitle">—</div><div class="mini-cal-tag">UAC SCHEDULE</div></div>
       <div class="mini-grid" id="miniCalGrid"></div>
       <div class="rp-divider"></div>
-      <div class="rp-head"><div class="rp-head-title">TODAY'S SCHEDULE &amp; RSVPS</div><span style="font-size:11px;color:var(--muted-2);font-weight:700;" id="rpTodayDate">—</span></div>
+      <div class="rp-head"><div class="rp-head-title" id="rpHeadTitle">TODAY'S SCHEDULE &amp; RSVPS</div><span style="font-size:11px;color:var(--muted-2);font-weight:700;" id="rpTodayDate">—</span></div>
       <div id="rpTodayList"><div class="muted" style="font-size:12.5px;padding:6px 2px;">Nothing scheduled yet. Official events and your RSVPs will show up here.</div></div>
     </aside>
   </div>
@@ -133,6 +139,7 @@
       <div style="flex:1;"></div>
       <div id="modal-rsvp-section">
         <a class="modal-rsvp-btn" id="modal-rsvp-link" href="#" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/></svg>Open RSVP Form</a>
+        <div class="modal-note" style="margin-top:4px;">Demo link — this prototype's RSVP form isn't a real, submittable form.</div>
         <label class="modal-rsvp-confirm" id="modal-rsvp-done-wrap"><input type="checkbox" id="modal-rsvp-done"> I've submitted the form — add to My RSVPs</label>
         <div class="modal-note" id="modal-rsvp-note">Checking the box above is what adds this to your My RSVPs — opening the form alone doesn't.</div>
       </div>

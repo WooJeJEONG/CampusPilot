@@ -792,15 +792,45 @@ function gpRenderCourseRules(){
   if(!wrap) return;
   var chips = c ? gpPolicyChipsForCourse(c) : [];
   if(!chips.length){ wrap.innerHTML = ''; return; }
+  /* Every chip (DROP LOWEST, REPLACEMENT, RECOVERY, CONFLICT, ...) used to
+     explain itself only through a native `title` hover tooltip, which a
+     first-time student is unlikely to ever discover — a syllabus's less
+     common grading rules (replacement, recovery, drop-N, etc.) would just
+     show up as a bare unexplained badge. Each chip now gets its own
+     clickable "i" button that opens a small popup with a general
+     explanation of what that rule type means, plus (when available) the
+     specific version of the rule this syllabus actually stated. */
   wrap.innerHTML = chips.map(function(chip){
     var style = GP_POLICY_CHIP_STYLES[chip.kind] || {};
-    var tooltipText = (chip.target ? (chip.target + ': ') : '') + (chip.specific || chip.general || '');
+    var general = chip.general || '';
+    var specific = (chip.specific && chip.specific !== general) ? chip.specific : '';
     var css = (style.color ? ('color:'+style.color+';') : '') + (style.bg ? ('background:'+style.bg+';') : '');
-    return '<span class="gp-rule-chip" style="'+css+'" title="'+tooltipText.replace(/"/g,'&quot;')+'">'
+    var popupCss = style.color ? ('border-top-color:'+style.color+';') : '';
+    var titleCss = style.color ? ('color:'+style.color+';') : '';
+    return '<span class="gp-rule-chip" style="'+css+'">'
       + '<svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>'
-      + chip.label + '</span>';
+      + gpEsc(chip.label)
+      + '<button type="button" class="gp-rule-info-btn" aria-label="What does '+gpEsc(chip.label)+' mean?" onclick="event.stopPropagation();gpToggleRuleInfo(this)">i</button>'
+      + '<div class="gp-rule-popup" style="'+popupCss+'" onclick="event.stopPropagation()">'
+        + '<div class="gp-rule-popup-title" style="'+titleCss+'">'+gpEsc(chip.label)+'</div>'
+        + (general ? '<p>'+gpEsc(general)+'</p>' : '')
+        + (specific ? '<p>'+gpEsc(specific)+'</p>' : '')
+      + '</div>'
+      + '</span>';
   }).join('');
 }
+function gpToggleRuleInfo(btn){
+  var chip = btn.closest('.gp-rule-chip');
+  var popup = chip ? chip.querySelector('.gp-rule-popup') : null;
+  if(!popup) return;
+  var wasOpen = popup.classList.contains('open');
+  document.querySelectorAll('.gp-rule-popup.open').forEach(function(p){ p.classList.remove('open'); });
+  if(!wasOpen) popup.classList.add('open');
+}
+document.addEventListener('click', function(e){
+  if(e.target.closest('.gp-rule-chip')) return;
+  document.querySelectorAll('.gp-rule-popup.open').forEach(function(p){ p.classList.remove('open'); });
+});
 
 function gpRenderGradeGrid(){
   var c = gpCourses[gpActiveKey];

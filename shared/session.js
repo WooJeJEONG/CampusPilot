@@ -149,7 +149,23 @@ function applySessionUI(session){
     avatarEl.classList.toggle('is-admin', session.role === 'admin');
   }
   if(nameEl){
-    nameEl.innerHTML = session.name + (session.role === 'admin' ? ' <span class="admin-badge">ADMIN</span>' : '');
+    /* Plain text only, truncated by .topbar-username's own ellipsis CSS.
+       The ADMIN badge used to be appended INSIDE this same element's
+       innerHTML, so on a long admin name the ellipsis truncation (which
+       applies to the whole element) would cut straight through the
+       badge's own markup, rendering a clipped, garbled "..." pill next
+       to the name. It's now a separate sibling element placed right
+       after nameEl, outside the truncated box, so it always renders
+       intact regardless of how long the name is. */
+    nameEl.textContent = session.name;
+    var existingBadge = nameEl.parentNode.querySelector('.topbar-admin-badge');
+    if(existingBadge) existingBadge.parentNode.removeChild(existingBadge);
+    if(session.role === 'admin'){
+      var badge = document.createElement('span');
+      badge.className = 'admin-badge topbar-admin-badge';
+      badge.textContent = 'ADMIN';
+      nameEl.parentNode.insertBefore(badge, nameEl.nextSibling);
+    }
   }
   document.body.classList.remove('role-student', 'role-admin');
   document.body.classList.add('role-' + session.role);

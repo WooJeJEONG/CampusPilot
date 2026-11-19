@@ -34,6 +34,48 @@ function mpFormatJoined(ts){
   return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
 }
 
+/* ---------------- My RSVPs card (student only) ----------------
+   Reads the exact same shared, per-student RSVP store Calendar and Home
+   both read/write (campuspilot.calendar.myrsvps.v1, keyed by SESSION.
+   unid), cross-referenced against Calendar's shared campus-events store,
+   so this card can never disagree with what Calendar or Home show. */
+var MP_CAL_STORE_KEY = 'campuspilot.calendar.events.v2';
+var MP_RSVP_KEY = 'campuspilot.calendar.myrsvps.v1';
+var MP_CAT_LABELS = { official:'Campus Event', career:'Career Event', food:'Free Food Event', deadline:'Deadline' };
+var MP_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function mpLoadRsvpIds(){
+  if(!SESSION || !SESSION.unid) return [];
+  try {
+    var all = JSON.parse(localStorage.getItem(MP_RSVP_KEY)) || {};
+    return all[SESSION.unid] || [];
+  } catch(e){ return []; }
+}
+function mpLoadCampusEvents(){
+  try { return JSON.parse(localStorage.getItem(MP_CAL_STORE_KEY)) || []; } catch(e){ return []; }
+}
+function mpRenderRsvps(){
+  var host = document.getElementById('mpRsvpList');
+  if(!host) return;
+  var ids = mpLoadRsvpIds();
+  var events = mpLoadCampusEvents();
+  var matched = events.filter(function(e){ return ids.indexOf(e.id) !== -1; });
+  matched.sort(function(a, b){
+    return new Date(a.year, a.month - 1, a.date) - new Date(b.year, b.month - 1, b.date);
+  });
+  if(!matched.length){
+    host.innerHTML = '<div class="muted" style="font-size:13px;padding:4px 0;">You haven’t RSVP’d to any events yet. RSVP from the Calendar page and they’ll show up here.</div>';
+    return;
+  }
+  host.innerHTML = matched.map(function(e){
+    var when = (MP_MONTH_NAMES[e.month - 1] || '').slice(0, 3) + ' ' + e.date + (e.time ? ' · ' + mpEsc(e.time) : '');
+    var label = MP_CAT_LABELS[e.cat] || 'Event';
+    return '<div class="rsvp-item"><div class="rsvp-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div>' +
+      '<div><div class="rsvp-title">' + mpEsc(e.title) + '</div><div class="rsvp-sub">' + when + (e.location ? ' · ' + mpEsc(e.location) : '') + '</div></div>' +
+      '<div class="rsvp-tag">' + label + '</div></div>';
+  }).join('');
+}
+
 function mpRenderAdminStats(){
   var lf = cpLoadJSON('campuspilot.lostfound.v1', null);
   var lfPending = (lf && lf.items) ? lf.items.filter(function(it){ return it.status === 'pending'; }).length : 0;
@@ -143,6 +185,8 @@ function mpApplyAdmin(){
   if(isAdmin){
     mpRenderAdminStats();
     mpRenderStudentRoster();
+  } else {
+    mpRenderRsvps();
   }
 }
 

@@ -131,8 +131,18 @@
 .gp-course-rules{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;row-gap:8px;margin-top:9px;}
 .gp-course-rules:not(:empty){margin-bottom:4px;}
 .gp-rule-chip-group{display:flex;flex-direction:column;align-items:flex-start;gap:3px;}
-.gp-rule-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;font-family:'Barlow',sans-serif;cursor:help;white-space:nowrap;}
+.gp-rule-chip{position:relative;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;font-family:'Barlow',sans-serif;white-space:nowrap;}
 .gp-rule-chip svg{flex-shrink:0;opacity:.7;}
+
+/* ---- clickable "i" info button + its explanation popup, per policy chip ---- */
+.gp-rule-info-btn{width:13px;height:13px;border-radius:50%;background:currentColor;color:inherit;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;margin-left:1px;cursor:pointer;position:relative;}
+.gp-rule-info-btn::after{content:'i';color:#fff;font-size:9px;font-weight:800;font-family:'Source Sans 3',sans-serif;font-style:italic;text-transform:none;letter-spacing:0;}
+.gp-rule-info-btn:hover{filter:brightness(1.15);}
+.gp-rule-popup{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:40;width:260px;background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--muted-2);border-radius:10px;box-shadow:0 14px 34px -10px rgba(0,0,0,.28);padding:12px 14px;white-space:normal;text-transform:none;letter-spacing:0;cursor:auto;}
+.gp-rule-popup.open{display:block;}
+.gp-rule-popup-title{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;color:var(--ink);}
+.gp-rule-popup p{font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink);margin:0;}
+.gp-rule-popup p+p{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
 .gp-rule-cat{font-size:10.5px;color:var(--muted-2);font-weight:600;text-transform:none;letter-spacing:0;}
 .gp-rule-conflict{color:var(--red);}
 .gp-rule-replacement{color:#6B46C1;}

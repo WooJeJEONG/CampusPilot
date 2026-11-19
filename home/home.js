@@ -82,8 +82,68 @@ function homeRenderGreeting(){
   var el = document.getElementById('homeGreeting');
   if(!el) return;
   var session = (typeof SESSION !== 'undefined') ? SESSION : null;
-  var first = (session && session.name) ? session.name.trim().split(' ')[0] : (session && session.role === 'admin' ? 'Admin' : 'there');
+  var first;
+  if(session && session.role === 'admin'){
+    first = 'Admin';
+  } else {
+    first = (session && session.name) ? session.name.trim().split(' ')[0] : 'there';
+  }
   el.textContent = 'Hi, ' + first + ' 👋';
+
+  var portalEl = document.getElementById('homePortalLabel');
+  if(portalEl) portalEl.textContent = (session && session.role === 'admin') ? 'Admin Portal' : 'Student Portal';
+
+  var rpTitleEl = document.getElementById('rpHeadTitle');
+  if(rpTitleEl) rpTitleEl.textContent = (session && session.role === 'admin') ? "TODAY'S CAMPUS EVENTS" : "TODAY'S SCHEDULE & RSVPS";
+
+  var mpSubEl = document.getElementById('myProfileCardSub');
+  if(mpSubEl) mpSubEl.textContent = (session && session.role === 'admin') ? 'Manage your admin account and sign-in settings' : 'Manage confirmed RSVPs and account preferences';
+}
+
+/* All campus (non-personal) events Calendar has, unfiltered by date --
+   used for the "Upcoming Events" / admin stat counts below. */
+function homeLoadAllCampusEvents(){
+  try { return JSON.parse(localStorage.getItem(HOME_CAL_STORE_KEY)) || []; } catch(e){ return []; }
+}
+function homeEventDateVal(e){ return new Date(e.year, e.month - 1, e.date).getTime(); }
+
+/* Fills in the stat-row tiles (student or admin variant, whichever is
+   visible for this session -- applySessionUI() in shared/session.js has
+   already shown/hidden the right one via [data-role]). Student tiles
+   reuse the exact same RSVP/today-event helpers the rest of this file
+   and Calendar both read from, so the numbers here can never drift from
+   what Calendar or My Profile show. */
+function homeRenderStats(){
+  var todayVal = new Date(HOME_TODAY.year, HOME_TODAY.month - 1, HOME_TODAY.date).getTime();
+  var all = homeLoadAllCampusEvents();
+  var upcoming = all.filter(function(e){ return homeEventDateVal(e) >= todayVal; }).length;
+
+  var upEl = document.getElementById('statUpcomingEvents');
+  if(upEl) upEl.textContent = upcoming;
+  var rsvpEl = document.getElementById('statConfirmedRsvps');
+  if(rsvpEl) rsvpEl.textContent = homeLoadRsvpIds().length;
+  var foodEl = document.getElementById('statFoodEvents');
+  if(foodEl) foodEl.textContent = homeLoadCampusEventsToday().filter(function(e){ return e.cat === 'food'; }).length;
+
+  if(homeIsAdmin()){
+    var totalEl = document.getElementById('statTotalStudents');
+    if(totalEl){
+      /* Reads the same shared accounts store shared/session.js's
+         getAccounts() reads (campuspilot.accounts.v1) -- store.js isn't
+         loaded on this page, so this reads localStorage directly rather
+         than calling getAccounts()/cpLoadJSON(), which would throw. */
+      var studentCount = 0;
+      try {
+        var accounts = JSON.parse(localStorage.getItem('campuspilot.accounts.v1')) || {};
+        studentCount = Object.keys(accounts).filter(function(k){ return accounts[k] && accounts[k].role === 'student'; }).length;
+      } catch(e){}
+      totalEl.textContent = studentCount;
+    }
+    var adminUpEl = document.getElementById('statAdminUpcoming');
+    if(adminUpEl) adminUpEl.textContent = upcoming;
+    var adminTodayEl = document.getElementById('statAdminToday');
+    if(adminTodayEl) adminTodayEl.textContent = homeLoadCampusEventsToday().length;
+  }
 }
 
 /* Mini month-at-a-glance grid -- always the REAL current month, with
@@ -247,4 +307,5 @@ function homeInit(){
   homeRenderGreeting();
   homeRenderMiniCal();
   homeRenderTodayPanel();
+  homeRenderStats();
 }
